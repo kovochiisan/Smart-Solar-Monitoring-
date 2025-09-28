@@ -129,6 +129,122 @@ session_start(); // must be first thing in your PHP
       /* bigger text */
       font-weight: 600;
     }
+
+
+
+
+
+    /* Dark Mode Theme */
+    body.dark-mode {
+      background-color: #0E0E23;
+    }
+
+    /* PC container keeps its distinct color */
+    body.dark-mode .pc-container {
+      background-color: #24243E;
+    }
+
+    /* Sidebar + Navbar */
+    body.dark-mode .pc-header,
+    body.dark-mode .pc-sidebar {
+      background-color: #0E0E23;
+      color: #FFFFFF !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Project title near logo (Smart Solar) */
+    body.dark-mode .m-header a span,
+    body.dark-mode .pc-header .logo-text,
+    body.dark-mode .pc-header .logo-text * {
+      color: #FFFFFF !important;
+    }
+
+    /* User name in header */
+    body.dark-mode .pc-header .user-info span,
+    body.dark-mode .pc-header .dropdown-toggle,
+    body.dark-mode .pc-header .user-name,
+    body.dark-mode .pc-header .pc-head-link span {
+      color: #FFFFFF !important;
+    }
+
+    /* Icons in header, sidebar, dropdowns */
+    body.dark-mode .pc-header i:not([class*="text-"]),
+    body.dark-mode .pc-sidebar i:not([class*="text-"]),
+    body.dark-mode .dropdown-menu i:not([class*="text-"]) {
+      color: #FFFFFF !important;
+    }
+
+    /* Dropdown menus for user profile */
+    body.dark-mode .dropdown-menu {
+      background-color: #24243E;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    body.dark-mode .dropdown-menu a,
+    body.dark-mode .dropdown-menu .dropdown-item {
+      color: #FFFFFF !important;
+    }
+
+    body.dark-mode .dropdown-menu a:hover,
+    body.dark-mode .dropdown-menu .dropdown-item:hover {
+      background-color: #33334d !important;
+      color: #FFFFFF !important;
+    }
+
+    /* Cards - strictly #0E0E23 */
+    body.dark-mode .card {
+      background-color: #0E0E23;
+      border: none !important;
+      box-shadow: none !important;
+      color: #FFFFFF !important;
+    }
+
+    /* Special: GIF card should be #24243E */
+    body.dark-mode .sidebar-gif-wrapper .card {
+      background-color: #24243E !important;
+      border: none !important;
+      box-shadow: none !important;
+      color: #FFFFFF !important;
+    }
+
+    /* Card text rules */
+    body.dark-mode .card h1,
+    body.dark-mode .card h2,
+    body.dark-mode .card h3,
+    body.dark-mode .card h4,
+    body.dark-mode .card h5,
+    body.dark-mode .card h6,
+    body.dark-mode .card p,
+    body.dark-mode .card label,
+    body.dark-mode .card small {
+      color: #FFFFFF !important;
+    }
+
+    /* Only top-level labels (Capacity, Yield, etc.) inside cards */
+    body.dark-mode .card small.text-muted.d-block {
+      color: #000000ff !important;
+    }
+
+
+    /* Values (numbers inside spans) = white in dark mode 
+   but keep bootstrap contextual colors (success, danger, warning, etc.) */
+    body.dark-mode .card span.fs-5:not([class*="text-"]) {
+      color: #000000ff !important;
+    }
+
+    /* Sidebar text */
+    body.dark-mode .pc-sidebar .pc-mtext {
+      color: #FFFFFF !important;
+    }
+
+    /* Badges keep their bootstrap colors */
+    body.dark-mode .badge,
+    body.dark-mode .badge * {
+      background: inherit !important;
+      color: inherit !important;
+    }
   </style>
 
 
@@ -197,6 +313,12 @@ session_start(); // must be first thing in your PHP
           <li class="pc-h-item pc-sidebar-popup">
             <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
               <i class="ti ti-menu-2"></i>
+            </a>
+          </li>
+          <!-- Dark Mode Toggle -->
+          <li class="pc-h-item">
+            <a href="#" class="pc-head-link ms-0" id="darkModeToggle" title="Toggle Dark Mode">
+              <i class="ti ti-moon" id="darkModeIcon"></i>
             </a>
           </li>
         </ul>
@@ -592,7 +714,12 @@ session_start(); // must be first thing in your PHP
                   The current weather is <span class="text-info fw-bold" id="weather-info">--</span>.
                 </p>
 
+                <!-- CREDIT LABEL -->
+                <p class="mt-3 mb-0 text-muted small">
+                  Data provided by <a href="https://openweathermap.org/" target="_blank" class="text-decoration-none">OpenWeather</a>
+                </p>
               </div>
+
               <!-- RIGHT ICON -->
               <div class="flex-shrink-0" id="weather-icon" style="font-size: 100px; line-height: 1;">
                 🌡️
@@ -600,6 +727,7 @@ session_start(); // must be first thing in your PHP
             </div>
           </div>
         </div>
+
 
         <!-- 📈 GRAPH CARD -->
         <div class="col-12 col-md-6">
@@ -1035,6 +1163,32 @@ session_start(); // must be first thing in your PHP
             document.getElementById('temperature-text').innerText = 'temperature too high!';
           }
           break;
+      }
+    });
+
+
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const darkModeIcon = document.getElementById('darkModeIcon');
+
+    // Check if dark mode was previously enabled
+    if (localStorage.getItem('darkMode') === 'enabled') {
+      document.body.classList.add('dark-mode');
+      darkModeIcon.classList.remove('ti-moon');
+      darkModeIcon.classList.add('ti-sun');
+    }
+
+    darkModeToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.body.classList.toggle('dark-mode');
+
+      if (document.body.classList.contains('dark-mode')) {
+        localStorage.setItem('darkMode', 'enabled');
+        darkModeIcon.classList.remove('ti-moon');
+        darkModeIcon.classList.add('ti-sun');
+      } else {
+        localStorage.setItem('darkMode', 'disabled');
+        darkModeIcon.classList.remove('ti-sun');
+        darkModeIcon.classList.add('ti-moon');
       }
     });
   </script>
