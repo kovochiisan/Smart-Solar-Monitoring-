@@ -134,7 +134,8 @@ session_start(); // must be first thing in your PHP
 
 
 
-    /* Dark Mode Theme */
+    /* @@@@@@@@@@@@@@@@@@@@@@@@  Dark Mode Theme  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+
     body.dark-mode {
       background-color: #0E0E23;
     }
@@ -178,8 +179,8 @@ session_start(); // must be first thing in your PHP
     /* Dropdown menus for user profile */
     body.dark-mode .dropdown-menu {
       background-color: #24243E;
-      border: none !important;
-      box-shadow: none !important;
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+      border: 3px solid #2f2f4a !important;
     }
 
     body.dark-mode .dropdown-menu a,
@@ -189,16 +190,19 @@ session_start(); // must be first thing in your PHP
 
     body.dark-mode .dropdown-menu a:hover,
     body.dark-mode .dropdown-menu .dropdown-item:hover {
-      background-color: #33334d !important;
-      color: #FFFFFF !important;
+      background-color: #33334D !important;
+      /* darker hover shade */
+      color: #e4e6eb !important;
+      /* soft readable text */
     }
+
 
     /* Cards - strictly #0E0E23 */
     body.dark-mode .card {
       background-color: #0E0E23;
       border: none !important;
-      box-shadow: none !important;
-      color: #FFFFFF !important;
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+      border: 3px solid #2f2f4a !important;
     }
 
     /* Special: GIF card should be #24243E */
@@ -284,7 +288,7 @@ session_start(); // must be first thing in your PHP
 
           <li class="pc-item sidebar-gif-wrapper">
             <div class="card"
-              style="width: 220px; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 .25rem .5rem rgba(0,0,0,.15); text-align:center;">
+              style="width: 220px; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 .25rem .5rem rgba(0,0,0,.15); text-align:center; margin-bottom:50px">
               <div class="card-body p-2">
                 <img src="../../images/Solar Panel GIF.gif" alt="Sidebar GIF"
                   style="width: 100%; height: auto; border-radius: 0.5rem; display:block; margin:0 auto;">
@@ -306,7 +310,7 @@ session_start(); // must be first thing in your PHP
         <ul class="list-unstyled">
           <!-- ======= Menu collapse Icon ===== -->
           <li class="pc-h-item pc-sidebar-collapse">
-            <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
+            <a href="#" class="pc-head-link ms-0" id="sidebar-hide" title="Hide/show the sidebar.">
               <i class="ti ti-menu-2"></i>
             </a>
           </li>
@@ -317,7 +321,7 @@ session_start(); // must be first thing in your PHP
           </li>
           <!-- Dark Mode Toggle -->
           <li class="pc-h-item">
-            <a href="#" class="pc-head-link ms-0" id="darkModeToggle" title="Toggle Dark Mode">
+            <a href="#" class="pc-head-link ms-0" id="darkModeToggle" title="Change the theme.">
               <i class="ti ti-moon" id="darkModeIcon"></i>
             </a>
           </li>
@@ -401,7 +405,7 @@ session_start(); // must be first thing in your PHP
     <div class="pc-content" style="padding-bottom: 2rem;">
 
       <!-- ✅ TOP METRICS ROW -->
-      <div class="row g-3 mt-4 mb-4">
+      <div class="row g-3 mt-2 mb-4">
         <!-- Solar Voltage -->
         <div class="col-12 col-md-4">
           <div class="card h-100 card-hover">
@@ -579,9 +583,9 @@ session_start(); // must be first thing in your PHP
 
 
       <!-- ✅ PERFORMANCE & STATUS ROW -->
-      <div class="row g-4 align-items-stretch">
+      <div class="row g-3 align-items-stretch">
         <!-- LEFT COLUMN -->
-        <div class="col-12 col-md-6 d-flex">
+        <div class="col-12 mt-2 col-md-6 d-flex">
           <div class="card card-hover w-100">
             <div class="card-body d-flex flex-column h-100">
               <!-- TOP SECTION -->
@@ -638,7 +642,7 @@ session_start(); // must be first thing in your PHP
         </div>
 
         <!-- RIGHT COLUMN -->
-        <div class="col-12 col-md-6 d-flex flex-column h-100">
+        <div class="col-12 col-md-6 mt-2 d-flex flex-column h-100">
           <div class="d-flex flex-column h-100 w-100">
 
             <!-- Battery Level -->
@@ -698,7 +702,7 @@ session_start(); // must be first thing in your PHP
       <!-- ✅ WEATHER & GRAPH ROW -->
       <div class="row g-3">
         <!-- 🌤️ WEATHER CARD -->
-        <div class="col-12 col-md-6">
+        <div class="col-12 mt-2 col-md-6">
           <div class="card card-hover h-100">
             <div class="card-body d-flex justify-content-between align-items-center p-3">
               <!-- LEFT CONTENT -->
@@ -716,7 +720,8 @@ session_start(); // must be first thing in your PHP
 
                 <!-- CREDIT LABEL -->
                 <p class="mt-3 mb-0 text-muted small">
-                  Data provided by <a href="https://openweathermap.org/" target="_blank" class="text-decoration-none">OpenWeather</a>
+                  Data provided by <a href="https://openweathermap.org/" target="_blank"
+                    class="text-decoration-none">OpenWeather</a>
                 </p>
               </div>
 
@@ -730,7 +735,7 @@ session_start(); // must be first thing in your PHP
 
 
         <!-- 📈 GRAPH CARD -->
-        <div class="col-12 col-md-6">
+        <div class="col-12 mt-2 col-md-6">
           <div class="card card-hover h-100 shadow-sm border-0">
             <div class="card-body d-flex flex-column justify-content-between" style="height:260px;">
               <h6 class="mb-3 fw-semibold text-primary">Weather Trend</h6>
@@ -888,7 +893,7 @@ session_start(); // must be first thing in your PHP
                 mode: 'index',
                 intersect: false,
                 callbacks: {
-                  label: function(context) {
+                  label: function (context) {
                     return context.raw === null ? 'No data' : context.raw + ' °C';
                   }
                 }
@@ -921,7 +926,7 @@ session_start(); // must be first thing in your PHP
 
 
     document.querySelectorAll('.logout-btn').forEach(btn => {
-      btn.addEventListener('click', function(e) {
+      btn.addEventListener('click', function (e) {
         e.preventDefault(); // prevent default link behavior
 
         Swal.fire({
@@ -1113,7 +1118,7 @@ session_start(); // must be first thing in your PHP
           document.getElementById('power-text').innerText = '--';
           break;
 
-          // -------- Battery --------
+        // -------- Battery --------
         case 'battery/voltage':
           latestBattV = value;
           document.getElementById('battery-voltage').innerText = value.toFixed(2);
@@ -1151,7 +1156,7 @@ session_start(); // must be first thing in your PHP
           }
           break;
 
-          // -------- Temperature --------
+        // -------- Temperature --------
         case 'system/temperature':
           latestTemperature = value;
           document.getElementById('temperature').innerText = value.toFixed(1);
