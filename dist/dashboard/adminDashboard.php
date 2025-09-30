@@ -325,8 +325,38 @@ session_start(); // must be first thing in your PHP
       </div>
 
       <?php
-      $fullName = $_SESSION['full_name'] ?? 'Guest User';
-      $role = $_SESSION['role'] ?? 'User';
+      require_once "config.php";
+
+      // Ensure user is logged in
+      if (!isset($_SESSION['user_id'])) {
+        die("You must be logged in to view this page.");
+      }
+
+      $userId = $_SESSION['user_id'];
+
+      // Fetch user info
+      $sql = "SELECT * FROM users WHERE id = ?";
+      $stmt = $conn->prepare($sql);
+      $stmt->bind_param("i", $userId);
+      $stmt->execute();
+      $result = $stmt->get_result();
+
+      if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        $fullName = $user['full_name'];
+        $email = $user['email'];
+        $phone = $user['contact_number'];
+        $dob = $user['date_of_birth'];
+        $address = $user['address'];
+        $role = $user['role'];
+        $profilePhoto = $user['profile_image'] ?? '../assets/images/user/avatar-2.jpg';
+
+        // Optional: store in session too
+        $_SESSION['email'] = $email;
+      } else {
+        die("User not found.");
+      }
       ?>
 
       <div class="ms-auto d-flex align-items-center">
@@ -335,16 +365,14 @@ session_start(); // must be first thing in your PHP
           <!-- User Profile Dropdown -->
           <li class="dropdown pc-h-item">
             <a class="pc-head-link dropdown-toggle d-flex align-items-center"
-              style="padding: 20px 16px; gap:12px; min-width: 280px; cursor:pointer;" data-bs-toggle="dropdown" href="#"
+              style="padding: 20px 16px; gap:12px; min-width: 280px; cursor:pointer;"
+              data-bs-toggle="dropdown" href="#"
               role="button" aria-haspopup="true" data-bs-auto-close="outside" aria-expanded="false">
 
               <!-- Avatar -->
-              <img src="../assets/images/user/avatar-2.jpg" alt="user-image"
-                style="width:40px; height:40px; object-fit:cover; border-radius:50%; flex-shrink:0; display:block;">
-
+              <img src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '/Smart Solar/dist/assets/images/user/avatar-1.jpg'); ?>" alt="Profile Picture" style="width:40px; height:40px; object-fit:cover; border-radius:50%; flex-shrink:0; display:block;">
               <!-- Full Name -->
-              <span
-                style="color:#000; font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              <span style="color:#000; font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 <?php echo htmlspecialchars($fullName); ?>
               </span>
 
@@ -353,7 +381,8 @@ session_start(); // must be first thing in your PHP
             <!-- Dropdown Menu -->
             <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
               <div class="dropdown-header d-flex align-items-center">
-                <img src="../assets/images/user/avatar-2.jpg" alt="user-image"
+                <img src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '/Smart Solar/dist/assets/images/user/avatar-1.jpg'); ?>"
+                  alt="user-image"
                   style="width:50px; height:50px; object-fit:cover; border-radius:50%; flex-shrink:0;">
                 <div class="ms-3">
                   <h6><?php echo htmlspecialchars($fullName); ?></h6>
@@ -363,7 +392,7 @@ session_start(); // must be first thing in your PHP
 
               <div class="px-3 py-2">
                 <h6 class="dropdown-header">Settings</h6>
-                <a href="#!" class="dropdown-item">
+                <a href="accountSettings.php" class="dropdown-item">
                   <i class="ti ti-user"></i>
                   <span>Account Settings</span>
                 </a>
@@ -381,12 +410,10 @@ session_start(); // must be first thing in your PHP
         </ul>
       </div>
 
-
-
-
     </div>
   </header>
   <!-- [ Header ] end -->
+
 
 
 
@@ -761,11 +788,6 @@ session_start(); // must be first thing in your PHP
   </div>
 
 
-
-
-
-  </div>
-  </div>
   <!-- [ Main Content ] end -->
 
 
