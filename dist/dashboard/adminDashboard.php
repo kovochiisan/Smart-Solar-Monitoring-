@@ -276,7 +276,7 @@ session_start(); // must be first thing in your PHP
           </li>
 
           <li class="pc-item">
-            <a href="../control-load/index.html" class="pc-link">
+            <a href="../dashboard/controlLoad.php" class="pc-link">
               <span class="pc-micon"><i class="ti ti-power"></i></span>
               <span class="pc-mtext">Control Load</span>
             </a>
