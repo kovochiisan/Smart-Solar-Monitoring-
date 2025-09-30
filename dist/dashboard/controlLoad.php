@@ -512,12 +512,13 @@ session_start(); // must be first thing in your PHP
                         <div class="card-body p-4">
                             <h4 class="fw-bold mb-2">Load Control</h4>
                             <p class="text-muted small mb-3">Manually switch the load ON or OFF.</p>
-                            <div class="form-check form-switch d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" id="loadSwitch">
-                                <label class="form-check-label ms-2" for="loadSwitch">Load</label>
+                            <div class="form-check form-switch d-flex justify-content-center align-items-center" style="gap: 10px;">
+                                <input class="form-check-input" type="checkbox" id="loadSwitch" style="width: 60px; height: 34px;">
+                                <label class="form-check-label fs-5" for="loadSwitch">Load</label>
                             </div>
                         </div>
                     </div>
+
 
                     <!-- Bottom row: Battery Status + Chart -->
                     <div class="row g-3">
@@ -554,7 +555,7 @@ session_start(); // must be first thing in your PHP
                                         <span id="batteryThresholdValue">100%</span>
                                     </div>
                                     <div class="text-end">
-                                        <button class="btn btn-success btn-lg shadow-sm">Apply Changes</button>
+                                        <button id="applyThresholdBtn" class="btn btn-success btn-lg shadow-sm">Apply Changes</button>
                                     </div>
                                 </div>
                             </div>
@@ -613,9 +614,6 @@ session_start(); // must be first thing in your PHP
 
         </div>
     </div>
-
-
-
     <!-- [ Main Content ] end -->
 
 
@@ -785,6 +783,73 @@ session_start(); // must be first thing in your PHP
                     break;
             }
         });
+
+
+
+
+        const loadSwitch = document.getElementById('loadSwitch');
+        const loadStatusDisplay = document.getElementById('loadStatus');
+
+        loadSwitch.addEventListener('change', () => {
+            const status = loadSwitch.checked ? "ON" : "OFF";
+            loadStatusDisplay.innerText = status;
+
+            // Publish to MQTT
+            client.publish('system/load/control', status, {
+                qos: 1,
+                retain: true
+            });
+
+            // Optional: Show feedback
+            console.log('Load control sent:', status);
+        });
+
+
+
+        applyThresholdBtn.addEventListener('click', () => {
+            const thresholdValue = batteryThresholdSlider.value;
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Apply battery threshold of ${thresholdValue}%?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, apply it!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Update display
+                    batteryThresholdDisplay.innerText = thresholdValue + '%';
+                    document.getElementById('batteryThresholdDisplay').innerText = thresholdValue + '%';
+
+                    // Publish to MQTT
+                    client.publish('system/battery/threshold', thresholdValue.toString(), {
+                        qos: 1,
+                        retain: true
+                    });
+
+                    console.log('Battery threshold sent:', thresholdValue);
+
+                    Swal.fire({
+                        title: 'Applied!',
+                        text: `Battery threshold set to ${thresholdValue}%`,
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
+
+
+
+
+
+
+
+
+
 
 
         const darkModeToggle = document.getElementById('darkModeToggle');
