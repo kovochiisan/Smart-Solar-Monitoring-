@@ -79,6 +79,7 @@ session_start(); // must be first thing in your PHP
 
     .pc-header {
       height: 70px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
       /* match sidebar top area height */
     }
 
@@ -92,6 +93,7 @@ session_start(); // must be first thing in your PHP
       transform: translate(-50%, -50%);
       /* center around that point */
     }
+
 
     /* Optional adjustments */
     .sidebar-gif-wrapper .card {
@@ -130,8 +132,50 @@ session_start(); // must be first thing in your PHP
       font-weight: 600;
     }
 
+    /* @@@@@@@@@@@@@@@@@@@@@@@ Light Mode Styles @@@@@@@@@@@@@@@@@@@@@@@ */
 
+    /* Dropdown menus (light mode) */
+    .dropdown-menu {
+      background-color: #ffffff;
+      border: px solid #dee2e6 !important;
+      /* soft gray border */
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
+      /* subtle shadow */
+      border-radius: 0.5rem;
+      /* match rounded edges */
+    }
 
+    .dropdown-menu a,
+    .dropdown-menu .dropdown-item {
+      color: #212529 !important;
+      /* bootstrap default text */
+    }
+
+    .dropdown-menu a:hover,
+    .dropdown-menu .dropdown-item:hover {
+      background-color: #f1f3f5 !important;
+      /* light hover */
+      color: #000 !important;
+    }
+
+    /* Cards (light mode) */
+    .card {
+      background-color: #ffffff;
+      border: 3px solid #dee2e6 !important;
+      /* light gray */
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
+      /* subtle lift */
+      border-radius: 0.75rem;
+      /* same rounding as hover cards */
+    }
+
+    /* Special: sidebar gif card (light mode) */
+    .sidebar-gif-wrapper .card {
+      background-color: #E8EBF5 !important;
+      border: 3px solid #dee2e6 !important;
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
+      border-radius: 0.75rem !important;
+    }
 
 
     /* @@@@@@@@@@@@@@@@@@@@@@@@  Dark Mode Theme  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -146,7 +190,13 @@ session_start(); // must be first thing in your PHP
     }
 
     /* Sidebar + Navbar */
-    body.dark-mode .pc-header,
+    body.dark-mode .pc-header {
+      background-color: #0E0E23;
+      color: #FFFFFF !important;
+      box-shadow: none !important;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6) !important;
+    }
+
     body.dark-mode .pc-sidebar {
       background-color: #0E0E23;
       color: #FFFFFF !important;
@@ -249,6 +299,45 @@ session_start(); // must be first thing in your PHP
       background: inherit !important;
       color: inherit !important;
     }
+
+    body.dark-mode .pc-header .pc-head-link,
+    body.dark-mode .pc-header .pc-head-link:hover {
+      color: #24243E !important;
+      transition: background-color 0.3s ease;
+      /* smooth hover effect */
+    }
+
+    /* Light mode (default) */
+    .user-fullname-title {
+      color: #000 !important;
+      /* black */
+    }
+
+    /* Dark mode */
+    body.dark-mode .user-fullname-title {
+      color: #fff !important;
+      /* white */
+    }
+
+
+    body.dark-mode h6.user-fullname {
+      color: white !important;
+    }
+
+    /* Default (light mode) fullname color */
+    .user-fullname {
+      color: #000 !important;
+    }
+
+    /* Dark mode default (not hovered) */
+    body.dark-mode .pc-head-link .user-fullname {
+      color: #fff !important;
+    }
+
+    /* Dark mode on hover */
+    body.dark-mode .pc-head-link:hover .user-fullname {
+      color: #000 !important;
+    }
   </style>
 
 
@@ -280,19 +369,21 @@ session_start(); // must be first thing in your PHP
           </li>
 
           <li class="pc-item">
-            <a href="../control-load/index.html" class="pc-link">
+            <a href="../dashboard/controlLoad.php" class="pc-link">
               <span class="pc-micon"><i class="ti ti-power"></i></span>
               <span class="pc-mtext">Control Load</span>
             </a>
           </li>
 
           <li class="pc-item sidebar-gif-wrapper">
-            <div class="card"
-              style="width: 220px; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 .25rem .5rem rgba(0,0,0,.15); text-align:center; margin-bottom:50px">
+            <div class="card" style="width:220px; border-radius:0.75rem !important; overflow:hidden !important; 
+           box-shadow:0 .25rem .5rem rgba(0,0,0,.15) !important; text-align:center !important; 
+           margin-bottom:50px !important;">
               <div class="card-body p-2">
-                <img src="../../images/Solar Panel GIF.gif" alt="Sidebar GIF"
-                  style="width: 100%; height: auto; border-radius: 0.5rem; display:block; margin:0 auto;">
-                <h6 style="margin-top: 0.5rem; font-size: 18px; font-weight:600; color:#333;">
+                <img src="../../images/Solar Panel GIF.gif" alt="Sidebar GIF" style="width:100% !important; height:auto !important; border-radius:0.5rem !important; 
+               display:block !important; margin:0 auto !important;">
+                <h6
+                  style="margin-top:0.5rem !important; font-size:18px !important; font-weight:600 !important">
                   Solar Admin
                 </h6>
               </div>
@@ -329,8 +420,38 @@ session_start(); // must be first thing in your PHP
       </div>
 
       <?php
-      $fullName = $_SESSION['full_name'] ?? 'Guest User';
-      $role = $_SESSION['role'] ?? 'User';
+      require_once "config.php";
+
+      // Ensure user is logged in
+      if (!isset($_SESSION['user_id'])) {
+        die("You must be logged in to view this page.");
+      }
+
+      $userId = $_SESSION['user_id'];
+
+      // Fetch user info
+      $sql = "SELECT * FROM users WHERE id = ?";
+      $stmt = $conn->prepare($sql);
+      $stmt->bind_param("i", $userId);
+      $stmt->execute();
+      $result = $stmt->get_result();
+
+      if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        $fullName = $user['full_name'];
+        $email = $user['email'];
+        $phone = $user['contact_number'];
+        $dob = $user['date_of_birth'];
+        $address = $user['address'];
+        $role = $user['role'];
+        $profilePhoto = $user['profile_image'] ?? '../assets/images/user/avatar-2.jpg';
+
+        // Optional: store in session too
+        $_SESSION['email'] = $email;
+      } else {
+        die("User not found.");
+      }
       ?>
 
       <div class="ms-auto d-flex align-items-center">
@@ -343,31 +464,35 @@ session_start(); // must be first thing in your PHP
               role="button" aria-haspopup="true" data-bs-auto-close="outside" aria-expanded="false">
 
               <!-- Avatar -->
-              <img src="../assets/images/user/avatar-2.jpg" alt="user-image"
+              <img
+                src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '/Smart Solar/dist/assets/images/user/avatar-1.jpg'); ?>"
+                alt="Profile Picture"
                 style="width:40px; height:40px; object-fit:cover; border-radius:50%; flex-shrink:0; display:block;">
 
               <!-- Full Name -->
-              <span
-                style="color:#000; font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              <span class="user-fullname"
+                style="font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 <?php echo htmlspecialchars($fullName); ?>
               </span>
-
             </a>
 
             <!-- Dropdown Menu -->
             <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
               <div class="dropdown-header d-flex align-items-center">
-                <img src="../assets/images/user/avatar-2.jpg" alt="user-image"
-                  style="width:50px; height:50px; object-fit:cover; border-radius:50%; flex-shrink:0;">
+                <img
+                  src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '/Smart Solar/dist/assets/images/user/avatar-1.jpg'); ?>"
+                  alt="user-image" style="width:50px; height:50px; object-fit:cover; border-radius:50%; flex-shrink:0;">
                 <div class="ms-3">
-                  <h6><?php echo htmlspecialchars($fullName); ?></h6>
+                  <h6 class="user-fullname-title">
+                    <?php echo htmlspecialchars($fullName); ?>
+                  </h6>
                   <span><?php echo htmlspecialchars(ucfirst($role)); ?></span>
                 </div>
               </div>
 
               <div class="px-3 py-2">
                 <h6 class="dropdown-header">Settings</h6>
-                <a href="#!" class="dropdown-item">
+                <a href="accountSettings.php" class="dropdown-item">
                   <i class="ti ti-user"></i>
                   <span>Account Settings</span>
                 </a>
@@ -618,7 +743,7 @@ session_start(); // must be first thing in your PHP
                 <div class="card"
                   style="min-width:320px; border-radius:1rem; box-shadow:0 .25rem .5rem rgba(0,0,0,.1); background-color:#f8f9fa;">
                   <div class="card-body p-4">
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center">
                       <div class="d-flex align-items-center me-4">
                         <i class="ti ti-battery-charging me-3 text-primary fs-3"></i>
                         <div>
@@ -626,6 +751,10 @@ session_start(); // must be first thing in your PHP
                           <span class="fw-bold fs-5">210 kWh</span>
                         </div>
                       </div>
+
+                      <!-- Vertical line separator -->
+                      <div style="width:1px; height:40px; background-color:#ccc; margin:0 30px 0 15px;"></div>
+
                       <div class="d-flex align-items-center">
                         <i class="ti ti-sun me-3 text-warning fs-3"></i>
                         <div>
