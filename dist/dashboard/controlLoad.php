@@ -242,11 +242,12 @@ session_start(); // must be first thing in your PHP
         }
 
         /* Cards - strictly #0E0E23 */
+        /* Cards - strictly #0E0E23 */
         body.dark-mode .card {
             background-color: #0E0E23;
             border: none !important;
-            box-shadow: none !important;
-            color: #FFFFFF !important;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+            border: 3px solid #2f2f4a !important;
         }
 
         body.dark-mode .sidebar-gif-wrapper .card {
@@ -419,6 +420,38 @@ session_start(); // must be first thing in your PHP
         body.dark-mode h6.user-fullname {
             color: white !important;
         }
+
+        /* Light mode (default) */
+        .user-fullname-title {
+            color: #000 !important;
+            /* black */
+        }
+
+        /* Dark mode */
+        body.dark-mode .user-fullname-title {
+            color: #fff !important;
+            /* white */
+        }
+
+
+        body.dark-mode h6.user-fullname {
+            color: white !important;
+        }
+
+        /* Default (light mode) fullname color */
+        .user-fullname {
+            color: #000 !important;
+        }
+
+        /* Dark mode default (not hovered) */
+        body.dark-mode .pc-head-link .user-fullname {
+            color: #fff !important;
+        }
+
+        /* Dark mode on hover */
+        body.dark-mode .pc-head-link:hover .user-fullname {
+            color: #000 !important;
+        }
     </style>
 
 
@@ -548,11 +581,10 @@ session_start(); // must be first thing in your PHP
                                 alt="Profile Picture"
                                 style="width:40px; height:40px; object-fit:cover; border-radius:50%; flex-shrink:0; display:block;">
                             <!-- Full Name -->
-                            <span
-                                style="color:#000; font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <span class="user-fullname"
+                                style="font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                 <?php echo htmlspecialchars($fullName); ?>
                             </span>
-
                         </a>
 
                         <!-- Dropdown Menu -->
@@ -593,7 +625,7 @@ session_start(); // must be first thing in your PHP
 
     <!-- [ Main Content ] start -->
     <div class="pc-container">
-        <div class="pc-content" style="padding: 20px 35px 32px">
+        <div class="pc-content" style="padding: 22px 35px 32px">
 
             <div class="row g-3 mt-1">
 

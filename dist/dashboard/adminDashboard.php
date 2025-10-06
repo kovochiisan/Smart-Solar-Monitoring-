@@ -258,8 +258,8 @@ session_start(); // must be first thing in your PHP
     /* Special: GIF card should be #24243E */
     body.dark-mode .sidebar-gif-wrapper .card {
       background-color: #24243E !important;
-      border: none !important;
-      box-shadow: none !important;
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+      border: 3px solid #2f2f4a !important;
       color: #FFFFFF !important;
     }
 
@@ -377,13 +377,12 @@ session_start(); // must be first thing in your PHP
 
           <li class="pc-item sidebar-gif-wrapper">
             <div class="card" style="width:220px; border-radius:0.75rem !important; overflow:hidden !important; 
-           box-shadow:0 .25rem .5rem rgba(0,0,0,.15) !important; text-align:center !important; 
+           box-shadow:0 .25rem .5rem rgba(0,0,0,.15); text-align:center !important; 
            margin-bottom:50px !important;">
               <div class="card-body p-2">
                 <img src="../../images/Solar Panel GIF.gif" alt="Sidebar GIF" style="width:100% !important; height:auto !important; border-radius:0.5rem !important; 
                display:block !important; margin:0 auto !important;">
-                <h6
-                  style="margin-top:0.5rem !important; font-size:18px !important; font-weight:600 !important">
+                <h6 style="margin-top:0.5rem !important; font-size:18px !important; font-weight:600 !important">
                   Solar Admin
                 </h6>
               </div>

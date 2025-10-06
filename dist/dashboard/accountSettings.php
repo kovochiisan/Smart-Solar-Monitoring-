@@ -447,6 +447,38 @@ require_once "config.php";
         .card-hover h4.card-title {
             margin-top: 2rem;
         }
+
+        /* Light mode (default) */
+        .user-fullname-title {
+            color: #000 !important;
+            /* black */
+        }
+
+        /* Dark mode */
+        body.dark-mode .user-fullname-title {
+            color: #fff !important;
+            /* white */
+        }
+
+
+        body.dark-mode h6.user-fullname {
+            color: white !important;
+        }
+
+        /* Default (light mode) fullname color */
+        .user-fullname {
+            color: #000 !important;
+        }
+
+        /* Dark mode default (not hovered) */
+        body.dark-mode .pc-head-link .user-fullname {
+            color: #fff !important;
+        }
+
+        /* Dark mode on hover */
+        body.dark-mode .pc-head-link:hover .user-fullname {
+            color: #000 !important;
+        }
     </style>
 </head>
 <!-- [Head] end -->
@@ -574,8 +606,8 @@ require_once "config.php";
                                 alt="Profile Picture"
                                 style="width:40px; height:40px; object-fit:cover; border-radius:50%; flex-shrink:0; display:block;">
                             <!-- Full Name -->
-                            <span
-                                style="color:#000; font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <span class="user-fullname"
+                                style="font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                 <?php echo htmlspecialchars($fullName); ?>
                             </span>
                         </a>
