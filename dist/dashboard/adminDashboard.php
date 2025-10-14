@@ -79,6 +79,7 @@ session_start(); // must be first thing in your PHP
 
     .pc-header {
       height: 70px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
       /* match sidebar top area height */
     }
 
@@ -92,6 +93,7 @@ session_start(); // must be first thing in your PHP
       transform: translate(-50%, -50%);
       /* center around that point */
     }
+
 
     /* Optional adjustments */
     .sidebar-gif-wrapper .card {
@@ -130,11 +132,54 @@ session_start(); // must be first thing in your PHP
       font-weight: 600;
     }
 
+    /* @@@@@@@@@@@@@@@@@@@@@@@ Light Mode Styles @@@@@@@@@@@@@@@@@@@@@@@ */
+
+    /* Dropdown menus (light mode) */
+    .dropdown-menu {
+      background-color: #ffffff;
+      border: px solid #dee2e6 !important;
+      /* soft gray border */
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
+      /* subtle shadow */
+      border-radius: 0.5rem;
+      /* match rounded edges */
+    }
+
+    .dropdown-menu a,
+    .dropdown-menu .dropdown-item {
+      color: #212529 !important;
+      /* bootstrap default text */
+    }
+
+    .dropdown-menu a:hover,
+    .dropdown-menu .dropdown-item:hover {
+      background-color: #f1f3f5 !important;
+      /* light hover */
+      color: #000 !important;
+    }
+
+    /* Cards (light mode) */
+    .card {
+      background-color: #ffffff;
+      border: 3px solid #dee2e6 !important;
+      /* light gray */
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
+      /* subtle lift */
+      border-radius: 0.75rem;
+      /* same rounding as hover cards */
+    }
+
+    /* Special: sidebar gif card (light mode) */
+    .sidebar-gif-wrapper .card {
+      background-color: #E8EBF5 !important;
+      border: 3px solid #dee2e6 !important;
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
+      border-radius: 0.75rem !important;
+    }
 
 
+    /* @@@@@@@@@@@@@@@@@@@@@@@@  Dark Mode Theme  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
-
-    /* Dark Mode Theme */
     body.dark-mode {
       background-color: #0E0E23;
     }
@@ -145,7 +190,13 @@ session_start(); // must be first thing in your PHP
     }
 
     /* Sidebar + Navbar */
-    body.dark-mode .pc-header,
+    body.dark-mode .pc-header {
+      background-color: #0E0E23;
+      color: #FFFFFF !important;
+      box-shadow: none !important;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6) !important;
+    }
+
     body.dark-mode .pc-sidebar {
       background-color: #0E0E23;
       color: #FFFFFF !important;
@@ -178,8 +229,8 @@ session_start(); // must be first thing in your PHP
     /* Dropdown menus for user profile */
     body.dark-mode .dropdown-menu {
       background-color: #24243E;
-      border: none !important;
-      box-shadow: none !important;
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+      border: 3px solid #2f2f4a !important;
     }
 
     body.dark-mode .dropdown-menu a,
@@ -189,23 +240,26 @@ session_start(); // must be first thing in your PHP
 
     body.dark-mode .dropdown-menu a:hover,
     body.dark-mode .dropdown-menu .dropdown-item:hover {
-      background-color: #33334d !important;
-      color: #FFFFFF !important;
+      background-color: #33334D !important;
+      /* darker hover shade */
+      color: #e4e6eb !important;
+      /* soft readable text */
     }
+
 
     /* Cards - strictly #0E0E23 */
     body.dark-mode .card {
       background-color: #0E0E23;
       border: none !important;
-      box-shadow: none !important;
-      color: #FFFFFF !important;
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+      border: 3px solid #2f2f4a !important;
     }
 
     /* Special: GIF card should be #24243E */
     body.dark-mode .sidebar-gif-wrapper .card {
       background-color: #24243E !important;
-      border: none !important;
-      box-shadow: none !important;
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+      border: 3px solid #2f2f4a !important;
       color: #FFFFFF !important;
     }
 
@@ -245,6 +299,244 @@ session_start(); // must be first thing in your PHP
       background: inherit !important;
       color: inherit !important;
     }
+
+    body.dark-mode .pc-header .pc-head-link,
+    body.dark-mode .pc-header .pc-head-link:hover {
+      color: #24243E !important;
+      transition: background-color 0.3s ease;
+      /* smooth hover effect */
+    }
+
+    /* Light mode (default) */
+    .user-fullname-title {
+      color: #000 !important;
+      /* black */
+    }
+
+    /* Dark mode */
+    body.dark-mode .user-fullname-title {
+      color: #fff !important;
+      /* white */
+    }
+
+
+    body.dark-mode h6.user-fullname {
+      color: white !important;
+    }
+
+    /* Default (light mode) fullname color */
+    .user-fullname {
+      color: #000 !important;
+    }
+
+    /* Dark mode default (not hovered) */
+    body.dark-mode .pc-head-link .user-fullname {
+      color: #fff !important;
+    }
+
+    /* Dark mode on hover */
+    body.dark-mode .pc-head-link:hover .user-fullname {
+      color: #000 !important;
+    }
+
+
+    /* Notification Bell Container */
+    .pc-h-item.notification {
+      position: relative;
+    }
+
+    /* Bell icon */
+    #notificationButton {
+      padding: 20px 21px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    #notificationButton i {
+      font-size: 1.8rem;
+    }
+
+    /* Notification badge */
+    #notificationBadge {
+      position: absolute;
+      top: 1px;
+      right: 1px;
+      background-color: #dc3545;
+      /* red */
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    }
+
+
+    /* ////////////   NOTIF DROP DOWN STYLE  //////////////*/
+
+    /* Notification Dropdown Container */
+    .notification-dropdown {
+      position: absolute;
+      top: 60px;
+      right: 0;
+      width: 320px;
+      background-color: #ffffff;
+      /* Light mode background */
+      color: #212529;
+      border-radius: 0.5rem;
+      border: 3px solid #dee2e6;
+      /* match your card/dropdown borders */
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1);
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    /* Show when active (JS can toggle this later) */
+    .notification-dropdown.active {
+      display: flex;
+    }
+
+    /* Header and Footer */
+    .notification-dropdown .dropdown-header {
+      font-weight: 600;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      background-color: rgba(232, 235, 245, 0.6);
+      /* matches your light theme tone */
+    }
+
+    .notification-dropdown .dropdown-footer {
+      text-align: center;
+      padding: 10px;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      background-color: rgba(232, 235, 245, 0.6);
+    }
+
+    .notification-dropdown .dropdown-footer a {
+      color: #007bff;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .notification-dropdown .dropdown-footer a:hover {
+      color: #0056b3;
+    }
+
+    /* Notification list */
+    .notification-list {
+      max-height: 300px;
+      /* fits ~5 notifications */
+      overflow-y: auto;
+    }
+
+    /* Hide scrollbar */
+    .notification-list::-webkit-scrollbar {
+      width: 0;
+      background: transparent;
+    }
+
+    .notification-list {
+      -ms-overflow-style: none;
+      /* IE/Edge */
+      scrollbar-width: none;
+      /* Firefox */
+    }
+
+    /* Notification item */
+    .notification-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      transition: background 0.25s ease;
+    }
+
+    .notification-item:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .notification-item i {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      color: #ffb300;
+      /* consistent with warning tone */
+    }
+
+    .notification-content {
+      flex: 1;
+    }
+
+    .notification-title {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-color, #222);
+    }
+
+    .notification-time {
+      font-size: 0.78rem;
+      color: #888;
+    }
+
+    /* Dark mode support */
+    body.dark-mode .notification-dropdown {
+      background-color: rgba(36, 36, 62, 0.96);
+      /* match dark dropdown w/ soft opacity */
+      color: #f0f0f0;
+      border: 3px solid #2f2f4a;
+      box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6);
+    }
+
+    body.dark-mode .notification-dropdown .dropdown-header,
+    body.dark-mode .notification-dropdown .dropdown-footer {
+      background-color: rgba(14, 14, 35, 0.6);
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    body.dark-mode .notification-item {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    body.dark-mode .notification-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    body.dark-mode .notification-title {
+      color: #f5f5f5;
+    }
+
+    body.dark-mode .notification-time {
+      color: #aaa;
+    }
+
+    body.dark-mode .notification-dropdown .dropdown-footer a {
+      color: #66b0ff;
+    }
+
+    body.dark-mode .notification-dropdown .dropdown-footer a:hover {
+      color: #99ccff;
+    }
+
+    /* /////////////////// PISTI KA LISOD KAYKA /////////////////// */
+    /* If your theme uses pseudo-element overlays, hide them */
+    /* body.dark-mode .pc-header .pc-head-link::before,
+body.dark-mode .pc-header .pc-head-link::after {
+  content: none !important;
+  color: inherit !important;
+  opacity: 1 !important; 
+  filter: none !important;
+} */
   </style>
 
 
@@ -283,12 +575,13 @@ session_start(); // must be first thing in your PHP
           </li>
 
           <li class="pc-item sidebar-gif-wrapper">
-            <div class="card"
-              style="width: 220px; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 .25rem .5rem rgba(0,0,0,.15); text-align:center;">
+            <div class="card" style="width:220px; border-radius:0.75rem !important; overflow:hidden !important; 
+           box-shadow:0 .25rem .5rem rgba(0,0,0,.15); text-align:center !important; 
+           margin-bottom:50px !important;">
               <div class="card-body p-2">
-                <img src="../../images/Solar Panel GIF.gif" alt="Sidebar GIF"
-                  style="width: 100%; height: auto; border-radius: 0.5rem; display:block; margin:0 auto;">
-                <h6 style="margin-top: 0.5rem; font-size: 18px; font-weight:600; color:#333;">
+                <img src="../../images/Solar Panel GIF.gif" alt="Sidebar GIF" style="width:100% !important; height:auto !important; border-radius:0.5rem !important; 
+               display:block !important; margin:0 auto !important;">
+                <h6 style="margin-top:0.5rem !important; font-size:18px !important; font-weight:600 !important">
                   Solar Admin
                 </h6>
               </div>
@@ -306,7 +599,7 @@ session_start(); // must be first thing in your PHP
         <ul class="list-unstyled">
           <!-- ======= Menu collapse Icon ===== -->
           <li class="pc-h-item pc-sidebar-collapse">
-            <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
+            <a href="#" class="pc-head-link ms-0" id="sidebar-hide" title="Hide/show the sidebar.">
               <i class="ti ti-menu-2"></i>
             </a>
           </li>
@@ -317,7 +610,7 @@ session_start(); // must be first thing in your PHP
           </li>
           <!-- Dark Mode Toggle -->
           <li class="pc-h-item">
-            <a href="#" class="pc-head-link ms-0" id="darkModeToggle" title="Toggle Dark Mode">
+            <a href="#" class="pc-head-link ms-0" id="darkModeToggle" title="Change the theme.">
               <i class="ti ti-moon" id="darkModeIcon"></i>
             </a>
           </li>
@@ -359,8 +652,85 @@ session_start(); // must be first thing in your PHP
       }
       ?>
 
+
+
       <div class="ms-auto d-flex align-items-center">
+
         <ul class="list-unstyled d-flex align-items-center mb-0">
+
+
+
+
+
+          <!-- Notification Bell Button -->
+          <li class="pc-h-item notification" style="position: relative;">
+            <a href="#" class="pc-head-link ms-0" id="notificationButton" title="Notifications"
+              style="padding: 20px 21px; display: flex; align-items: center; justify-content: center;">
+              <i class="ti ti-bell" style="font-size: 1.8rem;"></i>
+              <span id="notificationBadge" style="position:absolute; top:1px; right:1px; background:#dc3545; color:white; 
+             font-size:0.7rem; font-weight:600; border-radius:50%; width:18px; height:18px;
+             display:flex; align-items:center; justify-content:center; box-shadow:0 0 4px rgba(0,0,0,0.3);">
+                5
+              </span>
+            </a>
+
+            <!-- Custom Notification Dropdown -->
+            <div class="notification-dropdown" id="notificationDropdown">
+              <div class="dropdown-header">Notifications</div>
+
+              <div class="notification-list">
+                <div class="notification-item">
+                  <i class="ti ti-bolt"></i>
+                  <div class="notification-content">
+                    <span class="notification-title">Load 1 turned OFF automatically.</span>
+                    <span class="notification-time">2 mins ago</span>
+                  </div>
+                </div>
+
+                <div class="notification-item">
+                  <i class="ti ti-battery"></i>
+                  <div class="notification-content">
+                    <span class="notification-title">Battery level low (18%).</span>
+                    <span class="notification-time">10 mins ago</span>
+                  </div>
+                </div>
+
+                <div class="notification-item">
+                  <i class="ti ti-sun"></i>
+                  <div class="notification-content">
+                    <span class="notification-title">Solar output stable at 420W.</span>
+                    <span class="notification-time">25 mins ago</span>
+                  </div>
+                </div>
+
+                <div class="notification-item">
+                  <i class="ti ti-alert-triangle"></i>
+                  <div class="notification-content">
+                    <span class="notification-title">Overload detected on Load 3.</span>
+                    <span class="notification-time">40 mins ago</span>
+                  </div>
+                </div>
+
+                <div class="notification-item">
+                  <i class="ti ti-device-analytics"></i>
+                  <div class="notification-content">
+                    <span class="notification-title">New performance report available.</span>
+                    <span class="notification-time">1 hour ago</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- <div class="dropdown-footer">
+      <a href="#">View all notifications</a>
+    </div> -->
+            </div>
+          </li>
+
+
+
+
+
+
 
           <!-- User Profile Dropdown -->
           <li class="dropdown pc-h-item">
@@ -370,22 +740,28 @@ session_start(); // must be first thing in your PHP
               role="button" aria-haspopup="true" data-bs-auto-close="outside" aria-expanded="false">
 
               <!-- Avatar -->
-              <img src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '/Smart Solar/dist/assets/images/user/avatar-1.jpg'); ?>" alt="Profile Picture" style="width:40px; height:40px; object-fit:cover; border-radius:50%; flex-shrink:0; display:block;">
+              <img
+                src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '/Smart Solar/dist/assets/images/user/avatar-1.jpg'); ?>"
+                alt="Profile Picture"
+                style="width:40px; height:40px; object-fit:cover; border-radius:50%; flex-shrink:0; display:block;">
+
               <!-- Full Name -->
-              <span style="color:#000; font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              <span class="user-fullname"
+                style="font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 <?php echo htmlspecialchars($fullName); ?>
               </span>
-
             </a>
 
             <!-- Dropdown Menu -->
             <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
               <div class="dropdown-header d-flex align-items-center">
-                <img src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '/Smart Solar/dist/assets/images/user/avatar-1.jpg'); ?>"
-                  alt="user-image"
-                  style="width:50px; height:50px; object-fit:cover; border-radius:50%; flex-shrink:0;">
+                <img
+                  src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '/Smart Solar/dist/assets/images/user/avatar-1.jpg'); ?>"
+                  alt="user-image" style="width:50px; height:50px; object-fit:cover; border-radius:50%; flex-shrink:0;">
                 <div class="ms-3">
-                  <h6><?php echo htmlspecialchars($fullName); ?></h6>
+                  <h6 class="user-fullname-title">
+                    <?php echo htmlspecialchars($fullName); ?>
+                  </h6>
                   <span><?php echo htmlspecialchars(ucfirst($role)); ?></span>
                 </div>
               </div>
@@ -428,7 +804,7 @@ session_start(); // must be first thing in your PHP
     <div class="pc-content" style="padding-bottom: 2rem;">
 
       <!-- ✅ TOP METRICS ROW -->
-      <div class="row g-3 mt-4 mb-4">
+      <div class="row g-3 mt-2 mb-4">
         <!-- Solar Voltage -->
         <div class="col-12 col-md-4">
           <div class="card h-100 card-hover">
@@ -606,9 +982,9 @@ session_start(); // must be first thing in your PHP
 
 
       <!-- ✅ PERFORMANCE & STATUS ROW -->
-      <div class="row g-4 align-items-stretch">
+      <div class="row g-3 align-items-stretch">
         <!-- LEFT COLUMN -->
-        <div class="col-12 col-md-6 d-flex">
+        <div class="col-12 mt-2 col-md-6 d-flex">
           <div class="card card-hover w-100">
             <div class="card-body d-flex flex-column h-100">
               <!-- TOP SECTION -->
@@ -625,6 +1001,45 @@ session_start(); // must be first thing in your PHP
                     style="max-width:300px; height:auto; border-radius:0.5rem;">
                 </div>
               </div>
+
+
+
+
+              <?php
+              // Connect to database
+              $host = "localhost";
+              $user = "root";
+              $pass = "";
+              $db   = "smart_solar";
+
+              $conn = new mysqli($host, $user, $pass, $db);
+              if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+              }
+
+              // Calculate total solar energy yield in kWh
+              $sql = "
+              SELECT SUM(energy_kwh) AS total_kwh FROM (
+                  SELECT 
+                      solar_power,
+                      reading_time,
+                      LAG(reading_time) OVER (ORDER BY reading_time) AS prev_time,
+                      IF(LAG(reading_time) OVER (ORDER BY reading_time) IS NULL, 0,
+                        (solar_power / 1000) * (TIMESTAMPDIFF(SECOND, LAG(reading_time) OVER (ORDER BY reading_time), reading_time)/3600)
+                      ) AS energy_kwh
+                  FROM sensor_reading
+              ) AS subquery;
+              ";
+
+              $result = $conn->query($sql);
+              $total_kwh = 0;
+
+              if ($result && $row = $result->fetch_assoc()) {
+                $total_kwh = $row['total_kwh'] ?? 0;
+              }
+
+              $conn->close();
+              ?>
 
               <!-- BOTTOM SECTION -->
               <div class="d-flex justify-content-between align-items-start mt-auto">
@@ -646,14 +1061,16 @@ session_start(); // must be first thing in your PHP
                         <i class="ti ti-battery-charging me-3 text-primary fs-3"></i>
                         <div>
                           <small class="text-muted d-block">Capacity</small>
-                          <span class="fw-bold fs-5">210 kWh</span>
+                          <span class="fw-bold fs-5">0.084 kWh</span>
                         </div>
                       </div>
                       <div class="d-flex align-items-center">
                         <i class="ti ti-sun me-3 text-warning fs-3"></i>
                         <div>
                           <small class="text-muted d-block">Yield</small>
-                          <span class="fw-bold fs-5">178 kWh</span>
+                          <span class="fw-bold fs-5">
+                            <?php echo number_format($total_kwh, 3); ?> kWh
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -665,7 +1082,7 @@ session_start(); // must be first thing in your PHP
         </div>
 
         <!-- RIGHT COLUMN -->
-        <div class="col-12 col-md-6 d-flex flex-column h-100">
+        <div class="col-12 col-md-6 mt-2 d-flex flex-column h-100">
           <div class="d-flex flex-column h-100 w-100">
 
             <!-- Battery Level -->
@@ -725,7 +1142,7 @@ session_start(); // must be first thing in your PHP
       <!-- ✅ WEATHER & GRAPH ROW -->
       <div class="row g-3">
         <!-- 🌤️ WEATHER CARD -->
-        <div class="col-12 col-md-6">
+        <div class="col-12 mt-2 col-md-6">
           <div class="card card-hover h-100">
             <div class="card-body d-flex justify-content-between align-items-center p-3">
               <!-- LEFT CONTENT -->
@@ -743,7 +1160,8 @@ session_start(); // must be first thing in your PHP
 
                 <!-- CREDIT LABEL -->
                 <p class="mt-3 mb-0 text-muted small">
-                  Data provided by <a href="https://openweathermap.org/" target="_blank" class="text-decoration-none">OpenWeather</a>
+                  Data provided by <a href="https://openweathermap.org/" target="_blank"
+                    class="text-decoration-none">OpenWeather</a>
                 </p>
               </div>
 
@@ -757,7 +1175,7 @@ session_start(); // must be first thing in your PHP
 
 
         <!-- 📈 GRAPH CARD -->
-        <div class="col-12 col-md-6">
+        <div class="col-12 mt-2 col-md-6">
           <div class="card card-hover h-100 shadow-sm border-0">
             <div class="card-body d-flex flex-column justify-content-between" style="height:260px;">
               <h6 class="mb-3 fw-semibold text-primary">Weather Trend</h6>
@@ -1211,6 +1629,20 @@ session_start(); // must be first thing in your PHP
         localStorage.setItem('darkMode', 'disabled');
         darkModeIcon.classList.remove('ti-sun');
         darkModeIcon.classList.add('ti-moon');
+      }
+    });
+
+    const notifButton = document.getElementById("notificationButton");
+    const notifDropdown = document.getElementById("notificationDropdown");
+
+    notifButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      notifDropdown.classList.toggle("active");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!notifDropdown.contains(e.target) && !notifButton.contains(e.target)) {
+        notifDropdown.classList.remove("active");
       }
     });
   </script>

@@ -950,7 +950,6 @@ session_start(); // must be first thing in your PHP
                                         </li>
                                     </ul>
                                 </div>
-
                                 <!-- Right Column of Info -->
                                 <div class="col-6">
                                     <ul class="list-unstyled">
@@ -967,10 +966,9 @@ session_start(); // must be first thing in your PHP
                 </div>
 
 
-
             </div>
-
         </div>
+        
     </div>
     <!-- [ Main Content ] end -->
 
@@ -991,10 +989,13 @@ session_start(); // must be first thing in your PHP
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
         const batteryThresholdSlider = document.getElementById('batteryThreshold');
         const batteryThresholdValue = document.getElementById('batteryThresholdValue');
+        const batteryThresholdDisplay = document.getElementById('batteryThresholdDisplay');
+        const applyThresholdBtn = document.getElementById('applyThresholdBtn');
 
         function updateSliderColor(value) {
             let color;
@@ -1004,11 +1005,10 @@ session_start(); // must be first thing in your PHP
             else if (value > 20) color = 'hsl(30, 90%, 45%)'; // orange
             else color = 'hsl(3, 90%, 45%)'; // red
 
-            // Apply gradient fill for slider
             batteryThresholdSlider.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${value}%, #d3d3d3 ${value}%, #d3d3d3 100%)`;
         }
 
-        // Initialize
+        // Initialize slider color
         updateSliderColor(batteryThresholdSlider.value);
 
         // Update dynamically
@@ -1017,11 +1017,157 @@ session_start(); // must be first thing in your PHP
             updateSliderColor(batteryThresholdSlider.value);
         });
 
+        // -------------------------------
+        // Load Control
+        // -------------------------------
+        const loadSwitch = document.getElementById('loadSwitch');
+        const loadStatusDisplay = document.getElementById('loadStatus');
+
+        function loadStateFromDB() {
+            fetch('get_load_state.php')
+                .then(res => res.json())
+                .then(data => {
+                    loadSwitch.checked = data.state == 1;
+                    loadStatusDisplay.innerText = data.state == 1 ? 'ON' : 'OFF';
+                });
+        }
+
+        function loadThresholdFromDB() {
+            fetch('get_threshold.php')
+                .then(res => res.json())
+                .then(data => {
+                    batteryThresholdSlider.value = data.value;
+                    batteryThresholdValue.innerText = data.value + '%';
+                    batteryThresholdDisplay.innerText = data.value + '%';
+                    updateSliderColor(data.value);
+                });
+        }
+
+        // Initial load from DB
+        loadStateFromDB();
+        loadThresholdFromDB();
+
+        // Load switch event
+        loadSwitch.addEventListener('change', () => {
+            const status = loadSwitch.checked ? "ON" : "OFF";
+            loadStatusDisplay.innerText = status;
+
+            // Publish to MQTT
+            client.publish('system/load/control', status, {
+                qos: 1,
+                retain: true
+            });
+            console.log('Load control sent:', status);
+
+            // Update DB
+            fetch('update_load_state.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'state=' + (loadSwitch.checked ? 1 : 0)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: `Load turned ${status}`,
+                            icon: 'success',
+                            timer: 1200,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        console.error('DB error:', data.error);
+                    }
+                });
+        });
+
+        // -------------------------------
+        // Apply Battery Threshold
+        // -------------------------------
+        applyThresholdBtn.addEventListener('click', () => {
+            const thresholdValue = batteryThresholdSlider.value;
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Apply battery threshold of ${thresholdValue}%?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, apply it!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    // Publish to MQTT
+                    client.publish('system/battery/threshold', thresholdValue.toString(), {
+                        qos: 1,
+                        retain: true
+                    });
+                    console.log('Battery threshold sent:', thresholdValue);
+
+                    // Update DB
+                    fetch('update_threshold.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'value=' + thresholdValue
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update display
+                                batteryThresholdValue.innerText = thresholdValue + '%';
+                                batteryThresholdDisplay.innerText = thresholdValue + '%';
+
+                                Swal.fire({
+                                    title: 'Applied!',
+                                    text: `Battery threshold set to ${thresholdValue}%`,
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                            } else {
+                                console.error('DB error:', data.error);
+                            }
+                        });
+
+                }
+            });
+        });
+
+        // -------------------------------
+        // Poll DB every 5 seconds to sync all users
+        // -------------------------------
+        setInterval(() => {
+            loadStateFromDB();
+            loadThresholdFromDB();
+        }, 5000);
 
 
 
+        document.querySelectorAll('.logout-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault(); // prevent default link behavior
 
-
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You will be logged out!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, logout!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'logout.php';
+                    }
+                });
+            });
+        });
 
         // -----------------------------
         // MQTT WebSocket Connection
@@ -1089,7 +1235,7 @@ session_start(); // must be first thing in your PHP
                     document.getElementById('power-text').innerText = '--';
                     break;
 
-                // -------- Battery --------
+                    // -------- Battery --------
                 case 'battery/voltage':
                     latestBattV = value;
                     document.getElementById('battery-voltage').innerText = value.toFixed(2);
@@ -1127,7 +1273,7 @@ session_start(); // must be first thing in your PHP
                     }
                     break;
 
-                // -------- Temperature --------
+                    // -------- Temperature --------
                 case 'system/temperature':
                     latestTemperature = value;
                     document.getElementById('temperature').innerText = value.toFixed(1);
@@ -1141,72 +1287,6 @@ session_start(); // must be first thing in your PHP
                     break;
             }
         });
-
-
-
-
-        const loadSwitch = document.getElementById('loadSwitch');
-        const loadStatusDisplay = document.getElementById('loadStatus');
-
-        loadSwitch.addEventListener('change', () => {
-            const status = loadSwitch.checked ? "ON" : "OFF";
-            loadStatusDisplay.innerText = status;
-
-            // Publish to MQTT
-            client.publish('system/load/control', status, {
-                qos: 1,
-                retain: true
-            });
-
-            // Optional: Show feedback
-            console.log('Load control sent:', status);
-        });
-
-
-
-        applyThresholdBtn.addEventListener('click', () => {
-            const thresholdValue = batteryThresholdSlider.value;
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: `Apply battery threshold of ${thresholdValue}%?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, apply it!',
-                cancelButtonText: 'Cancel',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Update display
-                    batteryThresholdDisplay.innerText = thresholdValue + '%';
-                    document.getElementById('batteryThresholdDisplay').innerText = thresholdValue + '%';
-
-                    // Publish to MQTT
-                    client.publish('system/battery/threshold', thresholdValue.toString(), {
-                        qos: 1,
-                        retain: true
-                    });
-
-                    console.log('Battery threshold sent:', thresholdValue);
-
-                    Swal.fire({
-                        title: 'Applied!',
-                        text: `Battery threshold set to ${thresholdValue}%`,
-                        icon: 'success',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                }
-            });
-        });
-
-
-
-
-
-
-
-
 
 
 
@@ -1350,7 +1430,6 @@ session_start(); // must be first thing in your PHP
                 notifDropdown.classList.remove("active");
             }
         });
-
     </script>
 
 
