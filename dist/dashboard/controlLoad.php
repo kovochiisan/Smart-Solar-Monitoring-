@@ -79,7 +79,7 @@ session_start(); // must be first thing in your PHP
 
         .pc-header {
             height: 70px;
-            /* match sidebar top area height */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
         }
 
         /* Wrapper to center the card in sidebar */
@@ -131,6 +131,48 @@ session_start(); // must be first thing in your PHP
         }
 
 
+        /* @@@@@@@@@@@@@@@@@@@@@@@ Light Mode Styles @@@@@@@@@@@@@@@@@@@@@@@ */
+
+        /* Dropdown menus (light mode) */
+        .dropdown-menu {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6 !important;
+            /* soft gray border */
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
+            /* subtle shadow */
+            border-radius: 0.5rem;
+            /* match rounded edges */
+        }
+
+        .dropdown-menu a,
+        .dropdown-menu .dropdown-item {
+            color: #212529 !important;
+            /* bootstrap default text */
+        }
+
+        .dropdown-menu a:hover,
+        .dropdown-menu .dropdown-item:hover {
+            background-color: #f1f3f5 !important;
+            /* light hover */
+            color: #000 !important;
+        }
+
+        /* Cards (light mode) */
+        .card {
+            background-color: #ffffff;
+            border: 3px solid #dee2e6 !important;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
+            border-radius: 0.75rem;
+        }
+
+        /* Special: sidebar gif card (light mode) */
+        .sidebar-gif-wrapper .card {
+            background-color: #E8EBF5 !important;
+            border: 3px solid #dee2e6 !important;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
+            border-radius: 0.75rem !important;
+        }
+
 
 
 
@@ -145,7 +187,12 @@ session_start(); // must be first thing in your PHP
         }
 
         /* Sidebar + Navbar */
-        body.dark-mode .pc-header,
+        body.dark-mode .pc-header {
+            background-color: #0E0E23;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6) !important;
+        }
+
         body.dark-mode .pc-sidebar {
             background-color: #0E0E23;
             color: #FFFFFF !important;
@@ -178,9 +225,10 @@ session_start(); // must be first thing in your PHP
         /* Dropdown menus for user profile */
         body.dark-mode .dropdown-menu {
             background-color: #24243E;
-            border: none !important;
-            box-shadow: none !important;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+            border: 3px solid #2f2f4a !important;
         }
+
 
         body.dark-mode .dropdown-menu a,
         body.dark-mode .dropdown-menu .dropdown-item {
@@ -194,14 +242,14 @@ session_start(); // must be first thing in your PHP
         }
 
         /* Cards - strictly #0E0E23 */
+        /* Cards - strictly #0E0E23 */
         body.dark-mode .card {
             background-color: #0E0E23;
             border: none !important;
-            box-shadow: none !important;
-            color: #FFFFFF !important;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+            border: 3px solid #2f2f4a !important;
         }
 
-        /* Special: GIF card should be #24243E */
         body.dark-mode .sidebar-gif-wrapper .card {
             background-color: #24243E !important;
             border: none !important;
@@ -347,6 +395,216 @@ session_start(); // must be first thing in your PHP
             margin-top: -5px;
             transition: background 0.3s ease, transform 0.2s ease;
         }
+
+        /* Cards in dark mode - with border + shadow */
+        body.dark-mode .card {
+            background-color: #0E0E23 !important;
+            border: 3px solid #2f2f4a !important;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+            color: #FFFFFF !important;
+        }
+
+        /* Special: Sidebar GIF card */
+        body.dark-mode .sidebar-gif-wrapper .card {
+            background-color: #24243E !important;
+            border: 3px solid #2f2f4a !important;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+            color: #FFFFFF !important;
+        }
+
+        .pc-container {
+            min-height: 100vh;
+        }
+
+        /* Full name text inside dark mode */
+        body.dark-mode h6.user-fullname {
+            color: white !important;
+        }
+
+        /* Light mode (default) */
+        .user-fullname-title {
+            color: #000 !important;
+            /* black */
+        }
+
+        /* Dark mode */
+        body.dark-mode .user-fullname-title {
+            color: #fff !important;
+            /* white */
+        }
+
+
+        body.dark-mode h6.user-fullname {
+            color: white !important;
+        }
+
+        /* Default (light mode) fullname color */
+        .user-fullname {
+            color: #000 !important;
+        }
+
+        /* Dark mode default (not hovered) */
+        body.dark-mode .pc-head-link .user-fullname {
+            color: #fff !important;
+        }
+
+        /* Dark mode on hover */
+        body.dark-mode .pc-head-link:hover .user-fullname {
+            color: #000 !important;
+        }
+
+
+
+
+        /* ////////////   NOTIF DROP DOWN STYLE  //////////////*/
+
+        /* Notification Dropdown Container */
+        .notification-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 320px;
+            background-color: #ffffff;
+            /* Light mode background */
+            color: #212529;
+            border-radius: 0.5rem;
+            border: 3px solid #dee2e6;
+            /* match your card/dropdown borders */
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        /* Show when active (JS can toggle this later) */
+        .notification-dropdown.active {
+            display: flex;
+        }
+
+        /* Header and Footer */
+        .notification-dropdown .dropdown-header {
+            font-weight: 600;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            background-color: rgba(232, 235, 245, 0.6);
+            /* matches your light theme tone */
+        }
+
+        .notification-dropdown .dropdown-footer {
+            text-align: center;
+            padding: 10px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            background-color: rgba(232, 235, 245, 0.6);
+        }
+
+        .notification-dropdown .dropdown-footer a {
+            color: #007bff;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .notification-dropdown .dropdown-footer a:hover {
+            color: #0056b3;
+        }
+
+        /* Notification list */
+        .notification-list {
+            max-height: 300px;
+            /* fits ~5 notifications */
+            overflow-y: auto;
+        }
+
+        /* Hide scrollbar */
+        .notification-list::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+
+        .notification-list {
+            -ms-overflow-style: none;
+            /* IE/Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        /* Notification item */
+        .notification-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: background 0.25s ease;
+        }
+
+        .notification-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .notification-item i {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            color: #ffb300;
+            /* consistent with warning tone */
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-color, #222);
+        }
+
+        .notification-time {
+            font-size: 0.78rem;
+            color: #888;
+        }
+
+        /* Dark mode support */
+        body.dark-mode .notification-dropdown {
+            background-color: rgba(36, 36, 62, 0.96);
+            /* match dark dropdown w/ soft opacity */
+            color: #f0f0f0;
+            border: 3px solid #2f2f4a;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6);
+        }
+
+        body.dark-mode .notification-dropdown .dropdown-header,
+        body.dark-mode .notification-dropdown .dropdown-footer {
+            background-color: rgba(14, 14, 35, 0.6);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-mode .notification-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-mode .notification-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-mode .notification-title {
+            color: #f5f5f5;
+        }
+
+        body.dark-mode .notification-time {
+            color: #aaa;
+        }
+
+        body.dark-mode .notification-dropdown .dropdown-footer a {
+            color: #66b0ff;
+        }
+
+        body.dark-mode .notification-dropdown .dropdown-footer a:hover {
+            color: #99ccff;
+        }
     </style>
 
 
@@ -386,7 +644,7 @@ session_start(); // must be first thing in your PHP
 
                     <li class="pc-item sidebar-gif-wrapper">
                         <div class="card"
-                            style="width: 220px; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 .25rem .5rem rgba(0,0,0,.15); text-align:center;">
+                            style="margin-bottom: 50px; width: 220px; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 .25rem .5rem rgba(0,0,0,.15); text-align:center;">
                             <div class="card-body p-2">
                                 <img src="../../images/Solar Panel GIF.gif" alt="Sidebar GIF"
                                     style="width: 100%; height: auto; border-radius: 0.5rem; display:block; margin:0 auto;">
@@ -427,45 +685,140 @@ session_start(); // must be first thing in your PHP
             </div>
 
             <?php
-            $fullName = $_SESSION['full_name'] ?? 'Guest User';
-            $role = $_SESSION['role'] ?? 'User';
+            require_once "config.php";
+
+            // Ensure user is logged in
+            if (!isset($_SESSION['user_id'])) {
+                die("You must be logged in to view this page.");
+            }
+
+            $userId = $_SESSION['user_id'];
+
+            // Fetch user info
+            $sql = "SELECT * FROM users WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                $user = $result->fetch_assoc();
+
+                $fullName = $user['full_name'];
+                $email = $user['email'];
+                $phone = $user['contact_number'];
+                $dob = $user['date_of_birth'];
+                $address = $user['address'];
+                $role = $user['role'];
+                $profilePhoto = $user['profile_image'] ?? '../assets/images/user/avatar-2.jpg';
+
+                // Optional: store in session too
+                $_SESSION['email'] = $email;
+            } else {
+                die("User not found.");
+            }
             ?>
 
             <div class="ms-auto d-flex align-items-center">
                 <ul class="list-unstyled d-flex align-items-center mb-0">
 
+                    <!-- Notification Bell Button -->
+                    <li class="pc-h-item notification" style="position: relative;">
+                        <a href="#" class="pc-head-link ms-0" id="notificationButton" title="Notifications"
+                            style="padding: 20px 21px; display: flex; align-items: center; justify-content: center;">
+                            <i class="ti ti-bell" style="font-size: 1.8rem;"></i>
+                            <span id="notificationBadge" style="position:absolute; top:1px; right:1px; background:#dc3545; color:white; 
+             font-size:0.7rem; font-weight:600; border-radius:50%; width:18px; height:18px;
+             display:flex; align-items:center; justify-content:center; box-shadow:0 0 4px rgba(0,0,0,0.3);">
+                                5
+                            </span>
+                        </a>
+
+                        <!-- Custom Notification Dropdown -->
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="dropdown-header">Notifications</div>
+
+                            <div class="notification-list">
+                                <div class="notification-item">
+                                    <i class="ti ti-bolt"></i>
+                                    <div class="notification-content">
+                                        <span class="notification-title">Load 1 turned OFF automatically.</span>
+                                        <span class="notification-time">2 mins ago</span>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item">
+                                    <i class="ti ti-battery"></i>
+                                    <div class="notification-content">
+                                        <span class="notification-title">Battery level low (18%).</span>
+                                        <span class="notification-time">10 mins ago</span>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item">
+                                    <i class="ti ti-sun"></i>
+                                    <div class="notification-content">
+                                        <span class="notification-title">Solar output stable at 420W.</span>
+                                        <span class="notification-time">25 mins ago</span>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item">
+                                    <i class="ti ti-alert-triangle"></i>
+                                    <div class="notification-content">
+                                        <span class="notification-title">Overload detected on Load 3.</span>
+                                        <span class="notification-time">40 mins ago</span>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item">
+                                    <i class="ti ti-device-analytics"></i>
+                                    <div class="notification-content">
+                                        <span class="notification-title">New performance report available.</span>
+                                        <span class="notification-time">1 hour ago</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- <div class="dropdown-footer">
+      <a href="#">View all notifications</a>
+    </div> -->
+                        </div>
+                    </li>
+
                     <!-- User Profile Dropdown -->
                     <li class="dropdown pc-h-item">
                         <a class="pc-head-link dropdown-toggle d-flex align-items-center"
-                            style="padding: 20px 16px; gap:12px; min-width: 280px; cursor:pointer;" data-bs-toggle="dropdown" href="#"
-                            role="button" aria-haspopup="true" data-bs-auto-close="outside" aria-expanded="false">
+                            style="padding: 20px 16px; gap:12px; min-width: 280px; cursor:pointer;"
+                            data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                            data-bs-auto-close="outside" aria-expanded="false">
 
                             <!-- Avatar -->
-                            <img src="../assets/images/user/avatar-2.jpg" alt="user-image"
+                            <img src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '/Smart Solar/dist/assets/images/user/avatar-1.jpg'); ?>"
+                                alt="Profile Picture"
                                 style="width:40px; height:40px; object-fit:cover; border-radius:50%; flex-shrink:0; display:block;">
-
                             <!-- Full Name -->
-                            <span
-                                style="color:#000; font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <span class="user-fullname"
+                                style="font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                 <?php echo htmlspecialchars($fullName); ?>
                             </span>
-
                         </a>
 
                         <!-- Dropdown Menu -->
                         <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
                             <div class="dropdown-header d-flex align-items-center">
-                                <img src="../assets/images/user/avatar-2.jpg" alt="user-image"
+                                <img src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '/Smart Solar/dist/assets/images/user/avatar-1.jpg'); ?>"
+                                    alt="user-image"
                                     style="width:50px; height:50px; object-fit:cover; border-radius:50%; flex-shrink:0;">
                                 <div class="ms-3">
-                                    <h6><?php echo htmlspecialchars($fullName); ?></h6>
+                                    <h6 class="user-fullname"><?php echo htmlspecialchars($fullName); ?></h6>
                                     <span><?php echo htmlspecialchars(ucfirst($role)); ?></span>
                                 </div>
                             </div>
 
                             <div class="px-3 py-2">
                                 <h6 class="dropdown-header">Settings</h6>
-                                <a href="#!" class="dropdown-item">
+                                <a href="accountSettings.php" class="dropdown-item">
                                     <i class="ti ti-user"></i>
                                     <span>Account Settings</span>
                                 </a>
@@ -482,38 +835,29 @@ session_start(); // must be first thing in your PHP
                     </li>
                 </ul>
             </div>
-
-
-
-
         </div>
     </header>
     <!-- [ Header ] end -->
 
 
-
-
-
-
-
-
-
     <!-- [ Main Content ] start -->
     <div class="pc-container">
-        <div class="pc-content" style="padding: 2rem;">
+        <div class="pc-content" style="padding: 22px 35px 32px">
 
-            <div class="row g-3">
+            <div class="row g-3 mt-1">
 
                 <!-- Left Column -->
-                <div class="col-12 col-lg-8 d-flex flex-column gap-3">
+                <div class="col-12 col-lg-8 d-flex flex-column">
 
                     <!-- Load Control Card (Full Width) -->
-                    <div class="card card-hover shadow-lg text-center">
+                    <div class="card card-hover shadow-lg text-center" style="margin-bottom: 15px !important">
                         <div class="card-body p-4">
                             <h4 class="fw-bold mb-2">Load Control</h4>
                             <p class="text-muted small mb-3">Manually switch the load ON or OFF.</p>
-                            <div class="form-check form-switch d-flex justify-content-center align-items-center" style="gap: 10px;">
-                                <input class="form-check-input" type="checkbox" id="loadSwitch" style="width: 60px; height: 34px;">
+                            <div class="form-check form-switch d-flex justify-content-center align-items-center"
+                                style="gap: 10px;">
+                                <input class="form-check-input" type="checkbox" id="loadSwitch"
+                                    style="width: 60px; height: 34px;">
                                 <label class="form-check-label fs-5" for="loadSwitch">Load</label>
                             </div>
                         </div>
@@ -529,18 +873,22 @@ session_start(); // must be first thing in your PHP
                                 <div class="card-body p-4">
                                     <h4 class="fw-bold mb-2">Battery Status</h4>
                                     <p class="text-muted small mb-4">
-                                        Set the battery % threshold to automatically turn off the load if it drops below this level.
+                                        Set the battery % threshold to automatically turn off the load if it drops below
+                                        this level.
                                     </p>
-                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div class="d-flex justify-content-between align-items-center">
                                         <div style="flex-shrink: 0;">
                                             <svg class="battery" viewBox="0 0 100 100" width="140px" height="140px">
                                                 <g fill="none" transform="rotate(-75,50,50)">
-                                                    <circle r="40" cx="50" cy="50" stroke="hsla(223,10%,50%,0.2)" stroke-width="20"
-                                                        stroke-dasharray="251.33 251.33" stroke-dashoffset="20.944" />
-                                                    <circle class="battery__fill1" r="40" cx="50" cy="50" stroke="hsl(123,90%,45%)" stroke-width="20"
+                                                    <circle r="40" cx="50" cy="50" stroke="hsla(223,10%,50%,0.2)"
+                                                        stroke-width="20" stroke-dasharray="251.33 251.33"
+                                                        stroke-dashoffset="20.944" />
+                                                    <circle class="battery__fill1" r="40" cx="50" cy="50"
+                                                        stroke="hsl(123,90%,45%)" stroke-width="20"
                                                         stroke-dasharray="251.33 251.33" stroke-dashoffset="20.944" />
                                                 </g>
-                                                <text class="battery__value" font-size="16" fill="currentColor" x="50" y="56" text-anchor="middle" data-value>100%</text>
+                                                <text class="battery__value" font-size="16" fill="currentColor" x="50"
+                                                    y="56" text-anchor="middle" data-value>100%</text>
                                             </svg>
                                         </div>
                                         <div class="text-end" style="flex-shrink: 0;">
@@ -548,14 +896,17 @@ session_start(); // must be first thing in your PHP
                                             <span id="batteryThresholdValueDisplay" class="fw-bold fs-2">100%</span>
                                         </div>
                                     </div>
-                                    <label for="batteryThreshold" class="form-label fw-bold">Auto Shutdown Threshold (%)</label>
-                                    <input type="range" class="form-range mb-3" min="0" max="100" value="100" id="batteryThreshold">
+                                    <label for="batteryThreshold" class="form-label fw-bold">Auto Shutdown Threshold
+                                        (%)</label>
+                                    <input type="range" class="form-range mb-3" min="0" max="100" value="100"
+                                        id="batteryThreshold">
                                     <div class="d-flex justify-content-between mb-3">
                                         <span>0%</span>
                                         <span id="batteryThresholdValue">100%</span>
                                     </div>
                                     <div class="text-end">
-                                        <button id="applyThresholdBtn" class="btn btn-success btn-lg shadow-sm">Apply Changes</button>
+                                        <button id="applyThresholdBtn" class="btn btn-success btn-lg shadow-sm">Apply
+                                            Changes</button>
                                     </div>
                                 </div>
                             </div>
@@ -564,9 +915,10 @@ session_start(); // must be first thing in your PHP
                         <!-- Chart Card -->
                         <div class="col-12 col-md-6">
                             <div class="card card-hover shadow-lg text-center h-100">
-                                <div class="card-body p-5">
+                                <div class="card-body px-5">
                                     <h4 class="fw-bold mb-2">Load Activity Chart</h4>
-                                    <p class="text-muted small mb-4">Visualize recent load activity and battery status trends.</p>
+                                    <p class="text-muted small mb-4">Visualize recent load activity and battery status
+                                        trends.</p>
                                     <canvas id="loadChart" style="width:100%; height:300px;"></canvas>
                                 </div>
                             </div>
@@ -582,7 +934,8 @@ session_start(); // must be first thing in your PHP
                         <div class="card-body p-4 d-flex flex-column justify-content-start align-items-center">
 
                             <!-- Placeholder for Image or Icon -->
-                            <img src="https://via.placeholder.com/80x80?text=Load" alt="Load Image" class="mb-3" style="border-radius: 8px;">
+                            <img src="https://via.placeholder.com/80x80?text=Load" alt="Load Image" class="mb-3"
+                                style="border-radius: 8px;">
 
                             <h4 class="fw-bold mb-4 text-center">Load Overview</h4>
 
@@ -590,16 +943,21 @@ session_start(); // must be first thing in your PHP
                                 <!-- Left Column of Info -->
                                 <div class="col-6">
                                     <ul class="list-unstyled">
-                                        <li class="mb-2"><span style="color:#4CAF50;">●</span> Load Status: <span id="loadStatus">ON</span></li>
-                                        <li class="mb-2"><span style="color:#2196F3;">●</span> Auto Shutdown Threshold: <span id="batteryThresholdDisplay">100%</span></li>
+                                        <li class="mb-2"><span style="color:#4CAF50;">●</span> Load Status: <span
+                                                id="loadStatus">ON</span></li>
+                                        <li class="mb-2"><span style="color:#2196F3;">●</span> Auto Shutdown Threshold:
+                                            <span id="batteryThresholdDisplay">100%</span>
+                                        </li>
                                     </ul>
                                 </div>
 
                                 <!-- Right Column of Info -->
                                 <div class="col-6">
                                     <ul class="list-unstyled">
-                                        <li class="mb-2"><span style="color:#E91E63;">●</span> Runtime Today: <span id="loadRuntime">3h 20m</span></li>
-                                        <li class="mb-2"><span style="color:#FF5722;">●</span> Last Load Action: <span id="loadLastTriggered">10:45 AM</span></li>
+                                        <li class="mb-2"><span style="color:#E91E63;">●</span> Runtime Today: <span
+                                                id="loadRuntime">3h 20m</span></li>
+                                        <li class="mb-2"><span style="color:#FF5722;">●</span> Last Load Action: <span
+                                                id="loadLastTriggered">10:45 AM</span></li>
                                     </ul>
                                 </div>
                             </div>
@@ -731,7 +1089,7 @@ session_start(); // must be first thing in your PHP
                     document.getElementById('power-text').innerText = '--';
                     break;
 
-                    // -------- Battery --------
+                // -------- Battery --------
                 case 'battery/voltage':
                     latestBattV = value;
                     document.getElementById('battery-voltage').innerText = value.toFixed(2);
@@ -769,7 +1127,7 @@ session_start(); // must be first thing in your PHP
                     }
                     break;
 
-                    // -------- Temperature --------
+                // -------- Temperature --------
                 case 'system/temperature':
                     latestTemperature = value;
                     document.getElementById('temperature').innerText = value.toFixed(1);
@@ -976,6 +1334,23 @@ session_start(); // must be first thing in your PHP
                 }
             }
         });
+
+
+
+        const notifButton = document.getElementById("notificationButton");
+        const notifDropdown = document.getElementById("notificationDropdown");
+
+        notifButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            notifDropdown.classList.toggle("active");
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!notifDropdown.contains(e.target) && !notifButton.contains(e.target)) {
+                notifDropdown.classList.remove("active");
+            }
+        });
+
     </script>
 
 

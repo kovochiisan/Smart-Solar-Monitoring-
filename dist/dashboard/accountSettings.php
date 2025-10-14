@@ -31,12 +31,17 @@ require_once "config.php";
     <link rel="stylesheet" href="../assets/css/style-preset.css">
 
     <style>
-        /* Rounded edges, transition, hover lift */
         .card-hover {
             border-radius: 0.75rem;
+            background-color: #ffffff;
+            /* white card */
+            border: 3px solid #dee2e6;
+            /* light border */
             box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1);
             transition: all 0.3s ease;
             padding: 1.5rem;
+            color: #212529;
+            /* default text */
         }
 
         .card-hover:hover {
@@ -133,8 +138,6 @@ require_once "config.php";
 
 
 
-
-
         /* Dark Mode Theme */
         body.dark-mode {
             background-color: #0E0E23;
@@ -150,8 +153,7 @@ require_once "config.php";
         body.dark-mode .pc-sidebar {
             background-color: #0E0E23;
             color: #FFFFFF !important;
-            border: none !important;
-            box-shadow: none !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6) !important;
         }
 
         /* Project title near logo (Smart Solar) */
@@ -179,8 +181,8 @@ require_once "config.php";
         /* Dropdown menus for user profile */
         body.dark-mode .dropdown-menu {
             background-color: #24243E;
-            border: none !important;
-            box-shadow: none !important;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+            border: 3px solid #2f2f4a !important;
         }
 
         body.dark-mode .dropdown-menu a,
@@ -192,6 +194,10 @@ require_once "config.php";
         body.dark-mode .dropdown-menu .dropdown-item:hover {
             background-color: #33334d !important;
             color: #FFFFFF !important;
+        }
+
+        body.dark-mode .dropdown-menu .dropdown-header {
+            color: #6c757d !important;
         }
 
         /* Cards - strictly #0E0E23 */
@@ -245,6 +251,37 @@ require_once "config.php";
         body.dark-mode .badge * {
             background: inherit !important;
             color: inherit !important;
+        }
+
+        /* Cards in dark mode - with border + shadow */
+        body.dark-mode .card-hover {
+            background-color: #0E0E23 !important;
+            border: 3px solid #2f2f4a !important;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .card-hover:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 1rem 1.5rem rgba(0, 0, 0, .75) !important;
+        }
+
+
+        /* Special: Sidebar GIF card */
+        body.dark-mode .sidebar-gif-wrapper .card {
+            background-color: #24243E !important;
+            border: 3px solid #2f2f4a !important;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
+            color: #FFFFFF !important;
+        }
+
+        .pc-container {
+            min-height: 100vh !important;
+        }
+
+        /* Full name text inside dark mode */
+        body.dark-mode h6.user-fullname {
+            color: white !important;
         }
 
 
@@ -327,9 +364,274 @@ require_once "config.php";
             background-color: #0b5ed7;
             border-color: #0a58ca;
         }
+
+        .sidebar-gif-wrapper .card {
+            background-color: #E8EBF5 !important;
+            border: 3px solid #dee2e6 !important;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
+            border-radius: 0.75rem !important;
+        }
+
+        /* =========================================
+   Profile Card Spacing Improvements
+   ========================================= */
+        .card-hover h4,
+        .card-hover p,
+        .card-hover .badge {
+            margin-bottom: 0.75rem !important;
+            /* balanced spacing between name, email, role */
+        }
+
+        .card-hover .position-relative {
+            margin-bottom: 1.75rem !important;
+            /* extra space under profile picture */
+        }
+
+        .card-hover hr {
+            margin: 1.75rem 0;
+            /* breathing space for divider */
+        }
+
+        .card-hover .w-100.text-center>div {
+            margin-bottom: 2rem;
+            /* more spacing between detail sections */
+        }
+
+        .card-hover .w-100.text-center>div:last-child {
+            margin-bottom: 0;
+            /* remove last extra gap */
+        }
+
+        /* Labels (Phone, DOB, Address) */
+        .card-hover .w-100.text-center small {
+            color: #6c757d;
+            /* grey-ish in light mode */
+            font-weight: 600;
+        }
+
+        /* Dark mode labels */
+        body.dark-mode .card-hover .w-100.text-center small {
+            color: #696f73ff !important;
+            /* lighter grey for dark mode */
+            font-weight: 600;
+        }
+
+        /* Light mode role text */
+        .role-text {
+            font-size: 0.8rem;
+            color: #6c757d;
+            /* muted grey */
+            padding: 0.25rem 0.75rem;
+            display: inline-block;
+        }
+
+        /* Dark mode role text */
+        body.dark-mode .role-text {
+            color: #0d6efd !important;
+            /* Bootstrap blue */
+            border: 1px solid #0d6efd;
+            /* blue border */
+            background-color: transparent !important;
+            /* no background */
+            font-weight: 600;
+            /* make it stand out more */
+        }
+
+        /* Dropdown profile full name in dark mode */
+        body.dark-mode .dropdown-menu .user-fullname,
+        body.dark-mode .dropdown-menu h6,
+        body.dark-mode .dropdown-menu span.user-fullname {
+            color: #ffffff !important;
+        }
+
+        .card-hover h4.card-title {
+            margin-top: 2rem;
+        }
+
+        /* Light mode (default) */
+        .user-fullname-title {
+            color: #000 !important;
+            /* black */
+        }
+
+        /* Dark mode */
+        body.dark-mode .user-fullname-title {
+            color: #fff !important;
+            /* white */
+        }
+
+
+        body.dark-mode h6.user-fullname {
+            color: white !important;
+        }
+
+        /* Default (light mode) fullname color */
+        .user-fullname {
+            color: #000 !important;
+        }
+
+        /* Dark mode default (not hovered) */
+        body.dark-mode .pc-head-link .user-fullname {
+            color: #fff !important;
+        }
+
+        /* Dark mode on hover */
+        body.dark-mode .pc-head-link:hover .user-fullname {
+            color: #000 !important;
+        }
+
+
+
+        /* ////////////   NOTIF DROP DOWN STYLE  //////////////*/
+
+        /* Notification Dropdown Container */
+        .notification-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 320px;
+            background-color: #ffffff;
+            /* Light mode background */
+            color: #212529;
+            border-radius: 0.5rem;
+            border: 3px solid #dee2e6;
+            /* match your card/dropdown borders */
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        /* Show when active (JS can toggle this later) */
+        .notification-dropdown.active {
+            display: flex;
+        }
+
+        /* Header and Footer */
+        .notification-dropdown .dropdown-header {
+            font-weight: 600;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            background-color: rgba(232, 235, 245, 0.6);
+            /* matches your light theme tone */
+        }
+
+        .notification-dropdown .dropdown-footer {
+            text-align: center;
+            padding: 10px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            background-color: rgba(232, 235, 245, 0.6);
+        }
+
+        .notification-dropdown .dropdown-footer a {
+            color: #007bff;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .notification-dropdown .dropdown-footer a:hover {
+            color: #0056b3;
+        }
+
+        /* Notification list */
+        .notification-list {
+            max-height: 300px;
+            /* fits ~5 notifications */
+            overflow-y: auto;
+        }
+
+        /* Hide scrollbar */
+        .notification-list::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+
+        .notification-list {
+            -ms-overflow-style: none;
+            /* IE/Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        /* Notification item */
+        .notification-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: background 0.25s ease;
+        }
+
+        .notification-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .notification-item i {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            color: #ffb300;
+            /* consistent with warning tone */
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-color, #222);
+        }
+
+        .notification-time {
+            font-size: 0.78rem;
+            color: #888;
+        }
+
+        /* Dark mode support */
+        body.dark-mode .notification-dropdown {
+            background-color: rgba(36, 36, 62, 0.96);
+            /* match dark dropdown w/ soft opacity */
+            color: #f0f0f0;
+            border: 3px solid #2f2f4a;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6);
+        }
+
+        body.dark-mode .notification-dropdown .dropdown-header,
+        body.dark-mode .notification-dropdown .dropdown-footer {
+            background-color: rgba(14, 14, 35, 0.6);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-mode .notification-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-mode .notification-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-mode .notification-title {
+            color: #f5f5f5;
+        }
+
+        body.dark-mode .notification-time {
+            color: #aaa;
+        }
+
+        body.dark-mode .notification-dropdown .dropdown-footer a {
+            color: #66b0ff;
+        }
+
+        body.dark-mode .notification-dropdown .dropdown-footer a:hover {
+            color: #99ccff;
+        }
     </style>
-
-
 </head>
 <!-- [Head] end -->
 
@@ -358,7 +660,7 @@ require_once "config.php";
                     </li>
 
                     <li class="pc-item">
-                        <a href="../control-load/index.html" class="pc-link">
+                        <a href="../dashboard/controlLoad.php" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-power"></i></span>
                             <span class="pc-mtext">Control Load</span>
                         </a>
@@ -366,7 +668,7 @@ require_once "config.php";
 
                     <li class="pc-item sidebar-gif-wrapper">
                         <div class="card"
-                            style="width: 220px; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 .25rem .5rem rgba(0,0,0,.15); text-align:center;">
+                            style="margin-bottom: 50px; width: 220px; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 .25rem .5rem rgba(0,0,0,.15); text-align:center;">
                             <div class="card-body p-2">
                                 <img src="../../images/Solar Panel GIF.gif" alt="Sidebar GIF"
                                     style="width: 100%; height: auto; border-radius: 0.5rem; display:block; margin:0 auto;">
@@ -444,20 +746,88 @@ require_once "config.php";
             <div class="ms-auto d-flex align-items-center">
                 <ul class="list-unstyled d-flex align-items-center mb-0">
 
+
+                    <!-- Notification Bell Button -->
+                    <li class="pc-h-item notification" style="position: relative;">
+                        <a href="#" class="pc-head-link ms-0" id="notificationButton" title="Notifications"
+                            style="padding: 20px 21px; display: flex; align-items: center; justify-content: center;">
+                            <i class="ti ti-bell" style="font-size: 1.8rem;"></i>
+                            <span id="notificationBadge" style="position:absolute; top:1px; right:1px; background:#dc3545; color:white; 
+             font-size:0.7rem; font-weight:600; border-radius:50%; width:18px; height:18px;
+             display:flex; align-items:center; justify-content:center; box-shadow:0 0 4px rgba(0,0,0,0.3);">
+                                5
+                            </span>
+                        </a>
+
+                        <!-- Custom Notification Dropdown -->
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="dropdown-header">Notifications</div>
+
+                            <div class="notification-list">
+                                <div class="notification-item">
+                                    <i class="ti ti-bolt"></i>
+                                    <div class="notification-content">
+                                        <span class="notification-title">Load 1 turned OFF automatically.</span>
+                                        <span class="notification-time">2 mins ago</span>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item">
+                                    <i class="ti ti-battery"></i>
+                                    <div class="notification-content">
+                                        <span class="notification-title">Battery level low (18%).</span>
+                                        <span class="notification-time">10 mins ago</span>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item">
+                                    <i class="ti ti-sun"></i>
+                                    <div class="notification-content">
+                                        <span class="notification-title">Solar output stable at 420W.</span>
+                                        <span class="notification-time">25 mins ago</span>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item">
+                                    <i class="ti ti-alert-triangle"></i>
+                                    <div class="notification-content">
+                                        <span class="notification-title">Overload detected on Load 3.</span>
+                                        <span class="notification-time">40 mins ago</span>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item">
+                                    <i class="ti ti-device-analytics"></i>
+                                    <div class="notification-content">
+                                        <span class="notification-title">New performance report available.</span>
+                                        <span class="notification-time">1 hour ago</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- <div class="dropdown-footer">
+      <a href="#">View all notifications</a>
+    </div> -->
+                        </div>
+                    </li>
+
+
                     <!-- User Profile Dropdown -->
                     <li class="dropdown pc-h-item">
                         <a class="pc-head-link dropdown-toggle d-flex align-items-center"
                             style="padding: 20px 16px; gap:12px; min-width: 280px; cursor:pointer;"
-                            data-bs-toggle="dropdown" href="#"
-                            role="button" aria-haspopup="true" data-bs-auto-close="outside" aria-expanded="false">
+                            data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                            data-bs-auto-close="outside" aria-expanded="false">
 
                             <!-- Avatar -->
-                            <img src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '/Smart Solar/dist/assets/images/user/avatar-1.jpg'); ?>" alt="Profile Picture" style="width:40px; height:40px; object-fit:cover; border-radius:50%; flex-shrink:0; display:block;">
+                            <img src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '/Smart Solar/dist/assets/images/user/avatar-1.jpg'); ?>"
+                                alt="Profile Picture"
+                                style="width:40px; height:40px; object-fit:cover; border-radius:50%; flex-shrink:0; display:block;">
                             <!-- Full Name -->
-                            <span style="color:#000; font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <span class="user-fullname"
+                                style="font-weight:600; font-size:16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                 <?php echo htmlspecialchars($fullName); ?>
                             </span>
-
                         </a>
 
                         <!-- Dropdown Menu -->
@@ -541,11 +911,11 @@ require_once "config.php";
 
     <!-- [ Main Content ] start -->
     <div class="pc-container">
-        <div class="pc-content" style="padding-bottom: 2rem;">
-            <div class="row g-3 mt-4 mb-4">
+        <div class="pc-content" style="padding: 20px 35px 32px !important">
+            <div class="row g-3 mt-2 mb-2">
                 <!-- Main Profile Card -->
                 <div class="col-lg-8 col-12 d-flex">
-                    <div class="card card-hover flex-grow-1 h-100"
+                    <div class="card card-hover h-100"
                         style="width:100%; border-radius:0.75rem; box-shadow:0 .25rem .5rem rgba(0,0,0,.1); overflow:hidden; display:flex; flex-direction:column;">
 
                         <!-- Form Section -->
@@ -565,16 +935,19 @@ require_once "config.php";
                                     </div>
 
                                     <!-- Hidden File Input (connected to form) -->
-                                    <input type="file" name="profile_image" id="photoInput" accept="image/*" style="display: none;">
+                                    <input type="file" name="profile_image" id="photoInput" accept="image/*"
+                                        style="display: none;">
                                     <label for="photoInput"
                                         style="position: absolute; bottom: 0; right: 0; background-color: rgba(0,0,0,0.6); padding:6px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" viewBox="0 0 16 16">
-                                            <path d="M9.5 2a.5.5 0 0 1 .5.5V3h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-10a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h2v-.5a.5.5 0 0 1 .5-.5h5zM8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff"
+                                            viewBox="0 0 16 16">
+                                            <path
+                                                d="M9.5 2a.5.5 0 0 1 .5.5V3h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-10a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h2v-.5a.5.5 0 0 1 .5-.5h5zM8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
                                         </svg>
                                     </label>
                                 </div>
 
-                                <div style="flex:1; text-align:left;">
+                                <div style="flex:1; margin-left: 10px; text-align:left;">
                                     <h2 class="fw-bold mb-1" style="font-size:1.4rem;">
                                         <?php echo htmlspecialchars($fullName ?: 'N/A'); ?>
                                     </h2>
@@ -588,38 +961,43 @@ require_once "config.php";
                             </div>
 
                             <!-- Editable Fields -->
-                            <div style="padding: 1.5rem; border-top: 1px solid #eee;">
+                            <div style="padding: 1.5rem; border-top: 1px solid #383d42ff;">
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label for="email" class="form-label fw-semibold">Email</label>
                                         <input type="email" class="form-control" id="email" name="email"
-                                            value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" placeholder="N/A">
+                                            value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>"
+                                            placeholder="N/A">
                                     </div>
 
                                     <div class="col-md-6">
                                         <label for="fullname" class="form-label fw-semibold">Full Name</label>
                                         <input type="text" class="form-control" id="fullname" name="fullname"
-                                            value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>" placeholder="N/A">
+                                            value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>"
+                                            placeholder="N/A">
                                     </div>
 
                                     <div class="col-md-6">
                                         <label for="phone" class="form-label fw-semibold">Phone Number</label>
-                                        <input type="tel" class="form-control" id="phone" name="phone"
-                                            maxlength="11" pattern="^09\d{9}$"
+                                        <input type="tel" class="form-control" id="phone" name="phone" maxlength="11"
+                                            pattern="^09\d{9}$"
                                             title="Enter a valid 11-digit Philippine phone number starting with 09"
-                                            value="<?php echo htmlspecialchars($user['contact_number'] ?? ''); ?>" placeholder="N/A">
+                                            value="<?php echo htmlspecialchars($user['contact_number'] ?? ''); ?>"
+                                            placeholder="N/A">
                                     </div>
 
                                     <div class="col-md-6">
                                         <label for="dob" class="form-label fw-semibold">Date of Birth</label>
                                         <input type="date" class="form-control" id="dob" name="dob"
-                                            value="<?php echo htmlspecialchars($user['date_of_birth'] ?? ''); ?>" placeholder="N/A">
+                                            value="<?php echo htmlspecialchars($user['date_of_birth'] ?? ''); ?>"
+                                            placeholder="N/A">
                                     </div>
 
                                     <div class="col-md-6">
                                         <label for="address" class="form-label fw-semibold">Address</label>
                                         <input type="text" class="form-control" id="address" name="address"
-                                            value="<?php echo htmlspecialchars($user['address'] ?? ''); ?>" placeholder="N/A">
+                                            value="<?php echo htmlspecialchars($user['address'] ?? ''); ?>"
+                                            placeholder="N/A">
                                     </div>
 
                                     <div class="col-md-6">
@@ -629,7 +1007,7 @@ require_once "config.php";
                                     </div>
                                 </div>
 
-                                <div class="mt-3">
+                                <div class="mt-5">
                                     <button type="submit" class="btn btn-primary">Update Profile</button>
                                 </div>
                             </div>
@@ -641,19 +1019,20 @@ require_once "config.php";
 
                 <!-- Right Side Card (Account Overview) -->
                 <div class="col-12 col-lg-4 d-flex">
-                    <div class="card card-hover shadow-lg flex-grow-1 h-100 d-flex flex-column align-items-center justify-content-start text-center p-4">
+                    <div
+                        class="card card-hover shadow-lg flex-grow-1 h-100 d-flex flex-column align-items-center justify-content-start text-center p-4">
 
                         <!-- Label -->
-                        <h4 class="fw-bold mb-4">Profile Card</h4>
+                        <h4 class="fw-bold card-title">Profile Card</h4>
+                        <hr class="w-100">
 
                         <!-- Profile Picture -->
-                        <div class="position-relative mb-3"
+                        <div class="position-relative mt-2 mb-3"
                             style="width:140px; height:140px; border-radius:50%; overflow:hidden; border:3px solid white; box-shadow:0 0 8px rgba(0,0,0,0.15); cursor:pointer;">
 
                             <img id="profilePhoto"
                                 src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '../assets/images/user/avatar-1.jpg'); ?>"
-                                alt="Profile Picture"
-                                style="width:100%; height:100%; object-fit:cover; display:block;">
+                                alt="Profile Picture" style="width:100%; height:100%; object-fit:cover; display:block;">
                         </div>
 
 
@@ -664,37 +1043,38 @@ require_once "config.php";
                         <p class="text-muted mb-1" style="font-size:1rem;">
                             <?php echo htmlspecialchars($_SESSION['email'] ?? 'user@example.com'); ?>
                         </p>
-                        <span class="badge bg-primary mb-3" style="font-size:0.9rem; padding:0.5rem 1rem;">
+                        <span class="badge role-text bg-primary mb-3"
+                            style="color:black; font-size:0.9rem; padding:0.5rem 1rem;">
                             <?php echo htmlspecialchars(ucfirst($role)); ?>
                         </span>
 
                         <!-- Divider -->
                         <hr class="w-100">
                         <!-- Other Details (Single Column, Centered, Bigger Text with Icons) -->
-                        <div class="w-100 text-center">
+                        <div class="w-100 text-center mt-3">
                             <div class="mb-3">
-                                <small class="text-muted d-block" style="font-size:1rem; font-weight:600;">
-                                    <i class="bi bi-telephone me-1"></i> Phone
-                                </small>
                                 <span style="font-size:1.1rem;">
                                     <?php echo htmlspecialchars($phone ?? 'N/A'); ?>
                                 </span>
+                                <small class="text-muted d-block" style="font-size:1rem; font-weight:600;">
+                                    <i class="bi bi-telephone me-1"></i> Phone Number
+                                </small>
                             </div>
                             <div class="mb-3">
-                                <small class="text-muted d-block" style="font-size:1rem; font-weight:600;">
-                                    <i class="bi bi-calendar-event me-1"></i> Date of Birth
-                                </small>
                                 <span style="font-size:1.1rem;">
                                     <?php echo htmlspecialchars($dob ?? 'N/A'); ?>
                                 </span>
+                                <small class="text-muted d-block" style="font-size:1rem; font-weight:600;">
+                                    <i class="bi bi-calendar-event me-1"></i> Date of Birth
+                                </small>
                             </div>
                             <div class="mb-0">
-                                <small class="text-muted d-block" style="font-size:1rem; font-weight:600;">
-                                    <i class="bi bi-geo-alt me-1"></i> Address
-                                </small>
                                 <span style="font-size:1.1rem;">
                                     <?php echo htmlspecialchars($address ?? 'N/A'); ?>
                                 </span>
+                                <small class="text-muted d-block" style="font-size:1rem; font-weight:600;">
+                                    <i class="bi bi-geo-alt me-1"></i> Address
+                                </small>
                             </div>
                         </div>
 
@@ -732,7 +1112,7 @@ require_once "config.php";
 
     <script>
         document.querySelectorAll('.logout-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.preventDefault(); // prevent default link behavior
 
                 Swal.fire({
@@ -822,7 +1202,7 @@ require_once "config.php";
                     document.getElementById('power-text').innerText = '--';
                     break;
 
-                    // -------- Battery --------
+                // -------- Battery --------
                 case 'battery/voltage':
                     latestBattV = value;
                     document.getElementById('battery-voltage').innerText = value.toFixed(2);
@@ -860,7 +1240,7 @@ require_once "config.php";
                     }
                     break;
 
-                    // -------- Temperature --------
+                // -------- Temperature --------
                 case 'system/temperature':
                     latestTemperature = value;
                     document.getElementById('temperature').innerText = value.toFixed(1);
@@ -913,7 +1293,7 @@ require_once "config.php";
                 const file = e.target.files[0];
                 if (file) {
                     const reader = new FileReader();
-                    reader.onload = function(evt) {
+                    reader.onload = function (evt) {
                         profilePhoto.src = evt.target.result;
                     }
                     reader.readAsDataURL(file);
@@ -926,9 +1306,9 @@ require_once "config.php";
                 const formData = new FormData(updateForm);
 
                 fetch('updateUserInfo.php', {
-                        method: 'POST',
-                        body: formData
-                    })
+                    method: 'POST',
+                    body: formData
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
@@ -960,6 +1340,24 @@ require_once "config.php";
                     });
             });
         });
+
+
+
+
+        const notifButton = document.getElementById("notificationButton");
+        const notifDropdown = document.getElementById("notificationDropdown");
+
+        notifButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            notifDropdown.classList.toggle("active");
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!notifDropdown.contains(e.target) && !notifButton.contains(e.target)) {
+                notifDropdown.classList.remove("active");
+            }
+        });
+
     </script>
 
 
