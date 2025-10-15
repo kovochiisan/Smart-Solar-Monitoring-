@@ -658,79 +658,23 @@ body.dark-mode .pc-header .pc-head-link::after {
 
         <ul class="list-unstyled d-flex align-items-center mb-0">
 
-
-
-
-
           <!-- Notification Bell Button -->
           <li class="pc-h-item notification" style="position: relative;">
             <a href="#" class="pc-head-link ms-0" id="notificationButton" title="Notifications"
               style="padding: 20px 21px; display: flex; align-items: center; justify-content: center;">
               <i class="ti ti-bell" style="font-size: 1.8rem;"></i>
               <span id="notificationBadge" style="position:absolute; top:1px; right:1px; background:#dc3545; color:white; 
-             font-size:0.7rem; font-weight:600; border-radius:50%; width:18px; height:18px;
-             display:flex; align-items:center; justify-content:center; box-shadow:0 0 4px rgba(0,0,0,0.3);">
-                5
+                            font-size:0.7rem; font-weight:600; border-radius:50%; width:18px; height:18px;
+                            display:flex; align-items:center; justify-content:center; box-shadow:0 0 4px rgba(0,0,0,0.3); display:none;">
               </span>
             </a>
 
-            <!-- Custom Notification Dropdown -->
-            <div class="notification-dropdown" id="notificationDropdown">
+            <!-- Dropdown -->
+            <div class="notification-dropdown" id="notificationDropdown" style="display: none;">
               <div class="dropdown-header">Notifications</div>
-
-              <div class="notification-list">
-                <div class="notification-item">
-                  <i class="ti ti-bolt"></i>
-                  <div class="notification-content">
-                    <span class="notification-title">Load 1 turned OFF automatically.</span>
-                    <span class="notification-time">2 mins ago</span>
-                  </div>
-                </div>
-
-                <div class="notification-item">
-                  <i class="ti ti-battery"></i>
-                  <div class="notification-content">
-                    <span class="notification-title">Battery level low (18%).</span>
-                    <span class="notification-time">10 mins ago</span>
-                  </div>
-                </div>
-
-                <div class="notification-item">
-                  <i class="ti ti-sun"></i>
-                  <div class="notification-content">
-                    <span class="notification-title">Solar output stable at 420W.</span>
-                    <span class="notification-time">25 mins ago</span>
-                  </div>
-                </div>
-
-                <div class="notification-item">
-                  <i class="ti ti-alert-triangle"></i>
-                  <div class="notification-content">
-                    <span class="notification-title">Overload detected on Load 3.</span>
-                    <span class="notification-time">40 mins ago</span>
-                  </div>
-                </div>
-
-                <div class="notification-item">
-                  <i class="ti ti-device-analytics"></i>
-                  <div class="notification-content">
-                    <span class="notification-title">New performance report available.</span>
-                    <span class="notification-time">1 hour ago</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- <div class="dropdown-footer">
-      <a href="#">View all notifications</a>
-    </div> -->
+              <div class="notification-list" id="notificationList"></div>
             </div>
           </li>
-
-
-
-
-
-
 
           <!-- User Profile Dropdown -->
           <li class="dropdown pc-h-item">
@@ -1632,18 +1576,111 @@ body.dark-mode .pc-header .pc-head-link::after {
       }
     });
 
-    const notifButton = document.getElementById("notificationButton");
-    const notifDropdown = document.getElementById("notificationDropdown");
+    document.addEventListener('DOMContentLoaded', function() {
+      const bellBtn = document.getElementById('notificationButton');
+      const dropdown = document.getElementById('notificationDropdown');
+      const list = document.getElementById('notificationList');
+      const badge = document.getElementById('notificationBadge');
 
-    notifButton.addEventListener("click", (e) => {
-      e.preventDefault();
-      notifDropdown.classList.toggle("active");
-    });
+      const readNotifications = new Set();
 
-    document.addEventListener("click", (e) => {
-      if (!notifDropdown.contains(e.target) && !notifButton.contains(e.target)) {
-        notifDropdown.classList.remove("active");
+      // ----------------------------
+      // Fetch notifications
+      // ----------------------------
+      function fetchNotifications() {
+        fetch('fetch_notifications.php')
+          .then(res => res.json())
+          .then(data => {
+            if (!data.success) return;
+
+            const notifications = data.notifications;
+            let unreadCount = 0;
+            list.innerHTML = '';
+
+            if (notifications.length === 0) {
+              list.innerHTML = '<div class="text-center p-3 text-muted">No notifications</div>';
+            } else {
+              notifications.forEach(n => {
+                const isRead = n.is_read == 1 || readNotifications.has(n.user_notification_id);
+                if (!isRead) unreadCount++;
+
+                const style = isRead ? 'opacity:0.7;' : '';
+
+                list.innerHTML += `
+                            <div class="notification-item" style="cursor:pointer; ${style}" data-id="${n.user_notification_id}">
+                                <i class="${n.icon || 'ti ti-bell'}"></i>
+                                <div class="notification-content">
+                                    <span class="notification-title">${n.message}</span>
+                                    <span class="notification-time">${formatTime(n.time_stamp)}</span>
+                                </div>
+                            </div>
+                        `;
+              });
+            }
+
+            badge.textContent = unreadCount;
+            badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+          })
+          .catch(err => console.error('Error fetching notifications:', err));
       }
+
+      // ----------------------------
+      // Mark notification as read
+      // ----------------------------
+      function markAsRead(userNotificationId, itemElement = null) {
+        fetch('mark_as_read.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'user_notification_id=' + encodeURIComponent(userNotificationId)
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              readNotifications.add(userNotificationId);
+              if (itemElement) itemElement.style.opacity = 0.7;
+
+              let count = parseInt(badge.textContent || '0');
+              if (count > 0) count--;
+              badge.textContent = count;
+              badge.style.display = count > 0 ? 'flex' : 'none';
+            } else {
+              console.error('Failed to mark as read:', data.error);
+            }
+          })
+          .catch(err => console.error(err));
+      }
+
+      function formatTime(dateString) {
+        const date = new Date(dateString);
+        if (isNaN(date)) return '';
+        return date.toLocaleString('en-PH', {
+          hour12: true
+        });
+      }
+
+      // ----------------------------
+      // Toggle dropdown
+      // ----------------------------
+      bellBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+      });
+
+      // ----------------------------
+      // Event delegation
+      // ----------------------------
+      list.addEventListener('click', function(e) {
+        const item = e.target.closest('.notification-item');
+        if (!item) return;
+
+        const id = item.dataset.id;
+        markAsRead(id, item);
+      });
+
+      fetchNotifications();
+      setInterval(fetchNotifications, 5000);
     });
   </script>
 
