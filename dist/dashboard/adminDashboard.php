@@ -489,6 +489,24 @@ session_start(); // must be first thing in your PHP
       color: #888;
     }
 
+    .mark-read-disabled {
+      background: #b6d4fe !important;
+      /* lighter blue */
+      color: #fff !important;
+      cursor: not-allowed !important;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .clear-all-disabled {
+      background: #f5a6a6 !important;
+      /* lighter red */
+      color: #fff !important;
+      cursor: not-allowed !important;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
     /* Dark mode support */
     body.dark-mode .notification-dropdown {
       background-color: rgba(36, 36, 62, 0.96);
@@ -571,6 +589,13 @@ body.dark-mode .pc-header .pc-head-link::after {
             <a href="../dashboard/controlLoad.php" class="pc-link">
               <span class="pc-micon"><i class="ti ti-power"></i></span>
               <span class="pc-mtext">Control Load</span>
+            </a>
+          </li>
+
+          <li class="pc-item">
+            <a href="../dashboard/dataLogs.php" class="pc-link">
+              <span class="pc-micon"><i class="ti ti-file-text"></i></span>
+              <span class="pc-mtext">Data Logs</span>
             </a>
           </li>
 
@@ -670,10 +695,46 @@ body.dark-mode .pc-header .pc-head-link::after {
             </a>
 
             <!-- Dropdown -->
+            <!-- Dropdown -->
             <div class="notification-dropdown" id="notificationDropdown" style="display: none;">
-              <div class="dropdown-header">Notifications</div>
+              <div class="dropdown-header"
+                style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px;">
+
+                <span style="font-weight:600;">Notifications</span>
+
+                <!-- BUTTONS -->
+                <div style="display:flex; gap:8px;">
+                  <button id="markAllReadBtn"
+                    style="
+                    background:#0d6efd;
+                    color:white;
+                    border:none;
+                    padding:4px 10px;
+                    border-radius:4px;
+                    font-size:0.7rem;
+                    cursor:pointer;
+                ">
+                    Mark all as read
+                  </button>
+
+                  <button id="clearAllBtn"
+                    style="
+                    background:#dc3545;
+                    color:white;
+                    border:none;
+                    padding:4px 10px;
+                    border-radius:4px;
+                    font-size:0.7rem;
+                    cursor:pointer;
+                ">
+                    Clear all
+                  </button>
+                </div>
+              </div>
+
               <div class="notification-list" id="notificationList"></div>
             </div>
+
           </li>
 
           <!-- User Profile Dropdown -->
@@ -1492,7 +1553,7 @@ body.dark-mode .pc-header .pc-head-link::after {
           break;
 
         case 'solar/power':
-          document.getElementById('power').innerText = value.toFixed(1);
+          document.getElementById('power').innerText = value.toFixed(2);
           document.getElementById('power-status').innerText = '--';
           document.getElementById('power-text').innerText = '--';
           break;
@@ -1513,7 +1574,7 @@ body.dark-mode .pc-header .pc-head-link::after {
           break;
 
         case 'battery/power':
-          document.getElementById('battery-power').innerText = value.toFixed(1);
+          document.getElementById('battery-power').innerText = value.toFixed(2);
           document.getElementById('battery-power-status').innerText = '--';
           document.getElementById('battery-power-text').innerText = '--';
           break;
@@ -1581,6 +1642,8 @@ body.dark-mode .pc-header .pc-head-link::after {
       const dropdown = document.getElementById('notificationDropdown');
       const list = document.getElementById('notificationList');
       const badge = document.getElementById('notificationBadge');
+      const markBtn = document.getElementById("markAllReadBtn");
+      const clearBtn = document.getElementById("clearAllBtn");
 
       const readNotifications = new Set();
 
@@ -1605,7 +1668,6 @@ body.dark-mode .pc-header .pc-head-link::after {
                 if (!isRead) unreadCount++;
 
                 const style = isRead ? 'opacity:0.7;' : '';
-
                 list.innerHTML += `
                             <div class="notification-item" style="cursor:pointer; ${style}" data-id="${n.user_notification_id}">
                                 <i class="${n.icon || 'ti ti-bell'}"></i>
@@ -1618,14 +1680,19 @@ body.dark-mode .pc-header .pc-head-link::after {
               });
             }
 
+            // Update badge
             badge.textContent = unreadCount;
             badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+
+            // Update buttons
+            updateMarkAllButton(unreadCount);
+            updateClearAllButton(notifications.length);
           })
           .catch(err => console.error('Error fetching notifications:', err));
       }
 
       // ----------------------------
-      // Mark notification as read
+      // Mark individual notification as read
       // ----------------------------
       function markAsRead(userNotificationId, itemElement = null) {
         fetch('mark_as_read.php', {
@@ -1645,6 +1712,8 @@ body.dark-mode .pc-header .pc-head-link::after {
               if (count > 0) count--;
               badge.textContent = count;
               badge.style.display = count > 0 ? 'flex' : 'none';
+
+              updateMarkAllButton(count);
             } else {
               console.error('Failed to mark as read:', data.error);
             }
@@ -1669,7 +1738,7 @@ body.dark-mode .pc-header .pc-head-link::after {
       });
 
       // ----------------------------
-      // Event delegation
+      // Event delegation for individual notification clicks
       // ----------------------------
       list.addEventListener('click', function(e) {
         const item = e.target.closest('.notification-item');
@@ -1679,6 +1748,98 @@ body.dark-mode .pc-header .pc-head-link::after {
         markAsRead(id, item);
       });
 
+      // ----------------------------
+      // Mark All as Read
+      // ----------------------------
+      markBtn.addEventListener("click", () => {
+        if (markBtn.classList.contains("mark-read-disabled")) return;
+
+        Swal.fire({
+          title: 'Mark all notifications as read?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, mark all',
+          cancelButtonText: 'Cancel',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch("mark_all_read.php", {
+                method: "POST"
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (data.status === "success") {
+                  document.querySelectorAll(".notification-item").forEach(item => item.classList.add("read"));
+                  badge.style.display = "none";
+                  badge.textContent = "0";
+                  updateMarkAllButton(0);
+
+                  Swal.fire('Marked!', 'All notifications are marked as read.', 'success');
+                } else {
+                  Swal.fire('Error', data.message, 'error');
+                }
+              });
+          }
+        });
+      });
+
+      function updateMarkAllButton(unreadCount) {
+        if (unreadCount === 0) {
+          markBtn.classList.add("mark-read-disabled");
+        } else {
+          markBtn.classList.remove("mark-read-disabled");
+        }
+      }
+
+      // ----------------------------
+      // Clear All Notifications
+      // ----------------------------
+      clearBtn.addEventListener("click", () => {
+        if (clearBtn.classList.contains("clear-all-disabled")) return;
+
+        Swal.fire({
+          title: 'Clear all notifications?',
+          text: "This action cannot be undone!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, clear all',
+          cancelButtonText: 'Cancel',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch("clear_all_notifications.php", {
+                method: "POST"
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (data.status === "success") {
+                  list.innerHTML = '<div class="text-center p-3 text-muted">No notifications</div>';
+                  badge.style.display = "none";
+                  badge.textContent = "0";
+
+                  updateMarkAllButton(0);
+                  updateClearAllButton(0);
+
+                  Swal.fire('Cleared!', 'All notifications have been cleared.', 'success');
+                } else {
+                  Swal.fire('Error', data.message, 'error');
+                }
+              });
+          }
+        });
+      });
+
+      function updateClearAllButton(notificationsCount) {
+        if (notificationsCount === 0) {
+          clearBtn.classList.add("clear-all-disabled");
+        } else {
+          clearBtn.classList.remove("clear-all-disabled");
+        }
+      }
+
+      // ----------------------------
+      // Initial fetch + auto-refresh
+      // ----------------------------
       fetchNotifications();
       setInterval(fetchNotifications, 5000);
     });

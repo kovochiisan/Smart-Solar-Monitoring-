@@ -586,6 +586,119 @@ session_start(); // must be first thing in your PHP
             pointer-events: none;
         }
 
+        .btn-fixed-height {
+            height: 45px;
+            /* adjust the height as needed */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            justify-content: space-between;
+            /* distribute boxes evenly */
+        }
+
+        .info-card {
+            display: flex;
+            align-items: center;
+            justify-content: start;
+            padding: 12px;
+            /* slightly more padding */
+            border-radius: 0.5rem;
+            color: #fff;
+            flex: 1 1 0;
+            /* allow cards to grow evenly */
+            max-width: 250px;
+            /* maintain square-ish size */
+            height: 130px;
+            /* fixed height */
+            transition: transform 0.2s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .info-icon {
+            font-size: 2rem;
+            margin-right: 12px;
+        }
+
+        .info-text h6 {
+            margin: 0;
+            font-size: 0.9rem;
+            /* slightly larger */
+            font-weight: 600;
+            /* semi-bold */
+            color: #ffffff;
+            /* high contrast */
+        }
+
+        .info-text span {
+            display: block;
+            font-size: 1.3rem;
+            /* bigger number */
+            font-weight: 700;
+            /* bold */
+            color: #ffffff;
+            margin-top: 4px;
+        }
+
+
+        /* Color coding */
+        .bg-solar {
+            background-color: #0d6efd;
+        }
+
+        .bg-battery {
+            background-color: #198754;
+        }
+
+        .bg-soc {
+            background-color: #fd7e14;
+        }
+
+        .bg-max-temp {
+            background-color: #dc3545;
+        }
+
+        .bg-min-temp {
+            background-color: #0dcaf0;
+        }
+
+        .bg-readings {
+            background-color: #6c757d;
+        }
+
+        /* Table styling */
+        .table thead th {
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+            z-index: 10;
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+
+        .table tbody tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .table td,
+        .table th {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+
         /* Dark mode support */
         body.dark-mode .notification-dropdown {
             background-color: rgba(36, 36, 62, 0.96);
@@ -857,136 +970,226 @@ session_start(); // must be first thing in your PHP
     <!-- [ Header ] end -->
 
 
+
     <!-- [ Main Content ] start -->
+    <?php
+    // Database connection
+    $host = "localhost";
+    $user = "root";
+    $pass = "";
+    $db   = "smart_solar";
+
+    $conn = new mysqli($host, $user, $pass, $db);
+    if ($conn->connect_error) die("Connection failed: " . $conn->connect_error);
+
+    // Sampling interval in seconds
+    $sampling_interval_sec = 2;
+    $interval_hours = $sampling_interval_sec / 3600; // 2 seconds in hours ≈ 0.0005556 h
+
+    // Date range
+    $start_date = isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d');
+    $end_date   = isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d');
+    $start_time = isset($_POST['start_time']) ? $_POST['start_time'] : '00:00:00';
+    $end_time   = isset($_POST['end_time']) ? $_POST['end_time'] : '23:30:00';
+
+    // Combine date + time for SQL
+    $from_datetime = $start_date . ' ' . $start_time;
+    $to_datetime   = $end_date . ' ' . $end_time;
+
+
+
+    // Fetch summary totals
+    $summary_sql = "
+SELECT 
+    SUM(solar_power) * $interval_hours AS total_solar_energy,
+    SUM(battery_power) * $interval_hours AS total_battery_energy,
+    AVG(battery_soc) AS avg_battery_soc,
+    MAX(temperature) AS max_temp,
+    MIN(temperature) AS min_temp,
+    COUNT(*) AS total_readings
+FROM sensor_reading
+WHERE reading_time BETWEEN '$from_datetime' AND '$to_datetime'
+";
+
+    $summary_result = $conn->query($summary_sql);
+
+    if ($summary_result) {
+        $summary = $summary_result->fetch_assoc();
+    } else {
+        // Default values if query fails
+        $summary = [
+            'total_solar_energy' => 0,
+            'total_battery_energy' => 0,
+            'avg_battery_soc' => 0,
+            'max_temp' => 0,
+            'min_temp' => 0,
+            'total_readings' => 0
+        ];
+    }
+
+    $data_sql = "
+SELECT * FROM sensor_reading
+WHERE reading_time BETWEEN '$from_datetime' AND '$to_datetime'
+ORDER BY reading_time ASC
+";
+
+    $data_result = $conn->query($data_sql);
+    ?>
+
     <div class="pc-container">
-        <div class="pc-content" style="padding: 22px 35px 32px">
+        <div class="pc-content" style="padding: 22px 35px 32px;">
 
-            <div class="row g-3 mt-1">
+            <!-- Big Data Logs Card -->
+            <div class="card shadow-lg card-hover" style="height: 100vh;">
+                <div class="card-body p-4">
 
-                <!-- Left Column -->
-                <div class="col-12 col-lg-8 d-flex flex-column">
+                    <!-- Header + Date Filter -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-bold mb-0">Data Logs</h4>
 
-                    <!-- Load Control Card (Full Width) -->
-                    <div class="card card-hover shadow-lg text-center" style="margin-bottom: 15px !important">
-                        <div class="card-body p-4">
-                            <h4 class="fw-bold mb-2">Load Control</h4>
-                            <p class="text-muted small mb-3">Manually switch the load ON or OFF.</p>
-                            <div class="form-check form-switch d-flex justify-content-center align-items-center"
-                                style="gap: 10px;">
-                                <input class="form-check-input" type="checkbox" id="loadSwitch"
-                                    style="width: 60px; height: 34px;">
-                                <label class="form-check-label fs-5" for="loadSwitch">Load</label>
-                            </div>
+                        <div class="d-flex gap-2 align-items-end">
+                            <!-- Filter Form (POST) -->
+                            <form method="POST" class="d-flex gap-2 align-items-end">
+                                <!-- From Date + Time -->
+                                <div class="d-flex flex-column">
+                                    <label for="start_date" class="form-label mb-1">From</label>
+                                    <div class="d-flex gap-1">
+                                        <input type="date" id="start_date" name="start_date" value="<?= $start_date ?>" class="form-control">
+                                        <select name="start_time" class="form-select">
+                                            <?php
+                                            for ($h = 0; $h < 24; $h++) {
+                                                for ($m = 0; $m < 60; $m += 30) {
+                                                    $time = sprintf('%02d:%02d:00', $h, $m);
+                                                    $display = date('h:i A', strtotime($time));
+                                                    $selected = (isset($_POST['start_time']) && $_POST['start_time'] == $time) ? 'selected' : '';
+                                                    echo "<option value='$time' $selected>$display</option>";
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- To Date + Time -->
+                                <div class="d-flex flex-column">
+                                    <label for="end_date" class="form-label mb-1">To</label>
+                                    <div class="d-flex gap-1">
+                                        <input type="date" id="end_date" name="end_date" value="<?= $end_date ?>" class="form-control">
+                                        <select name="end_time" class="form-select">
+                                            <?php
+                                            for ($h = 0; $h < 24; $h++) {
+                                                for ($m = 0; $m < 60; $m += 30) {
+                                                    $time = sprintf('%02d:%02d:00', $h, $m);
+                                                    $display = date('h:i A', strtotime($time));
+                                                    $selected = (isset($_POST['end_time']) && $_POST['end_time'] == $time) ? 'selected' : '';
+                                                    echo "<option value='$time' $selected>$display</option>";
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button type="submit" name="filter" class="btn btn-primary btn-fixed-height">
+                                    Filter
+                                </button>
+                            </form>
+
+                            <!-- Generate Report Form (GET) -->
+                            <form method="GET" action="generate_report.php" target="_blank" class="d-flex align-items-end">
+                                <input type="hidden" name="start_time" value="<?= isset($_POST['start_time']) ? $_POST['start_time'] : '00:00:00' ?>">
+                                <input type="hidden" name="end_time" value="<?= isset($_POST['end_time']) ? $_POST['end_time'] : '23:30:00' ?>">
+                                <button type="submit" class="btn btn-success btn-fixed-height" style="min-width: 100px;">
+                                    Generate Report
+                                </button>
+                            </form>
                         </div>
                     </div>
 
 
-                    <!-- Bottom row: Battery Status + Chart -->
-                    <div class="row g-3">
+                    <!-- Summary Info Boxes Row -->
+                    <div class="info-row">
+                        <?php
+                        $summaries = [
+                            ['label' => 'Total Solar Energy (Wh)', 'value' => number_format($summary['total_solar_energy'], 4), 'class' => 'bg-solar', 'icon' => '☀️'],
+                            ['label' => 'Total Battery Energy (Wh)', 'value' => number_format($summary['total_battery_energy'], 4), 'class' => 'bg-battery', 'icon' => '🔋'],
+                            ['label' => 'Avg Battery SOC (%)', 'value' => number_format($summary['avg_battery_soc'], 2), 'class' => 'bg-soc', 'icon' => '⚡'],
+                            ['label' => 'Max Temp (°C)', 'value' => number_format($summary['max_temp'], 2), 'class' => 'bg-max-temp', 'icon' => '🔥'],
+                            ['label' => 'Min Temp (°C)', 'value' => number_format($summary['min_temp'], 2), 'class' => 'bg-min-temp', 'icon' => '❄️'],
+                            ['label' => 'Number of Readings', 'value' => $summary['total_readings'], 'class' => 'bg-readings', 'icon' => '📊'],
+                        ];
 
-                        <!-- Battery Status Card -->
-                        <div class="col-12 col-md-6">
-                            <div class="card card-hover shadow-lg h-100">
-                                <div class="card-body p-4">
-                                    <h4 class="fw-bold mb-2">Battery Status</h4>
-                                    <p class="text-muted small mb-4">
-                                        Set the battery % threshold to automatically turn off the load if it drops below
-                                        this level.
-                                    </p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div style="flex-shrink: 0;">
-                                            <svg class="battery" viewBox="0 0 100 100" width="140px" height="140px">
-                                                <g fill="none" transform="rotate(-75,50,50)">
-                                                    <circle r="40" cx="50" cy="50" stroke="hsla(223,10%,50%,0.2)"
-                                                        stroke-width="20" stroke-dasharray="251.33 251.33"
-                                                        stroke-dashoffset="20.944" />
-                                                    <circle class="battery__fill1" r="40" cx="50" cy="50"
-                                                        stroke="hsl(123,90%,45%)" stroke-width="20"
-                                                        stroke-dasharray="251.33 251.33" stroke-dashoffset="20.944" />
-                                                </g>
-                                                <text class="battery__value" font-size="16" fill="currentColor" x="50"
-                                                    y="56" text-anchor="middle" data-value>100%</text>
-                                            </svg>
-                                        </div>
-                                        <div class="text-end" style="flex-shrink: 0;">
-                                            <h6 class="mb-1">Current Threshold</h6>
-                                            <span id="batteryThresholdValueDisplay" class="fw-bold fs-2">100%</span>
-                                        </div>
-                                    </div>
-                                    <label for="batteryThreshold" class="form-label fw-bold">Auto Shutdown Threshold
-                                        (%)</label>
-                                    <input type="range" class="form-range mb-3" min="0" max="100" value="100"
-                                        id="batteryThreshold">
-                                    <div class="d-flex justify-content-between mb-3">
-                                        <span>0%</span>
-                                        <span id="batteryThresholdValue">100%</span>
-                                    </div>
-                                    <div class="text-end">
-                                        <button id="applyThresholdBtn" class="btn btn-success btn-lg shadow-sm">Apply
-                                            Changes</button>
-                                    </div>
+                        foreach ($summaries as $item): ?>
+                            <div class="info-card <?= $item['class'] ?>">
+                                <div class="info-icon"><?= $item['icon'] ?></div>
+                                <div class="info-text text-start">
+                                    <h6><?= $item['label'] ?></h6>
+                                    <span><?= $item['value'] ?></span>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Chart Card -->
-                        <div class="col-12 col-md-6">
-                            <div class="card card-hover shadow-lg text-center h-100">
-                                <div class="card-body px-5">
-                                    <h4 class="fw-bold mb-2">Load Activity Chart</h4>
-                                    <p class="text-muted small mb-4">Visualize recent load activity and battery status
-                                        trends.</p>
-                                    <canvas id="loadChart" style="width:100%; height:300px;"></canvas>
-                                </div>
-                            </div>
-                        </div>
-
+                        <?php endforeach; ?>
                     </div>
 
-                </div>
-
-                <!-- Right Column: Load Overview Card -->
-                <div class="col-12 col-lg-4">
-                    <div class="card card-hover shadow-lg h-100">
-                        <div class="card-body p-4 d-flex flex-column justify-content-start align-items-center">
-
-                            <!-- Placeholder for Image or Icon -->
-                            <img src="https://via.placeholder.com/80x80?text=Load" alt="Load Image" class="mb-3"
-                                style="border-radius: 8px;">
-
-                            <h4 class="fw-bold mb-4 text-center">Load Overview</h4>
-
-                            <div class="row w-100">
-                                <!-- Left Column of Info -->
-                                <div class="col-6">
-                                    <ul class="list-unstyled">
-                                        <li class="mb-2"><span style="color:#4CAF50;">●</span> Load Status: <span
-                                                id="loadStatus">ON</span></li>
-                                        <li class="mb-2"><span style="color:#2196F3;">●</span> Auto Shutdown Threshold:
-                                            <span id="batteryThresholdDisplay">100%</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <!-- Right Column of Info -->
-                                <div class="col-6">
-                                    <ul class="list-unstyled">
-                                        <li class="mb-2"><span style="color:#E91E63;">●</span> Runtime Today: <span
-                                                id="loadRuntime">3h 20m</span></li>
-                                        <li class="mb-2"><span style="color:#FF5722;">●</span> Last Load Action: <span
-                                                id="loadLastTriggered">10:45 AM</span></li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                        </div>
+                    <!-- Scrollable Table -->
+                    <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                        <table class="table table-bordered table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th> <!-- Row number column -->
+                                    <th>Solar Voltage (V)</th>
+                                    <th>Solar Current (A)</th>
+                                    <th>Solar Power (W)</th>
+                                    <th>Battery Voltage (V)</th>
+                                    <th>Battery Current (A)</th>
+                                    <th>Battery Power (W)</th>
+                                    <th>Battery SOC (%)</th>
+                                    <th>Temperature (°C)</th>
+                                    <th>Reading Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if ($data_result->num_rows > 0): ?>
+                                    <?php $counter = 1; ?> <!-- Initialize row number -->
+                                    <?php while ($row = $data_result->fetch_assoc()): ?>
+                                        <tr>
+                                            <td><?= $counter++ ?></td> <!-- Row number -->
+                                            <td><?= number_format($row['solar_voltage'], 2) ?></td>
+                                            <td><?= number_format($row['solar_current'], 2) ?></td>
+                                            <td><?= number_format($row['solar_power'], 2) ?></td>
+                                            <td><?= number_format($row['battery_voltage'], 2) ?></td>
+                                            <td><?= number_format($row['battery_current'], 2) ?></td>
+                                            <td><?= number_format($row['battery_power'], 2) ?></td>
+                                            <td><?= number_format($row['battery_soc'], 2) ?></td>
+                                            <td><?= number_format($row['temperature'], 2) ?></td>
+                                            <td><?= date('M d, Y H:i', strtotime($row['reading_time'])) ?></td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="10">No data available.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
 
 
-            </div>
+                </div> <!-- /.card-body -->
+            </div> <!-- /.big card -->
+
+
+
+
+
+
+
+
         </div>
-
     </div>
+
+
+
+
     <!-- [ Main Content ] end -->
 
 
@@ -1009,162 +1212,6 @@ session_start(); // must be first thing in your PHP
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-        const batteryThresholdSlider = document.getElementById('batteryThreshold');
-        const batteryThresholdValue = document.getElementById('batteryThresholdValue');
-        const batteryThresholdDisplay = document.getElementById('batteryThresholdDisplay');
-        const applyThresholdBtn = document.getElementById('applyThresholdBtn');
-
-        function updateSliderColor(value) {
-            let color;
-            if (value > 80) color = 'hsl(123, 90%, 45%)'; // full green
-            else if (value > 60) color = 'hsl(96, 90%, 45%)'; // light green
-            else if (value > 40) color = 'hsl(58, 90%, 45%)'; // yellow
-            else if (value > 20) color = 'hsl(30, 90%, 45%)'; // orange
-            else color = 'hsl(3, 90%, 45%)'; // red
-
-            batteryThresholdSlider.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${value}%, #d3d3d3 ${value}%, #d3d3d3 100%)`;
-        }
-
-        // Initialize slider color
-        updateSliderColor(batteryThresholdSlider.value);
-
-        // Update dynamically
-        batteryThresholdSlider.addEventListener('input', () => {
-            batteryThresholdValue.innerText = batteryThresholdSlider.value + '%';
-            updateSliderColor(batteryThresholdSlider.value);
-        });
-
-        // -------------------------------
-        // Load Control
-        // -------------------------------
-        const loadSwitch = document.getElementById('loadSwitch');
-        const loadStatusDisplay = document.getElementById('loadStatus');
-
-        function loadStateFromDB() {
-            fetch('get_load_state.php')
-                .then(res => res.json())
-                .then(data => {
-                    loadSwitch.checked = data.state == 1;
-                    loadStatusDisplay.innerText = data.state == 1 ? 'ON' : 'OFF';
-                });
-        }
-
-        function loadThresholdFromDB() {
-            fetch('get_threshold.php')
-                .then(res => res.json())
-                .then(data => {
-                    batteryThresholdSlider.value = data.value;
-                    batteryThresholdValue.innerText = data.value + '%';
-                    batteryThresholdDisplay.innerText = data.value + '%';
-                    updateSliderColor(data.value);
-                });
-        }
-
-        // Initial load from DB
-        loadStateFromDB();
-        loadThresholdFromDB();
-
-        // Load switch event
-        loadSwitch.addEventListener('change', () => {
-            const status = loadSwitch.checked ? "ON" : "OFF";
-            loadStatusDisplay.innerText = status;
-
-            // Publish to MQTT
-            client.publish('system/load/control', status, {
-                qos: 1,
-                retain: true
-            });
-            console.log('Load control sent:', status);
-
-            // Update DB
-            fetch('update_load_state.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: 'state=' + (loadSwitch.checked ? 1 : 0)
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: `Load turned ${status}`,
-                            icon: 'success',
-                            timer: 1200,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        console.error('DB error:', data.error);
-                    }
-                });
-        });
-
-        // -------------------------------
-        // Apply Battery Threshold
-        // -------------------------------
-        applyThresholdBtn.addEventListener('click', () => {
-            const thresholdValue = batteryThresholdSlider.value;
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: `Apply battery threshold of ${thresholdValue}%?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, apply it!',
-                cancelButtonText: 'Cancel',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-
-                    // Publish to MQTT
-                    client.publish('system/battery/threshold', thresholdValue.toString(), {
-                        qos: 1,
-                        retain: true
-                    });
-                    console.log('Battery threshold sent:', thresholdValue);
-
-                    // Update DB
-                    fetch('update_threshold.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: 'value=' + thresholdValue
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Update display
-                                batteryThresholdValue.innerText = thresholdValue + '%';
-                                batteryThresholdDisplay.innerText = thresholdValue + '%';
-
-                                Swal.fire({
-                                    title: 'Applied!',
-                                    text: `Battery threshold set to ${thresholdValue}%`,
-                                    icon: 'success',
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                });
-                            } else {
-                                console.error('DB error:', data.error);
-                            }
-                        });
-
-                }
-            });
-        });
-
-        // -------------------------------
-        // Poll DB every 5 seconds to sync all users
-        // -------------------------------
-        setInterval(() => {
-            loadStateFromDB();
-            loadThresholdFromDB();
-        }, 5000);
-
-
-
         document.querySelectorAll('.logout-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault(); // prevent default link behavior
@@ -1185,126 +1232,6 @@ session_start(); // must be first thing in your PHP
                 });
             });
         });
-
-        // -----------------------------
-        // MQTT WebSocket Connection
-        // -----------------------------
-        const client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt'); // non-TLS
-
-        // Keep latest values for calculations
-        let latestSolarV = 0;
-        let latestSolarI = 0;
-        let latestBattV = 0;
-        let latestBattI = 0;
-        let latestTemperature = 0;
-
-        client.on('connect', () => {
-            console.log('Connected to MQTT broker via WebSocket');
-
-            const topics = [
-                'solar/voltage',
-                'solar/current',
-                'solar/power',
-                'battery/voltage',
-                'battery/current',
-                'battery/power',
-                'battery/soc',
-                'system/temperature'
-            ];
-
-            topics.forEach(topic => {
-                client.subscribe(topic, (err) => {
-                    if (!err) console.log('Subscribed to', topic);
-                    else console.error('Subscribe error for', topic, err);
-                });
-            });
-        });
-
-        client.on('error', (err) => {
-            console.error('MQTT connection error:', err);
-        });
-
-        // -----------------------------
-        // MQTT Message Handling
-        // -----------------------------
-        client.on('message', (topic, message) => {
-            const value = parseFloat(message.toString());
-
-            switch (topic) {
-                // -------- Solar --------
-                case 'solar/voltage':
-                    latestSolarV = value;
-                    document.getElementById('voltage').innerText = value.toFixed(2);
-                    document.getElementById('voltage-status').innerText = value > 12.5 ? 'Stable' : 'Low';
-                    document.getElementById('voltage-text').innerText = value > 12.5 ? 'within normal range' : 'low';
-                    break;
-
-                case 'solar/current':
-                    latestSolarI = value;
-                    document.getElementById('current').innerText = Math.abs(value).toFixed(2);
-                    document.getElementById('current-status').innerText = Math.abs(value) < 10 ? 'Normal' : 'High';
-                    document.getElementById('current-text').innerText = Math.abs(value) < 10 ? 'within safe limits' : 'overcurrent!';
-                    break;
-
-                case 'solar/power':
-                    document.getElementById('power').innerText = value.toFixed(1);
-                    document.getElementById('power-status').innerText = '--';
-                    document.getElementById('power-text').innerText = '--';
-                    break;
-
-                    // -------- Battery --------
-                case 'battery/voltage':
-                    latestBattV = value;
-                    document.getElementById('battery-voltage').innerText = value.toFixed(2);
-                    document.getElementById('battery-voltage-status').innerText = value > 12 ? 'Stable' : 'Low';
-                    document.getElementById('battery-voltage-text').innerText = value > 12 ? 'within normal range' : 'low';
-                    break;
-
-                case 'battery/current':
-                    latestBattI = value;
-                    document.getElementById('battery-current').innerText = Math.abs(value).toFixed(2);
-                    document.getElementById('battery-current-status').innerText = Math.abs(value) < 10 ? 'Normal' : 'High';
-                    document.getElementById('battery-current-text').innerText = Math.abs(value) < 10 ? 'within safe limits' : 'overcurrent!';
-                    break;
-
-                case 'battery/power':
-                    document.getElementById('battery-power').innerText = value.toFixed(1);
-                    document.getElementById('battery-power-status').innerText = '--';
-                    document.getElementById('battery-power-text').innerText = '--';
-                    break;
-
-                case 'battery/soc':
-                    document.getElementById('battery-soc').innerText = value.toFixed(0);
-                    if (value > 75) {
-                        document.getElementById('battery-status').innerText = 'Good';
-                        document.getElementById('battery-text').innerText = 'optimal range';
-                        document.getElementById('battery-fill').setAttribute('width', '18');
-                    } else if (value > 50) {
-                        document.getElementById('battery-status').innerText = 'Moderate';
-                        document.getElementById('battery-text').innerText = 'acceptable range';
-                        document.getElementById('battery-fill').setAttribute('width', '12');
-                    } else {
-                        document.getElementById('battery-status').innerText = 'Low';
-                        document.getElementById('battery-text').innerText = 'needs charging';
-                        document.getElementById('battery-fill').setAttribute('width', '6');
-                    }
-                    break;
-
-                    // -------- Temperature --------
-                case 'system/temperature':
-                    latestTemperature = value;
-                    document.getElementById('temperature').innerText = value.toFixed(1);
-                    if (value < 40) {
-                        document.getElementById('temperature-status').innerText = 'Normal';
-                        document.getElementById('temperature-text').innerText = 'within safe operating levels';
-                    } else {
-                        document.getElementById('temperature-status').innerText = 'High';
-                        document.getElementById('temperature-text').innerText = 'temperature too high!';
-                    }
-                    break;
-            }
-        });
-
 
 
         const darkModeToggle = document.getElementById('darkModeToggle');
@@ -1329,106 +1256,6 @@ session_start(); // must be first thing in your PHP
                 localStorage.setItem('darkMode', 'disabled');
                 darkModeIcon.classList.remove('ti-sun');
                 darkModeIcon.classList.add('ti-moon');
-            }
-        });
-
-
-        window.addEventListener("DOMContentLoaded", () => {
-            const batteryMeter = new BatteryMeter(".battery");
-
-            // -----------------------------
-            // MQTT WebSocket Connection
-            // -----------------------------
-            const client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt'); // non-TLS
-
-            client.on('connect', () => {
-                console.log('Connected to MQTT broker via WebSocket');
-
-                client.subscribe('battery/soc', (err) => {
-                    if (!err) console.log('Subscribed to battery/soc');
-                    else console.error('Subscribe error:', err);
-                });
-            });
-
-            client.on('error', (err) => {
-                console.error('MQTT connection error:', err);
-            });
-
-            // Update battery meter when MQTT message arrives
-            client.on('message', (topic, message) => {
-                if (topic === 'battery/soc') {
-                    const soc = parseFloat(message.toString()); // value from 0 to 100
-                    batteryMeter.adjustHealth(soc / 100); // convert to 0-1 range for BatteryMeter
-                }
-            });
-        });
-
-        class BatteryMeter {
-            health = 1;
-            constructor(el) {
-                this.el = document.querySelector(el);
-                this.init();
-            }
-            get healthReadable() {
-                return `${Math.round(this.health * 100)}%`;
-            }
-            init() {
-                this.adjustHealth(this.health);
-            }
-            adjustHealth(value) {
-                this.health = Math.max(Math.min(value, 1), 0);
-                this.updateDisplay();
-            }
-            updateDisplay() {
-                this.el.style.setProperty("--percent", this.health);
-
-                const classes = ["battery--fullgreen", "battery--lightgreen", "battery--yellow", "battery--orange", "battery--critical", "battery--hide-symbols"];
-                this.el.classList.remove(...classes);
-
-                const valuePercent = this.health * 100;
-
-                if (valuePercent > 80) this.el.classList.add("battery--fullgreen");
-                else if (valuePercent > 60) this.el.classList.add("battery--lightgreen");
-                else if (valuePercent > 40) this.el.classList.add("battery--yellow");
-                else if (valuePercent > 20) this.el.classList.add("battery--orange");
-                else this.el.classList.add("battery--critical");
-
-                if (valuePercent <= 5) this.el.classList.add("battery--hide-symbols");
-
-                const valueEl = this.el.querySelector("[data-value]");
-                if (valueEl) valueEl.innerHTML = `${Math.round(valuePercent)}%`;
-            }
-        }
-
-
-        const ctx = document.getElementById('loadChart').getContext('2d');
-        const loadChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['10AM', '11AM', '12PM', '1PM', '2PM', '3PM'],
-                datasets: [{
-                    label: 'Voltage (V)',
-                    data: [12.4, 12.6, 12.8, 13.0, 12.9, 12.7],
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: true
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        suggestedMin: 11,
-                        suggestedMax: 14
-                    }
-                }
             }
         });
 
