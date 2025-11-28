@@ -767,6 +767,13 @@ body.dark-mode .pc-header .pc-head-link::after {
           </li>
 
           <li class="pc-item">
+            <a href="../dashboard/dataLogs.php" class="pc-link">
+              <span class="pc-micon"><i class="ti ti-file-text"></i></span>
+              <span class="pc-mtext">Data Logs</span>
+            </a>
+          </li>
+
+          <li class="pc-item">
             <a href="../dashboard/manageAccounts.php" class="pc-link">
               <span class="pc-micon"><i class="ti ti-settings"></i></span>
               <span class="pc-mtext">Manage Accounts</span>
