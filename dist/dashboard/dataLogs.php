@@ -814,6 +814,13 @@ session_start(); // must be first thing in your PHP
                         </a>
                     </li>
 
+                    <li class="pc-item">
+                        <a href="../dashboard/manageAccounts.php" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-settings"></i></span>
+                            <span class="pc-mtext">Manage Accounts</span>
+                        </a>
+                    </li>
+
 
                     <li class="pc-item sidebar-gif-wrapper">
                         <div class="card"

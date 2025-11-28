@@ -599,6 +599,13 @@ body.dark-mode .pc-header .pc-head-link::after {
             </a>
           </li>
 
+           <li class="pc-item">
+            <a href="../dashboard/manageAccounts.php" class="pc-link">
+              <span class="pc-micon"><i class="ti ti-settings"></i></span>
+              <span class="pc-mtext">Manage Accounts</span>
+            </a>
+          </li>
+
           <li class="pc-item sidebar-gif-wrapper">
             <div class="card" style="width:220px; border-radius:0.75rem !important; overflow:hidden !important; 
            box-shadow:0 .25rem .5rem rgba(0,0,0,.15); text-align:center !important; 

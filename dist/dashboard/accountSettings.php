@@ -688,6 +688,13 @@ require_once "config.php";
                         <span class="pc-mtext">Data Logs</span>
                     </a>
 
+                    <li class="pc-item">
+                        <a href="../dashboard/manageAccounts.php" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-settings"></i></span>
+                            <span class="pc-mtext">Manage Accounts</span>
+                        </a>
+                    </li>
+
                     <li class="pc-item sidebar-gif-wrapper">
                         <div class="card"
                             style="margin-bottom: 50px; width: 220px; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 .25rem .5rem rgba(0,0,0,.15); text-align:center;">
