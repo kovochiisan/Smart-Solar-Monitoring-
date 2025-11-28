@@ -884,6 +884,24 @@ session_start(); // must be first thing in your PHP
                     <!-- Bottom row: Battery Status + Chart -->
                     <div class="row g-3">
 
+                        <?php
+                        // Database connection
+                        $conn = new mysqli("localhost", "root", "", "smart_solar");
+                        if ($conn->connect_error) {
+                            die("Connection failed: " . $conn->connect_error);
+                        }
+
+                        // Fetch the current battery threshold
+                        $sql = "SELECT value FROM battery_threshold WHERE threshold_name = 'MainBattery' LIMIT 1";
+                        $result = $conn->query($sql);
+                        $thresholdValue = 100; // default
+
+                        if ($result && $row = $result->fetch_assoc()) {
+                            $thresholdValue = $row['value'];
+                        }
+                        ?>
+
+
                         <!-- Battery Status Card -->
                         <div class="col-12 col-md-6">
                             <div class="card card-hover shadow-lg h-100">
@@ -910,16 +928,13 @@ session_start(); // must be first thing in your PHP
                                         </div>
                                         <div class="text-end" style="flex-shrink: 0;">
                                             <h6 class="mb-1">Current Threshold</h6>
-                                            <span id="batteryThresholdValueDisplay" class="fw-bold fs-2">100%</span>
+                                            <span id="batteryThresholdValueDisplay" class="fw-bold fs-2"><?php echo $thresholdValue; ?>%</span>
                                         </div>
                                     </div>
-                                    <label for="batteryThreshold" class="form-label fw-bold">Auto Shutdown Threshold
-                                        (%)</label>
-                                    <input type="range" class="form-range mb-3" min="0" max="100" value="100"
-                                        id="batteryThreshold">
+                                    <input type="range" class="form-range mb-3" min="0" max="100" value="<?php echo $thresholdValue; ?>" id="batteryThreshold">
                                     <div class="d-flex justify-content-between mb-3">
                                         <span>0%</span>
-                                        <span id="batteryThresholdValue">100%</span>
+                                        <span id="batteryThresholdValue"><?php echo $thresholdValue; ?>%</span>
                                     </div>
                                     <div class="text-end">
                                         <button id="applyThresholdBtn" class="btn btn-success btn-lg shadow-sm">Apply
@@ -929,57 +944,83 @@ session_start(); // must be first thing in your PHP
                             </div>
                         </div>
 
-                        <!-- Chart Card -->
+                        <!-- Load Card -->
                         <div class="col-12 col-md-6">
                             <div class="card card-hover shadow-lg text-center h-100">
                                 <div class="card-body px-5">
-                                    <h4 class="fw-bold mb-2">Load Activity Chart</h4>
-                                    <p class="text-muted small mb-4">Visualize recent load activity and battery status
-                                        trends.</p>
-                                    <canvas id="loadChart" style="width:100%; height:300px;"></canvas>
+                                    <h4 class="fw-bold mb-2">Today's Peak Hours</h4>
+                                    <p class="text-muted small mb-4">
+                                        Load usage by hour for today. Peak hours are highlighted.
+                                    </p>
+
+                                    <canvas id="todayLoadChart" style="width:100%; height:300px;"></canvas>
                                 </div>
                             </div>
                         </div>
+
 
                     </div>
 
                 </div>
 
-                <!-- Right Column: Load Overview Card -->
+
+                <!-- Right Column: Load Overview + Chart Cards -->
                 <div class="col-12 col-lg-4">
-                    <div class="card card-hover shadow-lg h-100">
-                        <div class="card-body p-4 d-flex flex-column justify-content-start align-items-center">
 
-                            <!-- Placeholder for Image or Icon -->
-                            <img src="https://via.placeholder.com/80x80?text=Load" alt="Load Image" class="mb-3"
-                                style="border-radius: 8px;">
+                    <!-- Load Overview Card -->
+                    <div class="card card-hover shadow-lg mb-3" style="height: 225px;">
+                        <div class="card-body p-2 d-flex flex-column justify-content-start align-items-center">
 
-                            <h4 class="fw-bold mb-4 text-center">Load Overview</h4>
+                            <!-- Plug Emoji as Icon (bigger) -->
+                            <div class="mb-2" style="font-size: 3rem;">🔌</div>
 
-                            <div class="row w-100">
-                                <!-- Left Column of Info -->
+                            <h6 class="fw-bold mb-2 text-center">Load Overview</h6>
+
+                            <div class="row w-100 text-start">
+
+                                <!-- Left Column -->
                                 <div class="col-6">
-                                    <ul class="list-unstyled">
-                                        <li class="mb-2"><span style="color:#4CAF50;">●</span> Load Status: <span
-                                                id="loadStatus">ON</span></li>
-                                        <li class="mb-2"><span style="color:#2196F3;">●</span> Auto Shutdown Threshold:
-                                            <span id="batteryThresholdDisplay">100%</span>
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-1"><span style="color:#4CAF50;">●</span> Load Status:
+                                            <span id="loadStatus">ON</span>
                                         </li>
                                     </ul>
                                 </div>
-                                <!-- Right Column of Info -->
+
+                                <!-- Right Column -->
                                 <div class="col-6">
-                                    <ul class="list-unstyled">
-                                        <li class="mb-2"><span style="color:#E91E63;">●</span> Runtime Today: <span
-                                                id="loadRuntime">3h 20m</span></li>
-                                        <li class="mb-2"><span style="color:#FF5722;">●</span> Last Load Action: <span
-                                                id="loadLastTriggered">10:45 AM</span></li>
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-1"><span style="color:#2196F3;">●</span> Auto Shutdown:
+                                            <span id="autoShutdownDisplay"><?php echo $thresholdValue; ?>%</span>
+                                        </li>
                                     </ul>
                                 </div>
-                            </div>
 
+                            </div>
                         </div>
                     </div>
+
+
+
+                    <!-- Cumulative Energy Consumed Today Card -->
+                    <div class="card card-hover shadow-lg mb-3" style="height: 265px;">
+                        <div class="card-body p-2">
+                            <h6 class="fw-bold text-center mb-2">Today's Cumulative Energy Consumed(Wh)</h6>
+                            <canvas id="cumulativeEnergyChart" style="height: 100%; width: 100%;"></canvas>
+                            <p id="cumulativeEnergyLastUpdate" class="text-center small mb-0"></p>
+                        </div>
+                    </div>
+
+
+
+                    <!-- Battery Charge/Discharge Card -->
+                    <div class="card card-hover shadow-lg mb-3" style="height: 265px;">
+                        <div class="card-body p-2">
+                            <h6 class="fw-bold text-center mb-2">Today's Battery Charge/Discharge (W)</h6>
+                            <canvas id="batteryChart" style="height: 100%; width: 100%;"></canvas>
+                        </div>
+                    </div>
+
                 </div>
 
 
@@ -1003,7 +1044,7 @@ session_start(); // must be first thing in your PHP
     <script src="../assets/js/plugins/feather.min.js"></script>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
-
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -1011,65 +1052,49 @@ session_start(); // must be first thing in your PHP
     <script>
         const batteryThresholdSlider = document.getElementById('batteryThreshold');
         const batteryThresholdValue = document.getElementById('batteryThresholdValue');
-        const batteryThresholdDisplay = document.getElementById('batteryThresholdDisplay');
+        const batteryThresholdDisplay = document.getElementById('batteryThresholdValueDisplay');
+        const autoShutdownDisplay = document.getElementById('autoShutdownDisplay');
         const applyThresholdBtn = document.getElementById('applyThresholdBtn');
 
+        const loadSwitch = document.getElementById('loadSwitch');
+        const loadStatusDisplay = document.getElementById('loadStatus');
+
+        // -------------------------------
+        // Slider Color Function
+        // -------------------------------
         function updateSliderColor(value) {
             let color;
-            if (value > 80) color = 'hsl(123, 90%, 45%)'; // full green
-            else if (value > 60) color = 'hsl(96, 90%, 45%)'; // light green
-            else if (value > 40) color = 'hsl(58, 90%, 45%)'; // yellow
-            else if (value > 20) color = 'hsl(30, 90%, 45%)'; // orange
-            else color = 'hsl(3, 90%, 45%)'; // red
+            if (value > 80) color = 'hsl(123, 90%, 45%)';
+            else if (value > 60) color = 'hsl(96, 90%, 45%)';
+            else if (value > 40) color = 'hsl(58, 90%, 45%)';
+            else if (value > 20) color = 'hsl(30, 90%, 45%)';
+            else color = 'hsl(3, 90%, 45%)';
 
             batteryThresholdSlider.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${value}%, #d3d3d3 ${value}%, #d3d3d3 100%)`;
         }
 
-        // Initialize slider color
+        // -------------------------------
+        // Initialize Slider Color
+        // -------------------------------
         updateSliderColor(batteryThresholdSlider.value);
 
-        // Update dynamically
+        // -------------------------------
+        // Dynamic Slider Input (Preview Only)
+        // -------------------------------
         batteryThresholdSlider.addEventListener('input', () => {
-            batteryThresholdValue.innerText = batteryThresholdSlider.value + '%';
-            updateSliderColor(batteryThresholdSlider.value);
+            const val = batteryThresholdSlider.value;
+            batteryThresholdValue.innerText = val + '%';
+            updateSliderColor(val);
+            // Do NOT change batteryThresholdDisplay here
         });
 
         // -------------------------------
-        // Load Control
+        // Load Switch Event
         // -------------------------------
-        const loadSwitch = document.getElementById('loadSwitch');
-        const loadStatusDisplay = document.getElementById('loadStatus');
-
-        function loadStateFromDB() {
-            fetch('get_load_state.php')
-                .then(res => res.json())
-                .then(data => {
-                    loadSwitch.checked = data.state == 1;
-                    loadStatusDisplay.innerText = data.state == 1 ? 'ON' : 'OFF';
-                });
-        }
-
-        function loadThresholdFromDB() {
-            fetch('get_threshold.php')
-                .then(res => res.json())
-                .then(data => {
-                    batteryThresholdSlider.value = data.value;
-                    batteryThresholdValue.innerText = data.value + '%';
-                    batteryThresholdDisplay.innerText = data.value + '%';
-                    updateSliderColor(data.value);
-                });
-        }
-
-        // Initial load from DB
-        loadStateFromDB();
-        loadThresholdFromDB();
-
-        // Load switch event
         loadSwitch.addEventListener('change', () => {
             const status = loadSwitch.checked ? "ON" : "OFF";
-            loadStatusDisplay.innerText = status;
 
-            // Publish to MQTT
+            // Publish MQTT
             client.publish('system/load/control', status, {
                 qos: 1,
                 retain: true
@@ -1087,6 +1112,10 @@ session_start(); // must be first thing in your PHP
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
+                        // ✅ Update display only on success
+                        loadStatusDisplay.innerText = status;
+
+                        // Success SweetAlert
                         Swal.fire({
                             title: 'Success!',
                             text: `Load turned ${status}`,
@@ -1096,12 +1125,19 @@ session_start(); // must be first thing in your PHP
                         });
                     } else {
                         console.error('DB error:', data.error);
+                        // Revert toggle if failed
+                        loadSwitch.checked = !loadSwitch.checked;
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Failed to update load state. Try again.',
+                            icon: 'error'
+                        });
                     }
                 });
         });
 
         // -------------------------------
-        // Apply Battery Threshold
+        // Apply Battery Threshold Event
         // -------------------------------
         applyThresholdBtn.addEventListener('click', () => {
             const thresholdValue = batteryThresholdSlider.value;
@@ -1117,14 +1153,14 @@ session_start(); // must be first thing in your PHP
             }).then((result) => {
                 if (result.isConfirmed) {
 
-                    // Publish to MQTT
+                    // MQTT publish if needed
                     client.publish('system/battery/threshold', thresholdValue.toString(), {
                         qos: 1,
                         retain: true
                     });
                     console.log('Battery threshold sent:', thresholdValue);
 
-                    // Update DB
+                    // Update DB and live UI
                     fetch('update_threshold.php', {
                             method: 'POST',
                             headers: {
@@ -1135,33 +1171,59 @@ session_start(); // must be first thing in your PHP
                         .then(res => res.json())
                         .then(data => {
                             if (data.success) {
-                                // Update display
-                                batteryThresholdValue.innerText = thresholdValue + '%';
-                                batteryThresholdDisplay.innerText = thresholdValue + '%';
+                                const newValue = data.value;
+
+                                // ✅ Update current threshold display ONLY after successful DB update
+                                batteryThresholdDisplay.innerText = newValue + '%';
+                                autoShutdownDisplay.innerText = newValue + '%';
 
                                 Swal.fire({
                                     title: 'Applied!',
-                                    text: `Battery threshold set to ${thresholdValue}%`,
+                                    text: `Battery threshold set to ${newValue}%`,
                                     icon: 'success',
                                     timer: 1500,
                                     showConfirmButton: false
                                 });
                             } else {
                                 console.error('DB error:', data.error);
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'Failed to apply threshold. Try again.',
+                                    icon: 'error'
+                                });
                             }
                         });
-
                 }
             });
         });
 
         // -------------------------------
-        // Poll DB every 5 seconds to sync all users
+        // Initial Load from DB
         // -------------------------------
-        setInterval(() => {
-            loadStateFromDB();
-            loadThresholdFromDB();
-        }, 5000);
+        function loadStateFromDB() {
+            fetch('get_load_state.php')
+                .then(res => res.json())
+                .then(data => {
+                    loadSwitch.checked = data.state == 1;
+                    loadStatusDisplay.innerText = data.state == 1 ? 'ON' : 'OFF';
+                });
+        }
+
+        function loadThresholdFromDB() {
+            fetch('get_threshold.php')
+                .then(res => res.json())
+                .then(data => {
+                    const val = data.value;
+                    batteryThresholdSlider.value = val;
+                    batteryThresholdValue.innerText = val + '%';
+                    batteryThresholdDisplay.innerText = val + '%';
+                    updateSliderColor(val);
+                });
+        }
+
+        // Initial fetch on page load
+        loadStateFromDB();
+        loadThresholdFromDB();
 
 
 
@@ -1401,38 +1463,6 @@ session_start(); // must be first thing in your PHP
         }
 
 
-        const ctx = document.getElementById('loadChart').getContext('2d');
-        const loadChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['10AM', '11AM', '12PM', '1PM', '2PM', '3PM'],
-                datasets: [{
-                    label: 'Voltage (V)',
-                    data: [12.4, 12.6, 12.8, 13.0, 12.9, 12.7],
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: true
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        suggestedMin: 11,
-                        suggestedMax: 14
-                    }
-                }
-            }
-        });
-
-
         document.addEventListener('DOMContentLoaded', function() {
             const bellBtn = document.getElementById('notificationButton');
             const dropdown = document.getElementById('notificationDropdown');
@@ -1639,6 +1669,178 @@ session_start(); // must be first thing in your PHP
             fetchNotifications();
             setInterval(fetchNotifications, 5000);
         });
+
+        const ctx = document.getElementById('todayLoadChart').getContext('2d');
+        let todayLoadChart;
+
+        function formatHour(hour) {
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            hour = hour % 12 || 12; // convert 0 → 12, 13 → 1
+            return `${hour}:00 ${ampm}`;
+        }
+
+        async function fetchTodayLoad() {
+            const response = await fetch('load_profile_data.php');
+            const data = await response.json();
+
+            const labels = Array.from({
+                length: 24
+            }, (_, i) => formatHour(i));
+
+            // Highlight peak hours 10AM-2PM (10 → 10 AM, 14 → 2 PM)
+            const barColors = data.map((_, i) => (i >= 10 && i <= 14 ? 'rgba(255,99,132,0.8)' : 'rgba(54,162,235,0.6)'));
+
+            if (todayLoadChart) {
+                todayLoadChart.data.labels = labels;
+                todayLoadChart.data.datasets[0].data = data;
+                todayLoadChart.data.datasets[0].backgroundColor = barColors;
+                todayLoadChart.update();
+            } else {
+                todayLoadChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Load (W)',
+                            data,
+                            backgroundColor: barColors
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true
+                            },
+                            title: {
+                                display: true,
+                                text: "Today's Load Profile"
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Load chart on page load
+        fetchTodayLoad();
+
+
+        // Cumulative Battery Energy Chart
+        fetch('get_cumulative_battery_energy.php')
+            .then(res => res.json())
+            .then(res => {
+                // Convert 24-hour labels to 12-hour
+                const formattedLabels = res.labels.map(t => {
+                    let [hour, minute] = t.split(':').map(Number);
+                    const ampm = hour >= 12 ? 'PM' : 'AM';
+                    hour = hour % 12 || 12;
+                    return `${hour}:${minute.toString().padStart(2,'0')} ${ampm}`;
+                });
+
+                const ctx = document.getElementById('cumulativeEnergyChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: formattedLabels,
+                        datasets: [{
+                            label: 'Battery Energy Consumed (Wh)',
+                            data: res.data,
+                            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Wh'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Time'
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+
+
+        // Battery Chart
+        const batteryCtx = document.getElementById('batteryChart').getContext('2d');
+
+        const batteryChart = new Chart(batteryCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                        label: 'Charge (SOC Increase)',
+                        data: [],
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Discharge (Battery Power)',
+                        data: [],
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: true,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        async function updateBatteryChart() {
+            const res = await fetch('get_battery_data.php');
+            const data = await res.json();
+
+            // Convert 24-hour time to 12-hour format with AM/PM
+            const formattedTime = data.time.map(t => {
+                let [hour, minute] = t.split(':').map(Number);
+                const ampm = hour >= 12 ? 'PM' : 'AM';
+                hour = hour % 12 || 12;
+                return `${hour}:${minute.toString().padStart(2, '0')} ${ampm}`;
+            });
+
+            batteryChart.data.labels = formattedTime;
+            batteryChart.data.datasets[0].data = data.charge;
+            batteryChart.data.datasets[1].data = data.discharge;
+            batteryChart.update();
+        }
+
+        // Initial load
+        updateBatteryChart();
+        setInterval(updateBatteryChart, 60000);
     </script>
 
 

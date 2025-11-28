@@ -1,9 +1,16 @@
 <?php
-include 'config.php';
+// Database connection
+$conn = new mysqli("localhost", "root", "", "smart_solar");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
-$query = "SELECT value FROM battery_threshold WHERE threshold_name='MainBattery'";
-$result = mysqli_query($conn, $query);
-$row = mysqli_fetch_assoc($result);
+// Fetch the current battery threshold
+$sql = "SELECT value FROM battery_threshold WHERE threshold_name = 'MainBattery' LIMIT 1";
+$result = $conn->query($sql);
+$thresholdValue = 100; // default
 
-echo json_encode(['value' => $row['value']]);
+if ($result && $row = $result->fetch_assoc()) {
+    $thresholdValue = $row['value'];
+}
 ?>

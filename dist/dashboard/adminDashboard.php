@@ -879,7 +879,7 @@ body.dark-mode .pc-header .pc-head-link::after {
                   </span>
                 </h4>
                 <p class="mb-0 text-muted small">
-                  Solar power is <span class="text-warning fw-bold" id="power-text">--</span>.
+                  The solar power is <span class="text-warning fw-bold" id="power-text">--</span>.
                 </p>
               </div>
               <div class="flex-shrink-0">
@@ -909,7 +909,7 @@ body.dark-mode .pc-header .pc-head-link::after {
                   </span>
                 </h4>
                 <p class="mb-0 text-muted small">
-                  Battery voltage is <span class="text-info fw-bold" id="battery-voltage-text">--</span>.
+                  The battery voltage is <span class="text-info fw-bold" id="battery-voltage-text">--</span>.
                 </p>
               </div>
               <div class="flex-shrink-0">
@@ -937,7 +937,7 @@ body.dark-mode .pc-header .pc-head-link::after {
                   </span>
                 </h4>
                 <p class="mb-0 text-muted small">
-                  Battery current is <span class="text-danger fw-bold" id="battery-current-text">--</span>.
+                  The battery current is <span class="text-danger fw-bold" id="battery-current-text">--</span>.
                 </p>
               </div>
               <div class="flex-shrink-0">
@@ -967,7 +967,7 @@ body.dark-mode .pc-header .pc-head-link::after {
                   </span>
                 </h4>
                 <p class="mb-0 text-muted small">
-                  Battery power is <span class="text-warning fw-bold" id="battery-power-text">--</span>.
+                  The battery power is <span class="text-warning fw-bold" id="battery-power-text">--</span>.
                 </p>
               </div>
               <div class="flex-shrink-0">
@@ -1012,76 +1012,114 @@ body.dark-mode .pc-header .pc-head-link::after {
 
               <?php
               // Connect to database
-              $host = "localhost";
-              $user = "root";
-              $pass = "";
-              $db   = "smart_solar";
+              $conn = new mysqli("localhost", "root", "", "smart_solar");
+              if ($conn->connect_error) die("Connection failed: " . $conn->connect_error);
 
-              $conn = new mysqli($host, $user, $pass, $db);
-              if ($conn->connect_error) {
-                die("Connection failed: " . $conn->connect_error);
+              // Function to calculate energy (Wh) for a given period with capped time difference
+              function calculate_energy($conn, $start, $end, $type = 'solar')
+              {
+                $column = ($type === 'battery') ? 'battery_power' : 'solar_power';
+                $sql = "SELECT $column, reading_time FROM sensor_reading 
+            WHERE reading_time BETWEEN '$start' AND '$end' 
+            ORDER BY reading_time ASC";
+                $res = $conn->query($sql);
+                $total = 0;
+                $prev = null;
+
+                if ($res) {
+                  while ($row = $res->fetch_assoc()) {
+                    $cur = strtotime($row['reading_time']);
+                    if ($prev !== null) {
+                      // Calculate time difference in seconds, capped at 3600s (1 hour)
+                      $diff_sec = min($cur - $prev, 3600);
+                      $total += $row[$column] * ($diff_sec / 3600);
+                    }
+                    $prev = $cur;
+                  }
+                }
+                return $total;
               }
 
-              // Calculate total solar energy yield in kWh
-              $sql = "
-              SELECT SUM(energy_kwh) AS total_kwh FROM (
-                  SELECT 
-                      solar_power,
-                      reading_time,
-                      LAG(reading_time) OVER (ORDER BY reading_time) AS prev_time,
-                      IF(LAG(reading_time) OVER (ORDER BY reading_time) IS NULL, 0,
-                        (solar_power / 1000) * (TIMESTAMPDIFF(SECOND, LAG(reading_time) OVER (ORDER BY reading_time), reading_time)/3600)
-                      ) AS energy_kwh
-                  FROM sensor_reading
-              ) AS subquery;
-              ";
+              // Periods
+              $today = date('Y-m-d');
+              $start_week = date('Y-m-d', strtotime('monday this week'));
+              $start_month = date('Y-m-01');
 
-              $result = $conn->query($sql);
-              $total_kwh = 0;
+              // Solar yield
+              $daily_wh = calculate_energy($conn, "$today 00:00:00", "$today 23:59:59", 'solar');
+              $weekly_wh = calculate_energy($conn, "$start_week 00:00:00", "$today 23:59:59", 'solar');
+              $monthly_wh = calculate_energy($conn, "$start_month 00:00:00", "$today 23:59:59", 'solar');
 
-              if ($result && $row = $result->fetch_assoc()) {
-                $total_kwh = $row['total_kwh'] ?? 0;
-              }
+              // Battery usage
+              $daily_batt = calculate_energy($conn, "$today 00:00:00", "$today 23:59:59", 'battery');
+              $weekly_batt = calculate_energy($conn, "$start_week 00:00:00", "$today 23:59:59", 'battery');
+              $monthly_batt = calculate_energy($conn, "$start_month 00:00:00", "$today 23:59:59", 'battery');
 
               $conn->close();
               ?>
 
+
+
               <!-- BOTTOM SECTION -->
               <div class="d-flex justify-content-between align-items-start mt-auto">
+
+                <!-- Power Usage (Battery) -->
                 <div class="flex-grow-1 pe-3">
                   <h6 class="mb-1 d-flex align-items-center">
                     <i class="ti ti-bolt me-2 text-warning fs-4"></i>
                     Power Usage
                   </h6>
-                  <h3 class="mb-1 fw-bold">12.35</h3>
+                  <h3 class="mb-1 fw-bold" id="batteryValue"><?php echo number_format($daily_batt, 3); ?> Wh</h3>
                   <small class="text-muted">
-                    1 Hour usage <span class="fw-bold">6.8 kWh</span>
+                    1 Hour usage <span class="fw-bold" id="batteryHour"><?php echo number_format($daily_batt / 24, 3); ?> Wh</span>
                   </small>
                 </div>
-                <div class="card"
-                  style="min-width:320px; border-radius:1rem; box-shadow:0 .25rem .5rem rgba(0,0,0,.1); background-color:#f8f9fa;">
+
+                <!-- Solar Yield Card -->
+                <div class="card position-relative"
+                  style="min-width:450px; border-radius:1rem; box-shadow:0 .25rem .5rem rgba(0,0,0,.1); background-color:#f8f9fa;">
                   <div class="card-body p-4">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex align-items-center me-4">
+                    <div class="d-flex justify-content-between align-items-center">
+
+                      <!-- Capacity -->
+                      <div class="d-flex align-items-center me-2">
                         <i class="ti ti-battery-charging me-3 text-primary fs-3"></i>
                         <div>
                           <small class="text-muted d-block">Capacity</small>
-                          <span class="fw-bold fs-5">0.084 kWh</span>
+                          <span class="fw-bold fs-5">84 Wh</span>
                         </div>
                       </div>
-                      <div class="d-flex align-items-center">
+
+                      <!-- Vertical separator -->
+                      <div style="width:3px; background-color:#000000; height:40px;"></div>
+
+                      <!-- Dropdown in the center -->
+                      <div class="px-3">
+                        <select id="yieldPeriod" class="form-select form-select-sm">
+                          <option value="daily" selected>Daily</option>
+                          <option value="weekly">Weekly</option>
+                          <option value="monthly">Monthly</option>
+                        </select>
+                      </div>
+
+                      <!-- Yield -->
+                      <div class="d-flex align-items-center ms-2">
                         <i class="ti ti-sun me-3 text-warning fs-3"></i>
                         <div>
                           <small class="text-muted d-block">Yield</small>
-                          <span class="fw-bold fs-5">
-                            <?php echo number_format($total_kwh, 3); ?> kWh
-                          </span>
+                          <span id="yieldValue" class="fw-bold fs-5"><?php echo number_format($daily_wh, 3); ?> Wh</span>
                         </div>
                       </div>
+
                     </div>
                   </div>
                 </div>
+
+
+
               </div><!-- bottom section -->
+
+
             </div>
           </div>
         </div>
@@ -1102,7 +1140,7 @@ body.dark-mode .pc-header .pc-head-link::after {
                     </span>
                   </h4>
                   <p class="mb-0 text-muted small">
-                    Battery level is <span class="text-success fw-bold" id="battery-text">--</span>.
+                    The Battery level is <span class="text-success fw-bold" id="battery-text">--</span>.
                   </p>
                 </div>
                 <div class="flex-shrink-0">
@@ -1128,7 +1166,7 @@ body.dark-mode .pc-header .pc-head-link::after {
                     </span>
                   </h4>
                   <p class="mb-0 text-muted small">
-                    System temperature is <span class="text-warning fw-bold" id="temperature-text">--</span>.
+                    The System temperature is <span class="text-warning fw-bold" id="temperature-text">--</span>.
                   </p>
                 </div>
                 <div class="flex-shrink-0">
@@ -1537,6 +1575,7 @@ body.dark-mode .pc-header .pc-head-link::after {
       const value = parseFloat(message.toString());
 
       switch (topic) {
+
         // -------- Solar --------
         case 'solar/voltage':
           latestSolarV = value;
@@ -1554,9 +1593,19 @@ body.dark-mode .pc-header .pc-head-link::after {
 
         case 'solar/power':
           document.getElementById('power').innerText = value.toFixed(2);
-          document.getElementById('power-status').innerText = '--';
-          document.getElementById('power-text').innerText = '--';
+
+          if (value < 50) {
+            document.getElementById('power-status').innerText = 'Low';
+            document.getElementById('power-text').innerText = 'producing minimal power';
+          } else if (value < 150) {
+            document.getElementById('power-status').innerText = 'Normal';
+            document.getElementById('power-text').innerText = 'producing stable power';
+          } else {
+            document.getElementById('power-status').innerText = 'High';
+            document.getElementById('power-text').innerText = 'producing maximum power';
+          }
           break;
+
 
           // -------- Battery --------
         case 'battery/voltage':
@@ -1575,12 +1624,22 @@ body.dark-mode .pc-header .pc-head-link::after {
 
         case 'battery/power':
           document.getElementById('battery-power').innerText = value.toFixed(2);
-          document.getElementById('battery-power-status').innerText = '--';
-          document.getElementById('battery-power-text').innerText = '--';
+
+          if (value < 50) {
+            document.getElementById('battery-power-status').innerText = 'Low';
+            document.getElementById('battery-power-text').innerText = 'discharging at a low rate';
+          } else if (value < 150) {
+            document.getElementById('battery-power-status').innerText = 'Normal';
+            document.getElementById('battery-power-text').innerText = 'discharging normally';
+          } else {
+            document.getElementById('battery-power-status').innerText = 'High';
+            document.getElementById('battery-power-text').innerText = 'under high load';
+          }
           break;
 
         case 'battery/soc':
           document.getElementById('battery-soc').innerText = value.toFixed(0);
+
           if (value > 75) {
             document.getElementById('battery-status').innerText = 'Good';
             document.getElementById('battery-text').innerText = 'optimal range';
@@ -1596,10 +1655,12 @@ body.dark-mode .pc-header .pc-head-link::after {
           }
           break;
 
+
           // -------- Temperature --------
         case 'system/temperature':
           latestTemperature = value;
           document.getElementById('temperature').innerText = value.toFixed(1);
+
           if (value < 40) {
             document.getElementById('temperature-status').innerText = 'Normal';
             document.getElementById('temperature-text').innerText = 'within safe operating levels';
@@ -1842,6 +1903,42 @@ body.dark-mode .pc-header .pc-head-link::after {
       // ----------------------------
       fetchNotifications();
       setInterval(fetchNotifications, 5000);
+    });
+
+
+    const dailyWh = <?php echo $daily_wh; ?>;
+    const weeklyWh = <?php echo $weekly_wh; ?>;
+    const monthlyWh = <?php echo $monthly_wh; ?>;
+
+    const dailyBatt = <?php echo $daily_batt; ?>;
+    const weeklyBatt = <?php echo $weekly_batt; ?>;
+    const monthlyBatt = <?php echo $monthly_batt; ?>;
+
+    document.getElementById('yieldPeriod').addEventListener('change', function() {
+      const val = this.value;
+
+      let wh = 0;
+      let batt = 0;
+
+      if (val === 'daily') {
+        wh = dailyWh;
+        batt = dailyBatt;
+      }
+      if (val === 'weekly') {
+        wh = weeklyWh;
+        batt = weeklyBatt;
+      }
+      if (val === 'monthly') {
+        wh = monthlyWh;
+        batt = monthlyBatt;
+      }
+
+      // Update Yield
+      document.getElementById('yieldValue').textContent = wh.toFixed(3) + ' Wh';
+
+      // Update Power Usage (Battery)
+      document.getElementById('batteryValue').textContent = batt.toFixed(3) + ' Wh';
+      document.getElementById('batteryHour').textContent = (batt / 24).toFixed(3) + ' Wh';
     });
   </script>
 

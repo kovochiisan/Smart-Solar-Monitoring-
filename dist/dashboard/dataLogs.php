@@ -737,6 +737,39 @@ session_start(); // must be first thing in your PHP
         body.dark-mode .notification-dropdown .dropdown-footer a:hover {
             color: #99ccff;
         }
+
+        /* Dark mode for the new table */
+        body.dark-mode .table {
+            background-color: #0E0E23;
+            /* match card/container tone */
+            color: white;
+            border-color: #2f2f4a !important;
+        }
+
+        body.dark-mode .table thead th {
+            background-color: #24243E;
+            color: white;
+            border-color: #2f2f4a !important;
+        }
+
+        body.dark-mode .table tbody tr:nth-child(odd) {
+            background-color: #1a1a2e;
+        }
+
+        body.dark-mode .table tbody tr:nth-child(even) {
+            background-color: #0E0E23;
+        }
+
+        body.dark-mode .table tbody tr:hover {
+            background-color: #33334d;
+            /* subtle highlight */
+        }
+
+        body.dark-mode .table td,
+        body.dark-mode .table th {
+            color: white !important;
+            border-color: #2f2f4a !important;
+        }
     </style>
 
 
@@ -982,33 +1015,48 @@ session_start(); // must be first thing in your PHP
     $conn = new mysqli($host, $user, $pass, $db);
     if ($conn->connect_error) die("Connection failed: " . $conn->connect_error);
 
-    // Sampling interval in seconds
-    $sampling_interval_sec = 2;
-    $interval_hours = $sampling_interval_sec / 3600; // 2 seconds in hours ≈ 0.0005556 h
-
-    // Date range
-    $start_date = isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d');
-    $end_date   = isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d');
-    $start_time = isset($_POST['start_time']) ? $_POST['start_time'] : '00:00:00';
-    $end_time   = isset($_POST['end_time']) ? $_POST['end_time'] : '23:30:00';
+    // Date & time range from POST
+    $start_date = $_POST['start_date'] ?? date('Y-m-d');
+    $end_date   = $_POST['end_date'] ?? date('Y-m-d');
+    $start_time = $_POST['start_time'] ?? '00:00:00';
+    $end_time   = $_POST['end_time'] ?? '23:59:59';
 
     // Combine date + time for SQL
-    $from_datetime = $start_date . ' ' . $start_time;
-    $to_datetime   = $end_date . ' ' . $end_time;
+    $from_datetime = "$start_date $start_time";
+    $to_datetime   = "$end_date $end_time";
 
-
-
-    // Fetch summary totals
+    // -----------------------------
+    // Compute totals using capped time differences
+    // -----------------------------
     $summary_sql = "
 SELECT 
-    SUM(solar_power) * $interval_hours AS total_solar_energy,
-    SUM(battery_power) * $interval_hours AS total_battery_energy,
+    SUM(energy_wh) AS total_solar_energy,
+    SUM(battery_energy_wh) AS total_battery_energy,
     AVG(battery_soc) AS avg_battery_soc,
     MAX(temperature) AS max_temp,
     MIN(temperature) AS min_temp,
     COUNT(*) AS total_readings
-FROM sensor_reading
-WHERE reading_time BETWEEN '$from_datetime' AND '$to_datetime'
+FROM (
+    SELECT 
+        solar_power,
+        battery_power,
+        battery_soc,
+        temperature,
+        reading_time,
+        LAG(reading_time) OVER (ORDER BY reading_time) AS prev_time,
+        IF(
+            LAG(reading_time) OVER (ORDER BY reading_time) IS NULL, 
+            0,
+            solar_power * LEAST(TIMESTAMPDIFF(SECOND, LAG(reading_time) OVER (ORDER BY reading_time), reading_time), 3600)/3600
+        ) AS energy_wh,
+        IF(
+            LAG(reading_time) OVER (ORDER BY reading_time) IS NULL, 
+            0,
+            battery_power * LEAST(TIMESTAMPDIFF(SECOND, LAG(reading_time) OVER (ORDER BY reading_time), reading_time), 3600)/3600
+        ) AS battery_energy_wh
+    FROM sensor_reading
+    WHERE reading_time BETWEEN '$from_datetime' AND '$to_datetime'
+) AS subquery
 ";
 
     $summary_result = $conn->query($summary_sql);
@@ -1027,6 +1075,9 @@ WHERE reading_time BETWEEN '$from_datetime' AND '$to_datetime'
         ];
     }
 
+    // -----------------------------
+    // Fetch all sensor readings (optional for charts or tables)
+    // -----------------------------
     $data_sql = "
 SELECT * FROM sensor_reading
 WHERE reading_time BETWEEN '$from_datetime' AND '$to_datetime'
@@ -1035,6 +1086,8 @@ ORDER BY reading_time ASC
 
     $data_result = $conn->query($data_sql);
     ?>
+
+
 
     <div class="pc-container">
         <div class="pc-content" style="padding: 22px 35px 32px;">
@@ -1097,11 +1150,11 @@ ORDER BY reading_time ASC
 
                             <!-- Generate Report Form (GET) -->
                             <form method="GET" action="generate_report.php" target="_blank" class="d-flex align-items-end">
+                                <input type="hidden" name="start_date" value="<?= isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d') ?>">
+                                <input type="hidden" name="end_date" value="<?= isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d') ?>">
                                 <input type="hidden" name="start_time" value="<?= isset($_POST['start_time']) ? $_POST['start_time'] : '00:00:00' ?>">
                                 <input type="hidden" name="end_time" value="<?= isset($_POST['end_time']) ? $_POST['end_time'] : '23:30:00' ?>">
-                                <button type="submit" class="btn btn-success btn-fixed-height" style="min-width: 100px;">
-                                    Generate Report
-                                </button>
+                                <button type="submit" class="btn btn-success btn-fixed-height">Generate Report</button>
                             </form>
                         </div>
                     </div>
@@ -1161,7 +1214,7 @@ ORDER BY reading_time ASC
                                             <td><?= number_format($row['battery_power'], 2) ?></td>
                                             <td><?= number_format($row['battery_soc'], 2) ?></td>
                                             <td><?= number_format($row['temperature'], 2) ?></td>
-                                            <td><?= date('M d, Y H:i', strtotime($row['reading_time'])) ?></td>
+                                            <td><?= date('M d, Y h:i:s A', strtotime($row['reading_time'])) ?></td>
                                         </tr>
                                     <?php endwhile; ?>
                                 <?php else: ?>
