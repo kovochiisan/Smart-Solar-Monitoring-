@@ -90,14 +90,20 @@
                 <i class="fas fa-phone text-gray-500 mr-3"></i>
                 <input type="tel" name="contact_number" placeholder="Enter contact number"
                     class="w-full bg-transparent placeholder-gray-500 text-black text-lg focus:outline-none focus:border-green-400"
-                    inputmode="numeric" pattern="[0-9]*" required>
+                    inputmode="numeric"
+                    pattern="^(09\d{9}|\+639\d{9})$"
+                    title="Enter a valid number (e.g., 09171234567 or +639171234567)"
+                    required>
             </div>
 
             <!-- Password -->
             <div class="flex items-center border-b border-gray-500 py-3">
                 <i class="fas fa-lock text-gray-500 mr-3"></i>
                 <input type="password" name="password" placeholder="Create password"
-                    class="w-full bg-transparent placeholder-gray-500 text-black text-lg focus:outline-none focus:border-green-400" required>
+                    class="w-full bg-transparent placeholder-gray-500 text-black text-lg focus:outline-none focus:border-green-400"
+                    pattern=".{6,}"
+                    title="Password must be at least 6 characters long"
+                    required>
             </div>
 
             <button type="submit"

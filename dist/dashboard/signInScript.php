@@ -8,14 +8,13 @@ $password = "";
 $dbname = "smart_solar";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
-
 if ($conn->connect_error) {
     die(json_encode(['status' => 'error', 'message' => 'Database connection failed']));
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
-    $password = $_POST['password']; // plain-text password
+    $password = $_POST['password']; 
 
     $stmt = $conn->prepare("SELECT id, full_name, email, password, role FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
@@ -25,7 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        if ($password === $user['password']) {
+        // Use password_verify for hashed passwords
+        if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['full_name'] = $user['full_name'];
             $_SESSION['email'] = $user['email'];

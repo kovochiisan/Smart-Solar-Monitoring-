@@ -1,5 +1,6 @@
 <?php
-session_start(); // must be first thing in your PHP
+session_start();
+require_once "config.php";
 ?>
 
 <!DOCTYPE html>
@@ -30,12 +31,17 @@ session_start(); // must be first thing in your PHP
     <link rel="stylesheet" href="../assets/css/style-preset.css">
 
     <style>
-        /* Rounded edges, transition, hover lift */
         .card-hover {
             border-radius: 0.75rem;
+            background-color: #ffffff;
+            /* white card */
+            border: 3px solid #dee2e6;
+            /* light border */
             box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1);
             transition: all 0.3s ease;
             padding: 1.5rem;
+            color: #212529;
+            /* default text */
         }
 
         .card-hover:hover {
@@ -73,13 +79,13 @@ session_start(); // must be first thing in your PHP
         }
 
         .pc-container {
-            background-color: #E8EBF5;
-            /* light gray background */
+            background-color: #E8EBF5
+                /* light gray background */
         }
 
         .pc-header {
             height: 70px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+            /* match sidebar top area height */
         }
 
         /* Wrapper to center the card in sidebar */
@@ -131,50 +137,6 @@ session_start(); // must be first thing in your PHP
         }
 
 
-        /* @@@@@@@@@@@@@@@@@@@@@@@ Light Mode Styles @@@@@@@@@@@@@@@@@@@@@@@ */
-
-        /* Dropdown menus (light mode) */
-        .dropdown-menu {
-            background-color: #ffffff;
-            border: 1px solid #dee2e6 !important;
-            /* soft gray border */
-            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
-            /* subtle shadow */
-            border-radius: 0.5rem;
-            /* match rounded edges */
-        }
-
-        .dropdown-menu a,
-        .dropdown-menu .dropdown-item {
-            color: #212529 !important;
-            /* bootstrap default text */
-        }
-
-        .dropdown-menu a:hover,
-        .dropdown-menu .dropdown-item:hover {
-            background-color: #f1f3f5 !important;
-            /* light hover */
-            color: #000 !important;
-        }
-
-        /* Cards (light mode) */
-        .card {
-            background-color: #ffffff;
-            border: 3px solid #dee2e6 !important;
-            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
-            border-radius: 0.75rem;
-        }
-
-        /* Special: sidebar gif card (light mode) */
-        .sidebar-gif-wrapper .card {
-            background-color: #E8EBF5 !important;
-            border: 3px solid #dee2e6 !important;
-            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
-            border-radius: 0.75rem !important;
-        }
-
-
-
 
         /* Dark Mode Theme */
         body.dark-mode {
@@ -187,17 +149,11 @@ session_start(); // must be first thing in your PHP
         }
 
         /* Sidebar + Navbar */
-        body.dark-mode .pc-header {
-            background-color: #0E0E23;
-            color: #FFFFFF !important;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6) !important;
-        }
-
+        body.dark-mode .pc-header,
         body.dark-mode .pc-sidebar {
             background-color: #0E0E23;
             color: #FFFFFF !important;
-            border: none !important;
-            box-shadow: none !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6) !important;
         }
 
         /* Project title near logo (Smart Solar) */
@@ -229,7 +185,6 @@ session_start(); // must be first thing in your PHP
             border: 3px solid #2f2f4a !important;
         }
 
-
         body.dark-mode .dropdown-menu a,
         body.dark-mode .dropdown-menu .dropdown-item {
             color: #FFFFFF !important;
@@ -241,15 +196,19 @@ session_start(); // must be first thing in your PHP
             color: #FFFFFF !important;
         }
 
-        /* Cards - strictly #0E0E23 */
+        body.dark-mode .dropdown-menu .dropdown-header {
+            color: #6c757d !important;
+        }
+
         /* Cards - strictly #0E0E23 */
         body.dark-mode .card {
             background-color: #0E0E23;
             border: none !important;
-            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
-            border: 3px solid #2f2f4a !important;
+            box-shadow: none !important;
+            color: #FFFFFF !important;
         }
 
+        /* Special: GIF card should be #24243E */
         body.dark-mode .sidebar-gif-wrapper .card {
             background-color: #24243E !important;
             border: none !important;
@@ -270,16 +229,16 @@ session_start(); // must be first thing in your PHP
             color: #FFFFFF !important;
         }
 
-        /* Only top-level labels (Capacity, Yield, etc.) inside cards */
+        /* Dark mode labels (small) */
         body.dark-mode .card small.text-muted.d-block {
-            color: #000000ff !important;
+            color: #f8f9fa !important;
+            /* light color for dark mode */
         }
 
-
-        /* Values (numbers inside spans) = white in dark mode 
-   but keep bootstrap contextual colors (success, danger, warning, etc.) */
+        /* Dark mode values (span.fs-5) */
         body.dark-mode .card span.fs-5:not([class*="text-"]) {
-            color: #000000ff !important;
+            color: #f8f9fa !important;
+            /* light color for dark mode */
         }
 
         /* Sidebar text */
@@ -294,115 +253,19 @@ session_start(); // must be first thing in your PHP
             color: inherit !important;
         }
 
-        .battery {
-            --percent: 1;
-            display: block;
-            margin: 0 auto 1.5em auto;
-            width: 10em;
-            height: 10em;
-        }
-
-        .battery__bottom {
-            transform: rotate(calc(330deg * var(--percent))) translate(0, -50px);
-            transition: transform 0.5s ease-in-out;
-        }
-
-        .battery__fill1,
-        .battery__fill2,
-        .battery__fill3 {
-            transition: stroke 0.5s ease-in-out, stroke-dashoffset 0.5s ease-in-out;
-        }
-
-        .battery__fill1 {
-            stroke-dashoffset: calc(20.944px + 230.383px * (1 - var(--percent)));
-        }
-
-        .battery__fill2 {
-            stroke-dashoffset: calc(16.755px + 184.307px * (1 - var(--percent)));
-        }
-
-        .battery__fill3 {
-            stroke-dashoffset: calc(23.038px + 253.422px * (1 - var(--percent)));
-        }
-
-        .battery__plus,
-        .battery__minus {
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-        }
-
-        .battery__minus {
-            transform: rotate(calc(330deg * var(--percent))) translate(0, -44px);
-        }
-
-        .battery--fullgreen .battery__fill1 {
-            stroke: hsl(123, 90%, 45%);
-        }
-
-        .battery--lightgreen .battery__fill1 {
-            stroke: hsl(96, 90%, 45%);
-        }
-
-        .battery--yellow .battery__fill1 {
-            stroke: hsl(58, 90%, 45%);
-        }
-
-        .battery--orange .battery__fill1 {
-            stroke: hsl(30, 90%, 45%);
-        }
-
-        .battery--critical .battery__fill1 {
-            stroke: hsl(3, 90%, 45%);
-        }
-
-        .battery--hide-symbols .battery__plus,
-        .battery--hide-symbols .battery__minus {
-            opacity: 0;
-        }
-
-
-
-
-        /* Override Bootstrap form-range track */
-        #batteryThreshold {
-            width: 100%;
-            height: 15px;
-            border-radius: 10px;
-            outline: none;
-            background: #d3d3d3;
-            /* fallback */
-            transition: background 0.2s ease;
-        }
-
-        /* Chrome/Safari */
-        #batteryThreshold::-webkit-slider-runnable-track {
-            height: 15px;
-            border-radius: 10px;
-            background: transparent;
-            /* background applied to input instead */
-        }
-
-        /* Thumb */
-        #batteryThreshold::-webkit-slider-thumb {
-            appearance: none;
-            width: 25px;
-            height: 25px;
-            background: #4A90E2;
-            /* professional blue */
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid #2C3E50;
-            /* slightly darker for contrast */
-            margin-top: -5px;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
-
         /* Cards in dark mode - with border + shadow */
-        body.dark-mode .card {
+        body.dark-mode .card-hover {
             background-color: #0E0E23 !important;
             border: 3px solid #2f2f4a !important;
             box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .6) !important;
-            color: #FFFFFF !important;
+            color: #ffffff !important;
         }
+
+        body.dark-mode .card-hover:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 1rem 1.5rem rgba(0, 0, 0, .75) !important;
+        }
+
 
         /* Special: Sidebar GIF card */
         body.dark-mode .sidebar-gif-wrapper .card {
@@ -413,12 +276,176 @@ session_start(); // must be first thing in your PHP
         }
 
         .pc-container {
-            min-height: 100vh;
+            min-height: 100vh !important;
         }
 
         /* Full name text inside dark mode */
         body.dark-mode h6.user-fullname {
             color: white !important;
+        }
+
+
+        /* ================================
+   Form Styling for Profile Card
+   ================================ */
+
+        /* Form container spacing */
+        .card-hover form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            /* increased spacing between rows */
+        }
+
+        /* Form rows for two-column layout */
+        .card-hover form .row.g-3 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            /* increased horizontal and vertical spacing */
+        }
+
+        .card-hover form .col-md-6 {
+            flex: 0 0 48%;
+            max-width: 48%;
+        }
+
+        /* Responsive: stack columns on small screens */
+        @media (max-width: 768px) {
+            .card-hover form .col-md-6 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+
+        /* Form labels */
+        .card-hover form .form-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            /* more space below label */
+            font-size: 1.1rem;
+            /* bigger text */
+            color: #495057;
+        }
+
+        /* Form inputs */
+        .card-hover form .form-control {
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            /* larger padding */
+            border: 1px solid #ced4da;
+            font-size: 1.05rem;
+            /* bigger text */
+            transition: border 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Focus state for inputs */
+        .card-hover form .form-control:focus {
+            outline: none;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        /* Submit button */
+        .card-hover form .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            /* bigger button */
+            font-size: 1.1rem;
+            /* bigger text */
+            font-weight: 600;
+            align-self: flex-start;
+            transition: all 0.3s ease;
+        }
+
+        .card-hover form .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+
+        .sidebar-gif-wrapper .card {
+            background-color: #E8EBF5 !important;
+            border: 3px solid #dee2e6 !important;
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .1) !important;
+            border-radius: 0.75rem !important;
+        }
+
+        /* =========================================
+   Profile Card Spacing Improvements
+   ========================================= */
+        .card-hover h4,
+        .card-hover p,
+        .card-hover .badge {
+            margin-bottom: 0.75rem !important;
+            /* balanced spacing between name, email, role */
+        }
+
+        .card-hover .position-relative {
+            margin-bottom: 1.75rem !important;
+            /* extra space under profile picture */
+        }
+
+        .card-hover hr {
+            margin: 1.75rem 0;
+            /* breathing space for divider */
+        }
+
+        .card-hover .w-100.text-center>div {
+            margin-bottom: 2rem;
+            /* more spacing between detail sections */
+        }
+
+        .card-hover .w-100.text-center>div:last-child {
+            margin-bottom: 0;
+            /* remove last extra gap */
+        }
+
+        /* Labels (Phone, DOB, Address) */
+        .card-hover .w-100.text-center small {
+            color: #6c757d;
+            /* grey-ish in light mode */
+            font-weight: 600;
+        }
+
+        /* Dark mode labels */
+        body.dark-mode .card-hover .w-100.text-center small {
+            color: #696f73ff !important;
+            /* lighter grey for dark mode */
+            font-weight: 600;
+        }
+
+        /* Light mode role text */
+        .role-text {
+            font-size: 0.8rem;
+            color: #6c757d;
+            /* muted grey */
+            padding: 0.25rem 0.75rem;
+            display: inline-block;
+        }
+
+        /* Dark mode role text */
+        body.dark-mode .role-text {
+            color: #0d6efd !important;
+            /* Bootstrap blue */
+            border: 1px solid #0d6efd;
+            /* blue border */
+            background-color: transparent !important;
+            /* no background */
+            font-weight: 600;
+            /* make it stand out more */
+        }
+
+        /* Dropdown profile full name in dark mode */
+        body.dark-mode .dropdown-menu .user-fullname,
+        body.dark-mode .dropdown-menu h6,
+        body.dark-mode .dropdown-menu span.user-fullname {
+            color: #ffffff !important;
+        }
+
+        .card-hover h4.card-title {
+            margin-top: 2rem;
         }
 
         /* Light mode (default) */
@@ -452,7 +479,6 @@ session_start(); // must be first thing in your PHP
         body.dark-mode .pc-head-link:hover .user-fullname {
             color: #000 !important;
         }
-
 
 
 
@@ -567,7 +593,6 @@ session_start(); // must be first thing in your PHP
             color: #888;
         }
 
-
         .mark-read-disabled {
             background: #b6d4fe !important;
             /* lighter blue */
@@ -625,13 +650,12 @@ session_start(); // must be first thing in your PHP
             color: #99ccff;
         }
     </style>
-
-
 </head>
 <!-- [Head] end -->
 
 
 
+<!-- [Head] end -->
 <?php
 require_once "config.php";
 
@@ -643,7 +667,7 @@ if (session_status() === PHP_SESSION_NONE) {
 // DETERMINE USER STATE
 // ---------------------------------------------
 if (!isset($_SESSION['user_id'])) {
-    showAccessDenied("You must log in to access this page.", "authentication.php");
+    showAccessDenied("You must log in to access this page.", "login.php");
     exit();
 }
 
@@ -675,10 +699,10 @@ $profilePhoto = $user['profile_image'] ?? '../assets/images/user/avatar-2.jpg';
 $_SESSION['email'] = $email;
 
 // ---------------------------------------------
-// ADMIN ROLE VALIDATION
+// STAFF ROLE VALIDATION
 // ---------------------------------------------
-if ($role !== 'admin') {
-    showAccessDenied("You are logged in, but you do not have permission to access this admin page.", "staffDashboard.php");
+if ($role !== 'staff') {
+    showAccessDenied("You are logged in, but you do not have permission to access this staff page.", "adminDashboard.php");
     exit();
 }
 
@@ -687,13 +711,12 @@ function showAccessDenied($message, $redirect)
 {
 ?>
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Access Restricted</title>
+    <!-- Separate CSS for styling -->
     <link rel="stylesheet" href="access_denied.css">
 </head>
 <body>
@@ -702,16 +725,20 @@ function showAccessDenied($message, $redirect)
         <div class="lock-emoji">🔒</div>
         <h1>Access Denied</h1>
         <p><?= $message ?></p>
-        <p class="redirect-msg">Redirecting in <span id="countdown" data-redirect="<?= $redirect ?>">10</span> seconds...</p>
+        <p class="redirect-msg">
+            Redirecting in <span id="countdown" data-redirect="<?= $redirect ?>">10</span> seconds...
+        </p>
         <a href="<?= $redirect ?>" class="btn-modern">Go Now</a>
     </div>
 
+    <!-- Separate JS for countdown -->
     <script src="countdown.js"></script>
 </body>
 </html>
 <?php
 }
 ?>
+
 
 
 
@@ -732,33 +759,11 @@ function showAccessDenied($message, $redirect)
             <div class="navbar-content">
                 <ul class="pc-navbar">
                     <li class="pc-item">
-                        <a href="../dashboard/adminDashboard.php" class="pc-link">
+                        <a href="../dashboard/staffDashboard.php" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
                             <span class="pc-mtext">Dashboard</span>
                         </a>
                     </li>
-
-                    <li class="pc-item">
-                        <a href="../dashboard/controlLoad.php" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-power"></i></span>
-                            <span class="pc-mtext">Control Load</span>
-                        </a>
-                    </li>
-
-                    <li class="pc-item">
-                        <a href="../dashboard/dataLogs.php" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-file-text"></i></span>
-                            <span class="pc-mtext">Data Logs</span>
-                        </a>
-                    </li>
-
-                    <li class="pc-item">
-                        <a href="../dashboard/manageAccounts.php" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-settings"></i></span>
-                            <span class="pc-mtext">Manage Accounts</span>
-                        </a>
-                    </li>
-
 
                     <li class="pc-item sidebar-gif-wrapper">
                         <div class="card"
@@ -767,7 +772,7 @@ function showAccessDenied($message, $redirect)
                                 <img src="../../images/Solar Panel GIF.gif" alt="Sidebar GIF"
                                     style="width: 100%; height: auto; border-radius: 0.5rem; display:block; margin:0 auto;">
                                 <h6 style="margin-top: 0.5rem; font-size: 18px; font-weight:600; color:#333;">
-                                    Solar Admin
+                                    Solar Staff
                                 </h6>
                             </div>
                         </div>
@@ -818,6 +823,7 @@ function showAccessDenied($message, $redirect)
                         </a>
 
                         <!-- Dropdown -->
+                        <!-- Dropdown -->
                         <div class="notification-dropdown" id="notificationDropdown" style="display: none;">
                             <div class="dropdown-header"
                                 style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px;">
@@ -859,7 +865,6 @@ function showAccessDenied($message, $redirect)
 
                     </li>
 
-
                     <!-- User Profile Dropdown -->
                     <li class="dropdown pc-h-item">
                         <a class="pc-head-link dropdown-toggle d-flex align-items-center"
@@ -885,14 +890,14 @@ function showAccessDenied($message, $redirect)
                                     alt="user-image"
                                     style="width:50px; height:50px; object-fit:cover; border-radius:50%; flex-shrink:0;">
                                 <div class="ms-3">
-                                    <h6 class="user-fullname"><?php echo htmlspecialchars($fullName); ?></h6>
+                                    <h6><?php echo htmlspecialchars($fullName); ?></h6>
                                     <span><?php echo htmlspecialchars(ucfirst($role)); ?></span>
                                 </div>
                             </div>
 
                             <div class="px-3 py-2">
                                 <h6 class="dropdown-header">Settings</h6>
-                                <a href="accountSettings.php" class="dropdown-item">
+                                <a href="staffAccountSettings.php" class="dropdown-item">
                                     <i class="ti ti-user"></i>
                                     <span>Account Settings</span>
                                 </a>
@@ -909,183 +914,237 @@ function showAccessDenied($message, $redirect)
                     </li>
                 </ul>
             </div>
+
         </div>
     </header>
     <!-- [ Header ] end -->
 
 
+
+
+
+
+
+    <?php
+    require_once "config.php";
+
+    // Ensure user is logged in
+    if (!isset($_SESSION['user_id'])) {
+        die("You must be logged in to view this page.");
+    }
+
+    $userId = $_SESSION['user_id'];
+
+    // Fetch user info
+    $sql = "SELECT * FROM users WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        $fullName = $user['full_name'];
+        $email = $user['email'];
+        $phone = $user['contact_number'];
+        $dob = $user['date_of_birth'];
+        $address = $user['address'];
+        $role = $user['role'];
+        $profilePhoto = $user['profile_image'] ?? '../assets/images/user/avatar-2.jpg';
+
+        // Optional: store in session too
+        $_SESSION['email'] = $email;
+    } else {
+        die("User not found.");
+    }
+    ?>
+
+
+
     <!-- [ Main Content ] start -->
     <div class="pc-container">
-        <div class="pc-content" style="padding: 22px 35px 32px">
+        <div class="pc-content" style="padding: 20px 35px 32px !important">
+            <div class="row g-3 mt-2 mb-2">
+                <!-- Main Profile Card -->
+                <div class="col-lg-8 col-12 d-flex">
+                    <div class="card card-hover h-100"
+                        style="width:100%; border-radius:0.75rem; box-shadow:0 .25rem .5rem rgba(0,0,0,.1); overflow:hidden; display:flex; flex-direction:column;">
 
-            <div class="row g-3 mt-1">
+                        <!-- Form Section -->
+                        <form id="updateForm" method="POST" enctype="multipart/form-data" style="flex-grow:1;">
 
-                <!-- Left Column -->
-                <div class="col-12 col-lg-8 d-flex flex-column">
+                            <!-- Profile Section -->
+                            <div style="display:flex; align-items:center; padding: 1.5rem;">
+                                <div class="position-relative me-3" style="width: 140px; height: 140px;">
 
-                    <!-- Load Control Card (Full Width) -->
-                    <div class="card card-hover shadow-lg text-center" style="margin-bottom: 15px !important">
-                        <div class="card-body p-4">
-                            <h4 class="fw-bold mb-2">Load Control</h4>
-                            <p class="text-muted small mb-3">Manually switch the load ON or OFF.</p>
-                            <div class="form-check form-switch d-flex justify-content-center align-items-center"
-                                style="gap: 10px;">
-                                <input class="form-check-input" type="checkbox" id="loadSwitch"
-                                    style="width: 60px; height: 34px;">
-                                <label class="form-check-label fs-5" for="loadSwitch">Load</label>
-                            </div>
-                        </div>
-                    </div>
+                                    <!-- Circular Wrapper with White Border -->
+                                    <div class="border border-3 border-white rounded-circle shadow overflow-hidden"
+                                        style="width: 100%; height: 100%;">
+                                        <img id="profilePhoto"
+                                            src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '../assets/images/user/avatar-1.jpg'); ?>"
+                                            alt="Profile Photo"
+                                            style="width:100%; height:100%; object-fit:cover; cursor:pointer;">
+                                    </div>
 
+                                    <!-- Hidden File Input (connected to form) -->
+                                    <input type="file" name="profile_image" id="photoInput" accept="image/*"
+                                        style="display: none;">
+                                    <label for="photoInput"
+                                        style="position: absolute; bottom: 0; right: 0; background-color: rgba(0,0,0,0.6); padding:6px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff"
+                                            viewBox="0 0 16 16">
+                                            <path
+                                                d="M9.5 2a.5.5 0 0 1 .5.5V3h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-10a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h2v-.5a.5.5 0 0 1 .5-.5h5zM8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+                                        </svg>
+                                    </label>
+                                </div>
 
-                    <!-- Bottom row: Battery Status + Chart -->
-                    <div class="row g-3">
-
-                        <?php
-                        // Database connection
-                        $conn = new mysqli("localhost", "root", "", "smart_solar");
-                        if ($conn->connect_error) {
-                            die("Connection failed: " . $conn->connect_error);
-                        }
-
-                        // Fetch the current battery threshold
-                        $sql = "SELECT value FROM battery_threshold WHERE threshold_name = 'MainBattery' LIMIT 1";
-                        $result = $conn->query($sql);
-                        $thresholdValue = 100; // default
-
-                        if ($result && $row = $result->fetch_assoc()) {
-                            $thresholdValue = $row['value'];
-                        }
-                        ?>
-
-
-                        <!-- Battery Status Card -->
-                        <div class="col-12 col-md-6">
-                            <div class="card card-hover shadow-lg h-100">
-                                <div class="card-body p-4">
-                                    <h4 class="fw-bold mb-2">Battery Status</h4>
-                                    <p class="text-muted small mb-4">
-                                        Set the battery % threshold to automatically turn off the load if it drops below
-                                        this level.
+                                <div style="flex:1; margin-left: 10px; text-align:left;">
+                                    <h2 class="fw-bold mb-1" style="font-size:1.4rem;">
+                                        <?php echo htmlspecialchars($fullName ?: 'N/A'); ?>
+                                    </h2>
+                                    <p class="text-muted mb-1" style="font-size:0.85rem;">
+                                        <?php echo htmlspecialchars($_SESSION['email'] ?? 'N/A'); ?>
                                     </p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div style="flex-shrink: 0;">
-                                            <svg class="battery" viewBox="0 0 100 100" width="140px" height="140px">
-                                                <g fill="none" transform="rotate(-75,50,50)">
-                                                    <circle r="40" cx="50" cy="50" stroke="hsla(223,10%,50%,0.2)"
-                                                        stroke-width="20" stroke-dasharray="251.33 251.33"
-                                                        stroke-dashoffset="20.944" />
-                                                    <circle class="battery__fill1" r="40" cx="50" cy="50"
-                                                        stroke="hsl(123,90%,45%)" stroke-width="20"
-                                                        stroke-dasharray="251.33 251.33" stroke-dashoffset="20.944" />
-                                                </g>
-                                                <text class="battery__value" font-size="16" fill="currentColor" x="50"
-                                                    y="56" text-anchor="middle" data-value>100%</text>
-                                            </svg>
-                                        </div>
-                                        <div class="text-end" style="flex-shrink: 0;">
-                                            <h6 class="mb-1">Current Threshold</h6>
-                                            <span id="batteryThresholdValueDisplay" class="fw-bold fs-2"><?php echo $thresholdValue; ?>%</span>
-                                        </div>
-                                    </div>
-                                    <input type="range" class="form-range mb-3" min="0" max="100" value="<?php echo $thresholdValue; ?>" id="batteryThreshold">
-                                    <div class="d-flex justify-content-between mb-3">
-                                        <span>0%</span>
-                                        <span id="batteryThresholdValue"><?php echo $thresholdValue; ?>%</span>
-                                    </div>
-                                    <div class="text-end">
-                                        <button id="applyThresholdBtn" class="btn btn-success btn-lg shadow-sm">Apply
-                                            Changes</button>
-                                    </div>
+                                    <p class="text-muted mb-0" style="font-size:0.8rem;">
+                                        <?php echo htmlspecialchars(!empty($role) ? ucfirst($role) : 'N/A'); ?>
+                                    </p>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Load Card -->
-                        <div class="col-12 col-md-6">
-                            <div class="card card-hover shadow-lg text-center h-100">
-                                <div class="card-body px-5">
-                                    <h4 class="fw-bold mb-2">Today's Peak Hours</h4>
-                                    <p class="text-muted small mb-4">
-                                        Load usage by hour for today. Peak hours are highlighted.
-                                    </p>
+                            <!-- Editable Fields -->
+                            <div style="padding: 1.5rem; border-top: 1px solid #383d42ff;">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label fw-semibold">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email"
+                                            value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>"
+                                            placeholder="N/A">
+                                    </div>
 
-                                    <canvas id="todayLoadChart" style="width:100%; height:300px;"></canvas>
+                                    <div class="col-md-6">
+                                        <label for="fullname" class="form-label fw-semibold">Full Name</label>
+                                        <input type="text" class="form-control" id="fullname" name="fullname"
+                                            value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>"
+                                            placeholder="N/A">
+                                    </div>
+
+                                       <div class="col-md-6">
+                                        <label for="phone" class="form-label fw-semibold">Contact Number</label>
+                                        <input type="tel" class="form-control" id="phone" name="phone"
+                                            pattern="^(09\d{9}|\+639\d{9})$"
+                                            title="Enter a valid Philippine phone number (e.g., 09171234567 or +639171234567)"
+                                            value="<?php echo htmlspecialchars($user['contact_number'] ?? ''); ?>"
+                                            placeholder="N/A"
+                                            required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="dob" class="form-label fw-semibold">Date of Birth</label>
+                                        <input type="date" class="form-control" id="dob" name="dob"
+                                            value="<?php echo htmlspecialchars($user['date_of_birth'] ?? ''); ?>"
+                                            placeholder="N/A">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="address" class="form-label fw-semibold">Address</label>
+                                        <input type="text" class="form-control" id="address" name="address"
+                                            value="<?php echo htmlspecialchars($user['address'] ?? ''); ?>"
+                                            placeholder="N/A">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="password" class="form-label fw-semibold">Password</label>
+                                        <input type="password" class="form-control" id="password" name="password"
+                                            placeholder="Enter new password">
+                                    </div>
+                                </div>
+
+                                <div class="mt-5">
+                                    <button type="submit" class="btn btn-primary">Update Profile</button>
                                 </div>
                             </div>
-                        </div>
 
-
+                        </form>
                     </div>
-
                 </div>
 
 
-                <!-- Right Column: Load Overview + Chart Cards -->
-                <div class="col-12 col-lg-4">
+                <!-- Right Side Card (Account Overview) -->
+                <div class="col-12 col-lg-4 d-flex">
+                    <div
+                        class="card card-hover shadow-lg flex-grow-1 h-100 d-flex flex-column align-items-center justify-content-start text-center p-4">
 
-                    <!-- Load Overview Card -->
-                    <div class="card card-hover shadow-lg mb-3" style="height: 225px;">
-                        <div class="card-body p-2 d-flex flex-column justify-content-start align-items-center">
+                        <!-- Label -->
+                        <h4 class="fw-bold card-title">Profile Card</h4>
+                        <hr class="w-100">
 
-                            <!-- Plug Emoji as Icon (bigger) -->
-                            <div class="mb-2" style="font-size: 3rem;">🔌</div>
+                        <!-- Profile Picture -->
+                        <div class="position-relative mt-2 mb-3"
+                            style="width:140px; height:140px; border-radius:50%; overflow:hidden; border:3px solid white; box-shadow:0 0 8px rgba(0,0,0,0.15); cursor:pointer;">
 
-                            <h6 class="fw-bold mb-2 text-center">Load Overview</h6>
+                            <img id="profilePhoto"
+                                src="<?php echo htmlspecialchars(isset($user['profile_image']) && $user['profile_image'] != '' ? '../' . $user['profile_image'] : '../assets/images/user/avatar-1.jpg'); ?>"
+                                alt="Profile Picture" style="width:100%; height:100%; object-fit:cover; display:block;">
+                        </div>
 
-                            <div class="row w-100 text-start">
 
-                                <!-- Left Column -->
-                                <div class="col-6">
-                                    <ul class="list-unstyled mb-0">
-                                        <li class="mb-1"><span style="color:#4CAF50;">●</span> Load Status:
-                                            <span id="loadStatus">ON</span>
-                                        </li>
-                                    </ul>
-                                </div>
+                        <!-- User Info -->
+                        <h4 class="fw-bold mb-1" style="font-size:1.4rem;">
+                            <?php echo htmlspecialchars($fullName); ?>
+                        </h4>
+                        <p class="text-muted mb-1" style="font-size:1rem;">
+                            <?php echo htmlspecialchars($_SESSION['email'] ?? 'user@example.com'); ?>
+                        </p>
+                        <span class="badge role-text bg-primary mb-3"
+                            style="color:black; font-size:0.9rem; padding:0.5rem 1rem;">
+                            <?php echo htmlspecialchars(ucfirst($role)); ?>
+                        </span>
 
-                                <!-- Right Column -->
-                                <div class="col-6">
-                                    <ul class="list-unstyled mb-0">
-                                        <li class="mb-1"><span style="color:#2196F3;">●</span> Auto Shutdown:
-                                            <span id="autoShutdownDisplay"><?php echo $thresholdValue; ?>%</span>
-                                        </li>
-                                    </ul>
-                                </div>
-
+                        <!-- Divider -->
+                        <hr class="w-100">
+                        <!-- Other Details (Single Column, Centered, Bigger Text with Icons) -->
+                        <div class="w-100 text-center mt-3">
+                            <div class="mb-3">
+                                <span style="font-size:1.1rem;">
+                                    <?php echo htmlspecialchars($phone ?? 'N/A'); ?>
+                                </span>
+                                <small class="text-muted d-block" style="font-size:1rem; font-weight:600;">
+                                    <i class="bi bi-telephone me-1"></i> Phone Number
+                                </small>
+                            </div>
+                            <div class="mb-3">
+                                <span style="font-size:1.1rem;">
+                                    <?php echo htmlspecialchars($dob ?? 'N/A'); ?>
+                                </span>
+                                <small class="text-muted d-block" style="font-size:1rem; font-weight:600;">
+                                    <i class="bi bi-calendar-event me-1"></i> Date of Birth
+                                </small>
+                            </div>
+                            <div class="mb-0">
+                                <span style="font-size:1.1rem;">
+                                    <?php echo htmlspecialchars($address ?? 'N/A'); ?>
+                                </span>
+                                <small class="text-muted d-block" style="font-size:1rem; font-weight:600;">
+                                    <i class="bi bi-geo-alt me-1"></i> Address
+                                </small>
                             </div>
                         </div>
+
                     </div>
-
-
-
-                    <!-- Cumulative Energy Consumed Today Card -->
-                    <div class="card card-hover shadow-lg mb-3" style="height: 265px;">
-                        <div class="card-body p-2">
-                            <h6 class="fw-bold text-center mb-2">Today's Cumulative Energy Consumed(Wh)</h6>
-                            <canvas id="cumulativeEnergyChart" style="height: 100%; width: 100%;"></canvas>
-                            <p id="cumulativeEnergyLastUpdate" class="text-center small mb-0"></p>
-                        </div>
-                    </div>
-
-
-
-                    <!-- Battery Charge/Discharge Card -->
-                    <div class="card card-hover shadow-lg mb-3" style="height: 265px;">
-                        <div class="card-body p-2">
-                            <h6 class="fw-bold text-center mb-2">Today's Battery Charge/Discharge (W)</h6>
-                            <canvas id="batteryChart" style="height: 100%; width: 100%;"></canvas>
-                        </div>
-                    </div>
-
                 </div>
-
 
             </div>
         </div>
-
     </div>
     <!-- [ Main Content ] end -->
+
+
+
+
+
+
 
 
     <!-- [Page Specific JS] start -->
@@ -1101,189 +1160,11 @@ function showAccessDenied($message, $redirect)
     <script src="../assets/js/plugins/feather.min.js"></script>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-        const batteryThresholdSlider = document.getElementById('batteryThreshold');
-        const batteryThresholdValue = document.getElementById('batteryThresholdValue');
-        const batteryThresholdDisplay = document.getElementById('batteryThresholdValueDisplay');
-        const autoShutdownDisplay = document.getElementById('autoShutdownDisplay');
-        const applyThresholdBtn = document.getElementById('applyThresholdBtn');
-
-        const loadSwitch = document.getElementById('loadSwitch');
-        const loadStatusDisplay = document.getElementById('loadStatus');
-
-        // -------------------------------
-        // Slider Color Function
-        // -------------------------------
-        function updateSliderColor(value) {
-            let color;
-            if (value > 80) color = 'hsl(123, 90%, 45%)';
-            else if (value > 60) color = 'hsl(96, 90%, 45%)';
-            else if (value > 40) color = 'hsl(58, 90%, 45%)';
-            else if (value > 20) color = 'hsl(30, 90%, 45%)';
-            else color = 'hsl(3, 90%, 45%)';
-
-            batteryThresholdSlider.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${value}%, #d3d3d3 ${value}%, #d3d3d3 100%)`;
-        }
-
-        // -------------------------------
-        // Initialize Slider Color
-        // -------------------------------
-        updateSliderColor(batteryThresholdSlider.value);
-
-        // -------------------------------
-        // Dynamic Slider Input (Preview Only)
-        // -------------------------------
-        batteryThresholdSlider.addEventListener('input', () => {
-            const val = batteryThresholdSlider.value;
-            batteryThresholdValue.innerText = val + '%';
-            updateSliderColor(val);
-            // Do NOT change batteryThresholdDisplay here
-        });
-
-        // -------------------------------
-        // Load Switch Event
-        // -------------------------------
-        loadSwitch.addEventListener('change', () => {
-            const status = loadSwitch.checked ? "ON" : "OFF";
-
-            // Publish MQTT
-            client.publish('system/load/control', status, {
-                qos: 1,
-                retain: true
-            });
-            console.log('Load control sent:', status);
-
-            // Update DB
-            fetch('update_load_state.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: 'state=' + (loadSwitch.checked ? 1 : 0)
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        // ✅ Update display only on success
-                        loadStatusDisplay.innerText = status;
-
-                        // Success SweetAlert
-                        Swal.fire({
-                            title: 'Success!',
-                            text: `Load turned ${status}`,
-                            icon: 'success',
-                            timer: 1200,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        console.error('DB error:', data.error);
-                        // Revert toggle if failed
-                        loadSwitch.checked = !loadSwitch.checked;
-                        Swal.fire({
-                            title: 'Error!',
-                            text: 'Failed to update load state. Try again.',
-                            icon: 'error'
-                        });
-                    }
-                });
-        });
-
-        // -------------------------------
-        // Apply Battery Threshold Event
-        // -------------------------------
-        applyThresholdBtn.addEventListener('click', () => {
-            const thresholdValue = batteryThresholdSlider.value;
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: `Apply battery threshold of ${thresholdValue}%?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, apply it!',
-                cancelButtonText: 'Cancel',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-
-                    // MQTT publish if needed
-                    client.publish('system/battery/threshold', thresholdValue.toString(), {
-                        qos: 1,
-                        retain: true
-                    });
-                    console.log('Battery threshold sent:', thresholdValue);
-
-                    // Update DB and live UI
-                    fetch('update_threshold.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: 'value=' + thresholdValue
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                const newValue = data.value;
-
-                                // ✅ Update current threshold display ONLY after successful DB update
-                                batteryThresholdDisplay.innerText = newValue + '%';
-                                autoShutdownDisplay.innerText = newValue + '%';
-
-                                Swal.fire({
-                                    title: 'Applied!',
-                                    text: `Battery threshold set to ${newValue}%`,
-                                    icon: 'success',
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                });
-                            } else {
-                                console.error('DB error:', data.error);
-                                Swal.fire({
-                                    title: 'Error!',
-                                    text: 'Failed to apply threshold. Try again.',
-                                    icon: 'error'
-                                });
-                            }
-                        });
-                }
-            });
-        });
-
-        // -------------------------------
-        // Initial Load from DB
-        // -------------------------------
-        function loadStateFromDB() {
-            fetch('get_load_state.php')
-                .then(res => res.json())
-                .then(data => {
-                    loadSwitch.checked = data.state == 1;
-                    loadStatusDisplay.innerText = data.state == 1 ? 'ON' : 'OFF';
-                });
-        }
-
-        function loadThresholdFromDB() {
-            fetch('get_threshold.php')
-                .then(res => res.json())
-                .then(data => {
-                    const val = data.value;
-                    batteryThresholdSlider.value = val;
-                    batteryThresholdValue.innerText = val + '%';
-                    batteryThresholdDisplay.innerText = val + '%';
-                    updateSliderColor(val);
-                });
-        }
-
-        // Initial fetch on page load
-        loadStateFromDB();
-        loadThresholdFromDB();
-
-
-
         document.querySelectorAll('.logout-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault(); // prevent default link behavior
@@ -1304,6 +1185,10 @@ function showAccessDenied($message, $redirect)
                 });
             });
         });
+
+
+
+
 
         // -----------------------------
         // MQTT WebSocket Connection
@@ -1425,7 +1310,6 @@ function showAccessDenied($message, $redirect)
         });
 
 
-
         const darkModeToggle = document.getElementById('darkModeToggle');
         const darkModeIcon = document.getElementById('darkModeIcon');
 
@@ -1452,72 +1336,65 @@ function showAccessDenied($message, $redirect)
         });
 
 
-        window.addEventListener("DOMContentLoaded", () => {
-            const batteryMeter = new BatteryMeter(".battery");
 
-            // -----------------------------
-            // MQTT WebSocket Connection
-            // -----------------------------
-            const client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt'); // non-TLS
+        document.addEventListener('DOMContentLoaded', () => {
+            const updateForm = document.getElementById('updateForm');
+            const photoInput = document.getElementById('photoInput');
+            const profilePhoto = document.getElementById('profilePhoto');
 
-            client.on('connect', () => {
-                console.log('Connected to MQTT broker via WebSocket');
-
-                client.subscribe('battery/soc', (err) => {
-                    if (!err) console.log('Subscribed to battery/soc');
-                    else console.error('Subscribe error:', err);
-                });
-            });
-
-            client.on('error', (err) => {
-                console.error('MQTT connection error:', err);
-            });
-
-            // Update battery meter when MQTT message arrives
-            client.on('message', (topic, message) => {
-                if (topic === 'battery/soc') {
-                    const soc = parseFloat(message.toString()); // value from 0 to 100
-                    batteryMeter.adjustHealth(soc / 100); // convert to 0-1 range for BatteryMeter
+            // Preview profile image
+            photoInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        profilePhoto.src = evt.target.result;
+                    }
+                    reader.readAsDataURL(file);
                 }
+            });
+
+            // AJAX form submission
+            updateForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(updateForm);
+
+                fetch('updateUserInfo.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: data.message,
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                location.reload(); // Refresh page after clicking OK
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message,
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while updating your profile.',
+                            confirmButtonText: 'OK'
+                        });
+                    });
             });
         });
 
-        class BatteryMeter {
-            health = 1;
-            constructor(el) {
-                this.el = document.querySelector(el);
-                this.init();
-            }
-            get healthReadable() {
-                return `${Math.round(this.health * 100)}%`;
-            }
-            init() {
-                this.adjustHealth(this.health);
-            }
-            adjustHealth(value) {
-                this.health = Math.max(Math.min(value, 1), 0);
-                this.updateDisplay();
-            }
-            updateDisplay() {
-                this.el.style.setProperty("--percent", this.health);
-
-                const classes = ["battery--fullgreen", "battery--lightgreen", "battery--yellow", "battery--orange", "battery--critical", "battery--hide-symbols"];
-                this.el.classList.remove(...classes);
-
-                const valuePercent = this.health * 100;
-
-                if (valuePercent > 80) this.el.classList.add("battery--fullgreen");
-                else if (valuePercent > 60) this.el.classList.add("battery--lightgreen");
-                else if (valuePercent > 40) this.el.classList.add("battery--yellow");
-                else if (valuePercent > 20) this.el.classList.add("battery--orange");
-                else this.el.classList.add("battery--critical");
-
-                if (valuePercent <= 5) this.el.classList.add("battery--hide-symbols");
-
-                const valueEl = this.el.querySelector("[data-value]");
-                if (valueEl) valueEl.innerHTML = `${Math.round(valuePercent)}%`;
-            }
-        }
 
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1726,178 +1603,6 @@ function showAccessDenied($message, $redirect)
             fetchNotifications();
             setInterval(fetchNotifications, 5000);
         });
-
-        const ctx = document.getElementById('todayLoadChart').getContext('2d');
-        let todayLoadChart;
-
-        function formatHour(hour) {
-            const ampm = hour >= 12 ? 'PM' : 'AM';
-            hour = hour % 12 || 12; // convert 0 → 12, 13 → 1
-            return `${hour}:00 ${ampm}`;
-        }
-
-        async function fetchTodayLoad() {
-            const response = await fetch('load_profile_data.php');
-            const data = await response.json();
-
-            const labels = Array.from({
-                length: 24
-            }, (_, i) => formatHour(i));
-
-            // Highlight peak hours 10AM-2PM (10 → 10 AM, 14 → 2 PM)
-            const barColors = data.map((_, i) => (i >= 10 && i <= 14 ? 'rgba(255,99,132,0.8)' : 'rgba(54,162,235,0.6)'));
-
-            if (todayLoadChart) {
-                todayLoadChart.data.labels = labels;
-                todayLoadChart.data.datasets[0].data = data;
-                todayLoadChart.data.datasets[0].backgroundColor = barColors;
-                todayLoadChart.update();
-            } else {
-                todayLoadChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels,
-                        datasets: [{
-                            label: 'Load (W)',
-                            data,
-                            backgroundColor: barColors
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: true
-                            },
-                            title: {
-                                display: true,
-                                text: "Today's Load Profile"
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        // Load chart on page load
-        fetchTodayLoad();
-
-
-        // Cumulative Battery Energy Chart
-        fetch('get_cumulative_battery_energy.php')
-            .then(res => res.json())
-            .then(res => {
-                // Convert 24-hour labels to 12-hour
-                const formattedLabels = res.labels.map(t => {
-                    let [hour, minute] = t.split(':').map(Number);
-                    const ampm = hour >= 12 ? 'PM' : 'AM';
-                    hour = hour % 12 || 12;
-                    return `${hour}:${minute.toString().padStart(2,'0')} ${ampm}`;
-                });
-
-                const ctx = document.getElementById('cumulativeEnergyChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: formattedLabels,
-                        datasets: [{
-                            label: 'Battery Energy Consumed (Wh)',
-                            data: res.data,
-                            backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                            borderColor: 'rgba(255, 159, 64, 1)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.3
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Wh'
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Time'
-                                }
-                            }
-                        }
-                    }
-                });
-            });
-
-
-        // Battery Chart
-        const batteryCtx = document.getElementById('batteryChart').getContext('2d');
-
-        const batteryChart = new Chart(batteryCtx, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                        label: 'Charge (SOC Increase)',
-                        data: [],
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        fill: true,
-                        tension: 0.3
-                    },
-                    {
-                        label: 'Discharge (Battery Power)',
-                        data: [],
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        fill: true,
-                        tension: 0.3
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        async function updateBatteryChart() {
-            const res = await fetch('get_battery_data.php');
-            const data = await res.json();
-
-            // Convert 24-hour time to 12-hour format with AM/PM
-            const formattedTime = data.time.map(t => {
-                let [hour, minute] = t.split(':').map(Number);
-                const ampm = hour >= 12 ? 'PM' : 'AM';
-                hour = hour % 12 || 12;
-                return `${hour}:${minute.toString().padStart(2, '0')} ${ampm}`;
-            });
-
-            batteryChart.data.labels = formattedTime;
-            batteryChart.data.datasets[0].data = data.charge;
-            batteryChart.data.datasets[1].data = data.discharge;
-            batteryChart.update();
-        }
-
-        // Initial load
-        updateBatteryChart();
-        setInterval(updateBatteryChart, 60000);
     </script>
 
 

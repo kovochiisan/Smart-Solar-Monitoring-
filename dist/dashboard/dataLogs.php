@@ -777,6 +777,92 @@ session_start(); // must be first thing in your PHP
 <!-- [Head] end -->
 
 
+<?php
+require_once "config.php";
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// ---------------------------------------------
+// DETERMINE USER STATE
+// ---------------------------------------------
+if (!isset($_SESSION['user_id'])) {
+    showAccessDenied("You must log in to access this page.", "authentication.php");
+    exit();
+}
+
+$userId = $_SESSION['user_id'];
+
+// Fetch user info
+$sql = "SELECT * FROM users WHERE id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    showAccessDenied("User not found.", "authentication.php");
+    exit();
+}
+
+$user = $result->fetch_assoc();
+
+// ---------------- STORE INFO VARIABLES ----------------
+$fullName     = $user['full_name'];
+$email        = $user['email'];
+$phone        = $user['contact_number'];
+$dob          = $user['date_of_birth'];
+$address      = $user['address'];
+$role         = $user['role'];
+$profilePhoto = $user['profile_image'] ?? '../assets/images/user/avatar-2.jpg';
+
+$_SESSION['email'] = $email;
+
+// ---------------------------------------------
+// ADMIN ROLE VALIDATION
+// ---------------------------------------------
+if ($role !== 'admin') {
+    showAccessDenied("You are logged in, but you do not have permission to access this admin page.", "staffDashboard.php");
+    exit();
+}
+
+// ------------------ ACCESS DENIED FUNCTION ------------------
+function showAccessDenied($message, $redirect)
+{
+?>
+
+
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Access Restricted</title>
+        <link rel="stylesheet" href="access_denied.css">
+    </head>
+
+    <body>
+        <div class="glass-card">
+            <img src="../../images/LogoNoBG.png" class="logo" alt="Logo">
+            <div class="lock-emoji">🔒</div>
+            <h1>Access Denied</h1>
+            <p><?= $message ?></p>
+            <p class="redirect-msg">Redirecting in <span id="countdown" data-redirect="<?= $redirect ?>">10</span> seconds...</p>
+            <a href="<?= $redirect ?>" class="btn-modern">Go Now</a>
+        </div>
+
+        <script src="countdown.js"></script>
+    </body>
+
+    </html>
+<?php
+}
+?>
+
+
+
 <!-- [Body] Start -->
 
 <body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
@@ -864,41 +950,7 @@ session_start(); // must be first thing in your PHP
                 </ul>
             </div>
 
-            <?php
-            require_once "config.php";
-
-            // Ensure user is logged in
-            if (!isset($_SESSION['user_id'])) {
-                die("You must be logged in to view this page.");
-            }
-
-            $userId = $_SESSION['user_id'];
-
-            // Fetch user info
-            $sql = "SELECT * FROM users WHERE id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("i", $userId);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows > 0) {
-                $user = $result->fetch_assoc();
-
-                $fullName = $user['full_name'];
-                $email = $user['email'];
-                $phone = $user['contact_number'];
-                $dob = $user['date_of_birth'];
-                $address = $user['address'];
-                $role = $user['role'];
-                $profilePhoto = $user['profile_image'] ?? '../assets/images/user/avatar-2.jpg';
-
-                // Optional: store in session too
-                $_SESSION['email'] = $email;
-            } else {
-                die("User not found.");
-            }
-            ?>
-
+           
             <div class="ms-auto d-flex align-items-center">
                 <ul class="list-unstyled d-flex align-items-center mb-0">
 

@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $full_name = $_POST['full_name'];
     $email = $_POST['email'];
     $contact_number = $_POST['contact_number'];
-    $password = $_POST['password']; // store plain-text password
+    $password = $_POST['password']; // plain-text password
     $role = "staff"; // all new users are staff by default
 
     // Check if email already exists
@@ -30,9 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     $checkStmt->close();
 
+    // Hash the password before storing
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
     // Insert new user
     $stmt = $conn->prepare("INSERT INTO users (full_name, email, contact_number, password, role) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $full_name, $email, $contact_number, $password, $role);
+    $stmt->bind_param("sssss", $full_name, $email, $contact_number, $hashedPassword, $role);
 
     if ($stmt->execute()) {
         echo json_encode(['status' => 'success', 'message' => 'Registration successful!']);

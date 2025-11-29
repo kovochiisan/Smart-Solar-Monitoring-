@@ -559,11 +559,13 @@ body.dark-mode .pc-header .pc-head-link::after {
 
 
 </head>
+
+
+
+
+
+
 <!-- [Head] end -->
-
-
-
-
 <?php
 require_once "config.php";
 
@@ -607,10 +609,10 @@ $profilePhoto = $user['profile_image'] ?? '../assets/images/user/avatar-2.jpg';
 $_SESSION['email'] = $email;
 
 // ---------------------------------------------
-// ADMIN ROLE VALIDATION
+// STAFF ROLE VALIDATION
 // ---------------------------------------------
-if ($role !== 'admin') {
-    showAccessDenied("You are logged in, but you do not have permission to access this admin page.", "staffDashboard.php");
+if ($role !== 'staff') {
+    showAccessDenied("You are logged in, but you do not have permission to access this staff page.", "adminDashboard.php");
     exit();
 }
 
@@ -619,13 +621,12 @@ function showAccessDenied($message, $redirect)
 {
 ?>
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Access Restricted</title>
+    <!-- Separate CSS for styling -->
     <link rel="stylesheet" href="access_denied.css">
 </head>
 <body>
@@ -634,20 +635,19 @@ function showAccessDenied($message, $redirect)
         <div class="lock-emoji">🔒</div>
         <h1>Access Denied</h1>
         <p><?= $message ?></p>
-        <p class="redirect-msg">Redirecting in <span id="countdown" data-redirect="<?= $redirect ?>">10</span> seconds...</p>
+        <p class="redirect-msg">
+            Redirecting in <span id="countdown" data-redirect="<?= $redirect ?>">10</span> seconds...
+        </p>
         <a href="<?= $redirect ?>" class="btn-modern">Go Now</a>
     </div>
 
+    <!-- Separate JS for countdown -->
     <script src="countdown.js"></script>
 </body>
 </html>
 <?php
 }
 ?>
-
-
-
-
 
 
 <!-- [Body] Start -->
@@ -667,30 +667,9 @@ function showAccessDenied($message, $redirect)
       <div class="navbar-content">
         <ul class="pc-navbar">
           <li class="pc-item">
-            <a href="../dashboard/adminDashboard.php" class="pc-link">
+            <a href="../dashboard/staffDashboard.php" class="pc-link">
               <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
               <span class="pc-mtext">Dashboard</span>
-            </a>
-          </li>
-
-          <li class="pc-item">
-            <a href="../dashboard/controlLoad.php" class="pc-link">
-              <span class="pc-micon"><i class="ti ti-power"></i></span>
-              <span class="pc-mtext">Control Load</span>
-            </a>
-          </li>
-
-          <li class="pc-item">
-            <a href="../dashboard/dataLogs.php" class="pc-link">
-              <span class="pc-micon"><i class="ti ti-file-text"></i></span>
-              <span class="pc-mtext">Data Logs</span>
-            </a>
-          </li>
-
-          <li class="pc-item">
-            <a href="../dashboard/manageAccounts.php" class="pc-link">
-              <span class="pc-micon"><i class="ti ti-settings"></i></span>
-              <span class="pc-mtext">Manage Accounts</span>
             </a>
           </li>
 
@@ -702,7 +681,7 @@ function showAccessDenied($message, $redirect)
                 <img src="../../images/Solar Panel GIF.gif" alt="Sidebar GIF" style="width:100% !important; height:auto !important; border-radius:0.5rem !important; 
                display:block !important; margin:0 auto !important;">
                 <h6 style="margin-top:0.5rem !important; font-size:18px !important; font-weight:600 !important">
-                  Solar Admin
+                  Solar Staff
                 </h6>
               </div>
             </div>
@@ -736,6 +715,9 @@ function showAccessDenied($message, $redirect)
           </li>
         </ul>
       </div>
+
+      
+
 
 
       <div class="ms-auto d-flex align-items-center">
@@ -832,7 +814,7 @@ function showAccessDenied($message, $redirect)
 
               <div class="px-3 py-2">
                 <h6 class="dropdown-header">Settings</h6>
-                <a href="accountSettings.php" class="dropdown-item">
+                <a href="staffAccountSettings.php" class="dropdown-item">
                   <i class="ti ti-user"></i>
                   <span>Account Settings</span>
                 </a>

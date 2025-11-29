@@ -9,18 +9,18 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $userId = $_SESSION['user_id'];
-$email = $_POST['email'] ?? '';
-$fullname = $_POST['fullname'] ?? '';
-$phone = $_POST['phone'] ?? '';
-$dob = $_POST['dob'] ?? '';
-$address = $_POST['address'] ?? '';
-$password = $_POST['password'] ?? '';
+$email = trim($_POST['email'] ?? '');
+$fullname = trim($_POST['fullname'] ?? '');
+$phone = trim($_POST['phone'] ?? '');
+$dob = trim($_POST['dob'] ?? '');
+$address = trim($_POST['address'] ?? '');
+$password = trim($_POST['password'] ?? '');
 $profileImage = $_FILES['profile_image'] ?? null;
 
 $errors = [];
 
-// Email validation
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+// Email validation (allow empty, but if filled must be valid)
+if($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)){
     $errors[] = "Invalid email address";
 }
 
@@ -57,9 +57,16 @@ if($profileImage && $profileImage['error'] === UPLOAD_ERR_OK){
     $profileImagePath = $newFileName;
 }
 
-// Update DB
-$params = [$email, $fullname, $phone, $dob, $address];
+// Convert empty strings to NULL or 'N/A'
+$email = $email ?: null;
+$fullname = $fullname ?: null;
+$phone = $phone ?: null;
+$dob = $dob ?: null;
+$address = $address ?: null;
+
+// Build SQL dynamically
 $sql = "UPDATE users SET email=?, full_name=?, contact_number=?, date_of_birth=?, address=?";
+$params = [$email, $fullname, $phone, $dob, $address];
 
 if(!empty($password)){
     $sql .= ", password=?";
@@ -74,11 +81,18 @@ if($profileImagePath){
 $sql .= " WHERE id=?";
 $params[] = $userId;
 
+// Prepare and execute
 $stmt = $conn->prepare($sql);
-if($stmt->execute($params)){
-    $_SESSION['email'] = $email; // update session email
+
+// Bind parameters dynamically
+$types = str_repeat('s', count($params)-1) . 'i'; // all strings + last id integer
+$stmt->bind_param($types, ...$params);
+
+if($stmt->execute()){
+    if($email) $_SESSION['email'] = $email; // update session email if changed
     echo json_encode(["success"=>true,"message"=>"Profile updated successfully"]);
 } else {
     echo json_encode(["success"=>false,"message"=>"Failed to update profile"]);
 }
+
 ?>
