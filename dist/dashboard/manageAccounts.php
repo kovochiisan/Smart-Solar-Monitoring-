@@ -1354,39 +1354,118 @@ function showAccessDenied($message, $redirect)
       setInterval(fetchNotifications, 5000);
     });
 
-    // Event delegation for role updates
-    document.querySelector('tbody').addEventListener('change', function(e) {
-      if (e.target && e.target.classList.contains('role-select')) {
-        const select = e.target;
-        const userId = select.dataset.id;
-        const newRole = select.value;
-
-        fetch('update_role.php', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: `id=${encodeURIComponent(userId)}&role=${encodeURIComponent(newRole)}`
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (!data.success) alert('Failed to update role.');
-          })
-          .catch(err => {
-            console.error(err);
-            alert('Error updating role.');
-          });
+   
+    // --------------------------------------
+    // Save original role BEFORE user changes
+    // --------------------------------------
+    document.addEventListener('focusin', function(e) {
+      if (e.target.classList.contains('role-select')) {
+        e.target.dataset.old = e.target.value; // store original selected value
       }
     });
 
-    // Event delegation for delete buttons
+    // -------------------------------------------------
+    // Handle dropdown change → ask confirm → update role
+    // -------------------------------------------------
+    document.querySelector('tbody').addEventListener('change', function(e) {
+      if (e.target && e.target.classList.contains('role-select')) {
+
+        const select = e.target;
+        const userId = select.dataset.id;
+        const newRole = select.value;
+        const oldRole = select.dataset.old; // always correct now!
+
+        Swal.fire({
+          title: "Are you sure?",
+          text: `Change this user's role to ${newRole}?`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, update it",
+          cancelButtonText: "Cancel",
+          customClass: {
+            popup: 'dark-mode-popup'
+          }
+        }).then((result) => {
+
+          // User clicked CANCEL → revert instantly
+          if (!result.isConfirmed) {
+            select.value = oldRole;
+            return;
+          }
+
+          // Confirmed → Update in database
+          fetch('adminUpdate_role.php', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
+              body: `id=${encodeURIComponent(userId)}&role=${encodeURIComponent(newRole)}`
+            })
+            .then(res => res.json())
+            .then(data => {
+
+              if (data.success) {
+                // Update stored previous role
+                select.dataset.old = newRole;
+
+                Swal.fire({
+                  title: "Updated!",
+                  text: "User role has been updated successfully.",
+                  icon: "success",
+                  timer: 1500,
+                  showConfirmButton: false
+                });
+              } else {
+                // Fail → revert to old
+                select.value = oldRole;
+
+                Swal.fire({
+                  title: "Failed",
+                  text: "Failed to update role.",
+                  icon: "error"
+                });
+              }
+            })
+            .catch(err => {
+              console.error(err);
+
+              // Error → revert
+              select.value = oldRole;
+
+              Swal.fire({
+                title: "Error",
+                text: "Something went wrong while updating.",
+                icon: "error"
+              });
+            });
+
+        });
+      }
+    });
+
+
+
     document.querySelector('tbody').addEventListener('click', function(e) {
+
       if (e.target && (e.target.classList.contains('delete-account') || e.target.closest('.delete-account'))) {
+
         const btn = e.target.closest('.delete-account');
         const userId = btn.dataset.id;
 
-        if (confirm('Are you sure you want to delete this account?')) {
-          fetch('delete_account.php', {
+        Swal.fire({
+          title: "Delete Account?",
+          text: "This action cannot be undone!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Yes, delete",
+          cancelButtonText: "Cancel",
+        }).then((result) => {
+
+          if (!result.isConfirmed) return;
+
+          fetch('adminDelete_account.php', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -1395,19 +1474,40 @@ function showAccessDenied($message, $redirect)
             })
             .then(res => res.json())
             .then(data => {
+
               if (data.success) {
                 btn.closest('tr').remove();
+
+                Swal.fire({
+                  title: "Deleted!",
+                  text: "User account has been removed.",
+                  icon: "success",
+                  timer: 1500,
+                  showConfirmButton: false
+                });
+
               } else {
-                alert('Failed to delete account.');
+                Swal.fire({
+                  title: "Failed",
+                  text: "Failed to delete user.",
+                  icon: "error"
+                });
               }
+
             })
             .catch(err => {
               console.error(err);
-              alert('Error deleting account.');
+
+              Swal.fire({
+                title: "Error",
+                text: "Something went wrong while deleting.",
+                icon: "error"
+              });
             });
-        }
+        });
       }
     });
+
 
 
     function updateFontColors() {
