@@ -73,8 +73,8 @@ session_start(); // must be first thing in your PHP
     }
 
     .pc-container {
-      background-color: #E8EBF5
-        /* light gray background */
+      background-color: #E8EBF5;
+      min-height: 100vh;
     }
 
     .pc-header {
@@ -668,67 +668,43 @@ session_start(); // must be first thing in your PHP
 
     /* ====================================== */
     /* Dark mode for table */
-    body.dark-mode table.table {
-      color: #ffffff;
-      background-color: #24243E;
-      /* match pc-container dark bg */
-      border-color: #2f2f4a;
-    }
-
-    body.dark-mode table.table thead {
-      background-color: #3B3B7A !important;
-      /* semicolon added */
+    /* Table dark mode */
+    /* Dark mode table text */
+    body.dark-mode table.table,
+    body.dark-mode table.table th,
+    body.dark-mode table.table td {
       color: #ffffff !important;
-      /* force text color */
+      /* force all table text to white */
     }
 
+    /* Dark mode table header */
+    body.dark-mode table.table thead th {
+      background-color: #3B3B7A !important;
+      color: #ffffff !important;
+      /* force header text */
+    }
 
-
+    /* Dark mode table rows */
     body.dark-mode table.table tbody tr {
-      background-color: #24243E;
-      color: #ffffff;
-      border-bottom: 1px solid #2f2f4a;
+      background-color: #24243E !important;
+      color: #ffffff !important;
     }
 
     body.dark-mode table.table tbody tr:hover {
-      background-color: #2f2f4a;
-      /* subtle hover effect */
+      background-color: #2f2f4a !important;
     }
 
+    /* Dark mode select inside table */
     body.dark-mode .role-select {
-      background-color: #0E0E23;
-      color: #ffffff;
-      border: 1px solid #2f2f4a;
+      background-color: #0E0E23 !important;
+      color: #ffffff !important;
+      border: 1px solid #2f2f4a !important;
     }
 
     body.dark-mode .role-select option {
-      background-color: #0E0E23;
-      color: #ffffff;
+      background-color: #0E0E23 !important;
+      color: #ffffff !important;
     }
-
-    /* Delete button dark mode */
-    body.dark-mode .delete-account {
-      color: #ffffff;
-      background-color: #dc3545;
-      /* keep red */
-      border-color: #b52a38;
-    }
-
-    body.dark-mode .delete-account:hover {
-      background-color: #b52a38;
-      border-color: #92212d;
-    }
-
-
-    /* /////////////////// PISTI KA LISOD KAYKA /////////////////// */
-    /* If your theme uses pseudo-element overlays, hide them */
-    /* body.dark-mode .pc-header .pc-head-link::before,
-body.dark-mode .pc-header .pc-head-link::after {
-  content: none !important;
-  color: inherit !important;
-  opacity: 1 !important; 
-  filter: none !important;
-} */
   </style>
 
 
@@ -740,15 +716,15 @@ body.dark-mode .pc-header .pc-head-link::after {
 require_once "config.php";
 
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+  session_start();
 }
 
 // ---------------------------------------------
 // DETERMINE USER STATE
 // ---------------------------------------------
 if (!isset($_SESSION['user_id'])) {
-    showAccessDenied("You must log in to access this page.", "authentication.php");
-    exit();
+  showAccessDenied("You must log in to access this page.", "authentication.php");
+  exit();
 }
 
 $userId = $_SESSION['user_id'];
@@ -761,8 +737,8 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
-    showAccessDenied("User not found.", "authentication.php");
-    exit();
+  showAccessDenied("User not found.", "authentication.php");
+  exit();
 }
 
 $user = $result->fetch_assoc();
@@ -782,8 +758,8 @@ $_SESSION['email'] = $email;
 // ADMIN ROLE VALIDATION
 // ---------------------------------------------
 if ($role !== 'admin') {
-    showAccessDenied("You are logged in, but you do not have permission to access this admin page.", "manageAccounts.php");
-    exit();
+  showAccessDenied("You are logged in, but you do not have permission to access this admin page.", "staffDashboard.php");
+  exit();
 }
 
 // ------------------ ACCESS DENIED FUNCTION ------------------
@@ -793,26 +769,29 @@ function showAccessDenied($message, $redirect)
 
 
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
     <meta charset="UTF-8">
     <title>Access Restricted</title>
     <link rel="stylesheet" href="access_denied.css">
-</head>
-<body>
+  </head>
+
+  <body>
     <div class="glass-card">
-        <img src="../../images/LogoNoBG.png" class="logo" alt="Logo">
-        <div class="lock-emoji">🔒</div>
-        <h1>Access Denied</h1>
-        <p><?= $message ?></p>
-        <p class="redirect-msg">Redirecting in <span id="countdown" data-redirect="<?= $redirect ?>">10</span> seconds...</p>
-        <a href="<?= $redirect ?>" class="btn-modern">Go Now</a>
+      <img src="../../images/LogoNoBG.png" class="logo" alt="Logo">
+      <div class="lock-emoji">🔒</div>
+      <h1>Access Denied</h1>
+      <p><?= $message ?></p>
+      <p class="redirect-msg">Redirecting in <span id="countdown" data-redirect="<?= $redirect ?>">10</span> seconds...</p>
+      <a href="<?= $redirect ?>" class="btn-modern">Go Now</a>
     </div>
 
     <script src="countdown.js"></script>
-</body>
-</html>
+  </body>
+
+  </html>
 <?php
 }
 ?>
@@ -1017,68 +996,130 @@ function showAccessDenied($message, $redirect)
   </header>
   <!-- [ Header ] end -->
 
-  <!-- [ Main Content ] start -->
-  <main class="pc-container" style="padding: 20px; min-height: 85vh; color: #000;" data-dark-color="#fff">
-    <div class="container-fluid">
 
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="mb-0" style="color: inherit;">Manage Accounts</h3>
+  <?php
+  require_once "config.php";
+
+  // ------------------ DYNAMIC STATISTICS ------------------
+  // Total users
+  $totalUsersResult = $conn->query("SELECT COUNT(*) AS total_users FROM users");
+  $totalUsers = $totalUsersResult->fetch_assoc()['total_users'];
+
+  // Total admins
+  $totalAdminsResult = $conn->query("SELECT COUNT(*) AS total_admins FROM users WHERE role='admin'");
+  $totalAdmins = $totalAdminsResult->fetch_assoc()['total_admins'];
+
+  // Total staff
+  $totalStaffResult = $conn->query("SELECT COUNT(*) AS total_staff FROM users WHERE role='staff'");
+  $totalStaff = $totalStaffResult->fetch_assoc()['total_staff'];
+  ?>
+
+
+  <!-- [ Main Content ] start -->
+  <div class="pc-container">
+    <div class="pc-content" style="padding: 22px 35px 32px;">
+
+      <!-- Manage Accounts Card -->
+      <div class="card shadow-lg card-hover mb-4">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold mb-0">Manage Accounts</h4>
+          </div>
+          <table class="table table-bordered table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th class="text-center">ID</th>
+                <th class="text-center">Full Name</th>
+                <th class="text-center">Email</th>
+                <th class="text-center">Role</th>
+                <th class="text-center">Contact Number</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+              $sql = "SELECT * FROM users";
+              $result = $conn->query($sql);
+              if ($result->num_rows > 0):
+                while ($row = $result->fetch_assoc()):
+                  $role = $row['role'];
+              ?>
+                  <tr>
+                    <td class="text-center"><?= htmlspecialchars($row['id']) ?></td>
+                    <td class="text-center"><?= htmlspecialchars($row['full_name']) ?></td>
+                    <td class="text-center"><?= htmlspecialchars($row['email']) ?></td>
+                    <td class="text-center">
+                      <select class="form-select role-select" data-id="<?= $row['id'] ?>">
+                        <option value="staff" <?= $role === 'staff' ? 'selected' : '' ?>>Staff</option>
+                        <option value="admin" <?= $role === 'admin' ? 'selected' : '' ?>>Admin</option>
+                      </select>
+                    </td>
+                    <td class="text-center"><?= htmlspecialchars($row['contact_number']) ?></td>
+                    <td class="text-center">
+                      <button class="btn btn-danger btn-sm delete-account" data-id="<?= $row['id'] ?>">
+                        <i class="ti ti-trash"></i> Delete
+                      </button>
+                    </td>
+                  </tr>
+                <?php
+                endwhile;
+              else:
+                ?>
+                <tr>
+                  <td colspan="6" class="text-center">No accounts found.</td>
+                </tr>
+              <?php endif; ?>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div class="card card-hover">
-        <div class="card-body p-3">
-          <div class="table-responsive">
-            <table class="table table-bordered table-striped table-hover" style="color: inherit;">
-              <thead class="table-light" style="color: inherit;">
-                <tr>
-                  <th style="text-align:center">ID</th>
-                  <th style="text-align:center">Full Name</th>
-                  <th style="text-align:center">Email</th>
-                  <th style="text-align:center">Role</th>
-                  <th style="text-align:center">Contact Number</th>
-                  <th style="text-align:center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php
-                require_once "config.php";
+      <!-- Three Horizontal Cards -->
+      <div class="row g-4 mt-4">
+        <!-- Card 1: Total Users -->
+        <div class="col-lg-4">
+          <div class="card shadow-lg card-hover h-100 text-white" style="background-color: #0d6efd;">
+            <div class="card-body p-4 text-center">
+              <!-- Big Emoji -->
+              <div style="font-size: 3rem;">👥</div>
+              <h5 class="fw-bold mt-2 mb-1">Total Users</h5>
+              <p id="total-users" class="fs-2 mb-0"><?= $totalUsers ?></p>
+            </div>
+          </div>
+        </div>
 
-                $sql = "SELECT * FROM users";
-                $result = $conn->query($sql);
+        <!-- Card 2: Admins -->
+        <div class="col-lg-4">
+          <div class="card shadow-lg card-hover h-100 text-white" style="background-color: #198754;">
+            <div class="card-body p-4 text-center">
+              <!-- Big Emoji -->
+              <div style="font-size: 3rem;">🛡️</div>
+              <h5 class="fw-bold mt-2 mb-1">Admins</h5>
+              <p id="total-admins" class="fs-2 mb-0"><?= $totalAdmins ?></p>
+            </div>
+          </div>
+        </div>
 
-                if ($result->num_rows > 0) {
-                  while ($row = $result->fetch_assoc()) {
-                    $role = $row['role'];
-                    echo "<tr style='color: inherit;'>";
-                    echo "<td style='color: inherit; text-align:center'>" . htmlspecialchars($row['id']) . "</td>";
-                    echo "<td style='color: inherit; text-align:center'>" . htmlspecialchars($row['full_name']) . "</td>";
-                    echo "<td style='color: inherit; text-align:center'>" . htmlspecialchars($row['email']) . "</td>";
-                    echo "<td style='align-item:center'>
-                              <select class='form-select role-select' data-id='" . $row['id'] . "' style='color: inherit; background-color: inherit;'>
-                                <option value='staff' " . ($role === 'staff' ? 'selected' : '') . ">Staff</option>
-                                <option value='admin' " . ($role === 'admin' ? 'selected' : '') . ">Admin</option>
-                              </select>
-                            </td>";
-                    echo "<td style='color: inherit; text-align:center'>" . htmlspecialchars($row['contact_number']) . "</td>";
-                    echo "<td style='text-align:center'>
-                              <button class='btn btn-danger btn-sm delete-account' data-id='" . $row['id'] . "' style='color: #fff;'>
-                                <i class='ti ti-trash'></i> Delete
-                              </button>
-                            </td>";
-                    echo "</tr>";
-                  }
-                } else {
-                  echo "<tr><td colspan='6' class='text-center' style='color: inherit;'>No accounts found.</td></tr>";
-                }
-                ?>
-              </tbody>
-            </table>
+        <!-- Card 3: Staff -->
+        <div class="col-lg-4">
+          <div class="card shadow-lg card-hover h-100 text-dark" style="background-color: #ffc107;">
+            <div class="card-body p-4 text-center">
+              <!-- Big Emoji -->
+              <div style="font-size: 3rem;">👨‍💼</div>
+              <h5 class="fw-bold mt-2 mb-1">Staff</h5>
+              <p id="total-staff" class="fs-2 mb-0"><?= $totalStaff ?></p>
+            </div>
           </div>
         </div>
       </div>
 
+
+
     </div>
-  </main>
+  </div>
+
+
+
   <!-- [ Main Content ] end -->
 
 
@@ -1354,7 +1395,7 @@ function showAccessDenied($message, $redirect)
       setInterval(fetchNotifications, 5000);
     });
 
-   
+
     // --------------------------------------
     // Save original role BEFORE user changes
     // --------------------------------------
@@ -1408,6 +1449,22 @@ function showAccessDenied($message, $redirect)
                 // Update stored previous role
                 select.dataset.old = newRole;
 
+                // Update stats dynamically
+                const totalUsers = document.getElementById('total-users');
+                const totalAdmins = document.getElementById('total-admins');
+                const totalStaff = document.getElementById('total-staff');
+
+                // Adjust old role count
+                if (oldRole === 'admin') totalAdmins.innerText = parseInt(totalAdmins.innerText) - 1;
+                if (oldRole === 'staff') totalStaff.innerText = parseInt(totalStaff.innerText) - 1;
+
+                // Adjust new role count
+                if (newRole === 'admin') totalAdmins.innerText = parseInt(totalAdmins.innerText) + 1;
+                if (newRole === 'staff') totalStaff.innerText = parseInt(totalStaff.innerText) + 1;
+
+                // Total users remains the same (or you can recompute if needed)
+
+
                 Swal.fire({
                   title: "Updated!",
                   text: "User role has been updated successfully.",
@@ -1452,6 +1509,9 @@ function showAccessDenied($message, $redirect)
         const btn = e.target.closest('.delete-account');
         const userId = btn.dataset.id;
 
+        // Get role of the user in this row
+        const role = btn.closest('tr').querySelector('.role-select').value;
+
         Swal.fire({
           title: "Delete Account?",
           text: "This action cannot be undone!",
@@ -1476,7 +1536,18 @@ function showAccessDenied($message, $redirect)
             .then(data => {
 
               if (data.success) {
+                // Remove row
                 btn.closest('tr').remove();
+
+                // Update stats dynamically
+                const totalUsers = document.getElementById('total-users');
+                const totalAdmins = document.getElementById('total-admins');
+                const totalStaff = document.getElementById('total-staff');
+
+                totalUsers.innerText = parseInt(totalUsers.innerText) - 1;
+
+                if (role === 'admin') totalAdmins.innerText = parseInt(totalAdmins.innerText) - 1;
+                if (role === 'staff') totalStaff.innerText = parseInt(totalStaff.innerText) - 1;
 
                 Swal.fire({
                   title: "Deleted!",
@@ -1507,6 +1578,7 @@ function showAccessDenied($message, $redirect)
         });
       }
     });
+
 
 
 

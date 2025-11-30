@@ -18,7 +18,8 @@ $mqtt = new Bluerhinos\phpMQTT($server, $port, $client_id);
 // -----------------------------
 // Helper: Format PH number
 // -----------------------------
-function formatPHNumber($number) {
+function formatPHNumber($number)
+{
     $digits = preg_replace('/\D/', '', $number);
     if ($digits === '') return '';
     if (substr($digits, 0, 1) === '0') return '+63' . substr($digits, 1);
@@ -39,7 +40,7 @@ if (!$id || !$role) {
 }
 
 // -----------------------------
-// Get user's current name BEFORE updating
+// Get user's current name and old role BEFORE updating
 // -----------------------------
 $stmt = $conn->prepare("SELECT full_name, role FROM users WHERE id=?");
 $stmt->bind_param("i", $id);
@@ -52,6 +53,14 @@ if (!$full_name) {
     echo json_encode(['success' => false, 'error' => 'User not found']);
     exit;
 }
+
+// Capitalize roles for message
+$old_role = $old_role ?? 'Unknown';
+$role     = $role ?? 'Unknown';
+
+$old_role_cap = ucfirst($old_role);
+$role_cap     = ucfirst($role);
+
 
 // -----------------------------
 // Update role
@@ -67,11 +76,12 @@ if (!$stmt->execute()) {
 $stmt->close();
 
 // -----------------------------
-// Build NOTIFICATION + SMS message
+// Build grammatically correct friendly NOTIFICATION + SMS message
 // -----------------------------
-$admin_name = $_SESSION['full_name'] ?? "Unknown Admin";
+$admin_name = $_SESSION['full_name'] ?? "Someone";
 
-$notif_message = "User '$full_name' role changed from $old_role to $role by $admin_name.";
+// Refined message
+$notif_message = "Heads up! $admin_name has switched $full_name's role from $old_role_cap to $role_cap.";
 
 // -----------------------------
 // 1️⃣ Insert into notifications table
@@ -90,7 +100,7 @@ $users = $conn->query("SELECT id, contact_number FROM users");
 
 while ($user = $users->fetch_assoc()) {
     $uid = $user['id'];
-    
+
     // Assign notification
     $conn->query("
         INSERT INTO user_notifications (user_id, notification_id, is_read)
@@ -135,4 +145,3 @@ echo json_encode([
 ]);
 
 $conn->close();
-?>

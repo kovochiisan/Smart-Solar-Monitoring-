@@ -950,7 +950,7 @@ function showAccessDenied($message, $redirect)
                 </ul>
             </div>
 
-           
+
             <div class="ms-auto d-flex align-items-center">
                 <ul class="list-unstyled d-flex align-items-center mb-0">
 
@@ -1152,7 +1152,7 @@ ORDER BY reading_time ASC
         <div class="pc-content" style="padding: 22px 35px 32px;">
 
             <!-- Big Data Logs Card -->
-            <div class="card shadow-lg card-hover" style="height: 100vh;">
+            <div class="card shadow-lg card-hover" style="height: 100%;">
                 <div class="card-body p-4">
 
                     <!-- Header + Date Filter -->
