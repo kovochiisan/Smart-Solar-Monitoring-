@@ -1213,7 +1213,7 @@ ORDER BY reading_time ASC
                                 <input type="hidden" name="end_date" value="<?= isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d') ?>">
                                 <input type="hidden" name="start_time" value="<?= isset($_POST['start_time']) ? $_POST['start_time'] : '00:00:00' ?>">
                                 <input type="hidden" name="end_time" value="<?= isset($_POST['end_time']) ? $_POST['end_time'] : '23:30:00' ?>">
-                                <button type="submit" class="btn btn-success btn-fixed-height">Generate Report</button>
+                                <button type="submit" class="btn btn-success btn-fixed-height">Generate Logs</button>
                             </form>
                         </div>
                     </div>
@@ -1223,12 +1223,12 @@ ORDER BY reading_time ASC
                     <div class="info-row">
                         <?php
                         $summaries = [
-                            ['label' => 'Total Solar Energy (Wh)', 'value' => number_format($summary['total_solar_energy'], 4), 'class' => 'bg-solar', 'icon' => '☀️'],
-                            ['label' => 'Total Battery Energy (Wh)', 'value' => number_format($summary['total_battery_energy'], 4), 'class' => 'bg-battery', 'icon' => '🔋'],
+                            ['label' => 'Number of Readings', 'value' => $summary['total_readings'], 'class' => 'bg-readings', 'icon' => '📊'],
+                            ['label' => 'Total Solar Energy Yield (Wh)', 'value' => number_format($summary['total_solar_energy'], 4), 'class' => 'bg-solar', 'icon' => '☀️'],
+                            ['label' => 'Total Battery Output (Wh)', 'value' => number_format($summary['total_battery_energy'], 4), 'class' => 'bg-battery', 'icon' => '🔋'],
                             ['label' => 'Avg Battery SOC (%)', 'value' => number_format($summary['avg_battery_soc'], 2), 'class' => 'bg-soc', 'icon' => '⚡'],
                             ['label' => 'Max Temp (°C)', 'value' => number_format($summary['max_temp'], 2), 'class' => 'bg-max-temp', 'icon' => '🔥'],
                             ['label' => 'Min Temp (°C)', 'value' => number_format($summary['min_temp'], 2), 'class' => 'bg-min-temp', 'icon' => '❄️'],
-                            ['label' => 'Number of Readings', 'value' => $summary['total_readings'], 'class' => 'bg-readings', 'icon' => '📊'],
                         ];
 
                         foreach ($summaries as $item): ?>
