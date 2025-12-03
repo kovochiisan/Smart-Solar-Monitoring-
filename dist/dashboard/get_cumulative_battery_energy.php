@@ -6,29 +6,41 @@ $sql = "SELECT battery_power, reading_time
         FROM sensor_reading 
         WHERE DATE(reading_time) = CURDATE() 
         ORDER BY reading_time";
+
 $result = $conn->query($sql);
 
 $cumulative = 0;
 $prev_time = null;
-$labels = [];
-$data = [];
+
+$interval_minutes = 10;
+$interval_bucket = []; // store cumulative per 10-min bucket
 
 while ($row = $result->fetch_assoc()) {
     $time = strtotime($row['reading_time']);
 
     if ($prev_time !== null) {
-        $delta = $time - $prev_time; // seconds between readings
-        $delta_capped = min($delta, 3600); // cap at 3600 sec (1 hour)
-        $energy_wh = ($row['battery_power'] * $delta_capped) / 3600; // W × seconds → Wh
+        $delta = $time - $prev_time;
+
+        // cap delta between readings to avoid huge gaps
+        $delta = min($delta, 3600);
+
+        // compute Wh added
+        $energy_wh = ($row['battery_power'] * $delta) / 3600;
         $cumulative += $energy_wh;
     }
 
-    // Record cumulative per reading or per hour
-    $hour = date('H:00', $time);
-    $labels[] = $hour;
-    $data[] = round($cumulative, 2); // cumulative Wh
+    // 10-min interval key: e.g., 08:00, 08:10, 08:20, etc.
+    $minute = floor(date('i', $time) / $interval_minutes) * $interval_minutes;
+    $bucket_key = date('H', $time) . ':' . str_pad($minute, 2, '0', STR_PAD_LEFT);
+
+    // store the last reading in this bucket
+    $interval_bucket[$bucket_key] = round($cumulative, 2);
+
     $prev_time = $time;
 }
 
-echo json_encode(['labels'=>$labels, 'data'=>$data]);
+echo json_encode([
+    "labels" => array_keys($interval_bucket),
+    "data" => array_values($interval_bucket)
+]);
 ?>
