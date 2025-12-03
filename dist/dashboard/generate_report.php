@@ -14,12 +14,25 @@ $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-d');
 $end_date   = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
 $start_time = isset($_GET['start_time']) ? $_GET['start_time'] : '00:00:00';
 $end_time   = isset($_GET['end_time']) ? $_GET['end_time'] : '23:30:00';
+$selected_readings = isset($_GET['selected_readings']) ? explode(',', $_GET['selected_readings']) : [];
 
 $from_datetime = $start_date . ' ' . $start_time;
 $to_datetime   = $end_date . ' ' . $end_time;
 
 // -----------------------------
-// FETCH SUMMARY WITH CAPPED TIME
+// BUILD SQL CONDITION
+// -----------------------------
+if (!empty($selected_readings)) {
+    // Only selected readings
+    $ids = implode(',', array_map('intval', $selected_readings));
+    $whereCondition = "id IN ($ids)";
+} else {
+    // Full date range
+    $whereCondition = "reading_time BETWEEN '$from_datetime' AND '$to_datetime'";
+}
+
+// -----------------------------
+// FETCH SUMMARY
 // -----------------------------
 $summary_sql = "
 SELECT 
@@ -54,20 +67,18 @@ FROM (
             ) / 3600
         ) AS battery_energy_wh
     FROM sensor_reading
-    WHERE reading_time BETWEEN '$from_datetime' AND '$to_datetime'
+    WHERE $whereCondition
 ) AS subquery
 ";
-
 $summary = $conn->query($summary_sql)->fetch_assoc();
-
 
 // -----------------------------
 // FETCH DETAILED DATA
 // -----------------------------
 $data_sql = "
-    SELECT * FROM sensor_reading
-    WHERE reading_time BETWEEN '$from_datetime' AND '$to_datetime'
-    ORDER BY reading_time ASC
+SELECT * FROM sensor_reading
+WHERE $whereCondition
+ORDER BY reading_time ASC
 ";
 $data_result = $conn->query($data_sql);
 
@@ -215,9 +226,9 @@ $detailHeaderColors = [
 ];
 
 // Set widths
-$noCellWidth = 10;             // "No." column
-$groupCellWidth = 26;          // grouped 8 columns
-$readingTimeWidth = 50;        // separate for reading time
+$noCellWidth = 10;
+$groupCellWidth = 26;
+$readingTimeWidth = 50;
 $detailCellHeight = 12;
 $fillColors = [[224, 235, 255], [255, 255, 255]];
 
@@ -227,8 +238,8 @@ foreach ($detailHeaders as $i => $header) {
     $pdf->SetTextColor(255, 255, 255);
 
     if ($i == 0) $width = $noCellWidth;
-    elseif ($i == 9) $width = $readingTimeWidth; // Reading Time
-    else $width = $groupCellWidth;            // all other columns
+    elseif ($i == 9) $width = $readingTimeWidth;
+    else $width = $groupCellWidth;
 
     $pdf->Cell($width, $detailCellHeight, $header, 1, 0, 'C', 1);
 }
@@ -256,7 +267,6 @@ if ($data_result->num_rows > 0) {
         $pdf->Cell($groupCellWidth, $detailCellHeight, number_format($row['battery_soc'], 2), 1, 0, 'C', 1);
         $pdf->Cell($groupCellWidth, $detailCellHeight, number_format($row['temperature'], 2), 1, 0, 'C', 1);
 
-        // Reading Time
         $pdf->Cell($readingTimeWidth, $detailCellHeight, date('m/d/y h:i:s A', strtotime($row['reading_time'])), 1, 1, 'C', 1);
 
         $rowIndex++;
@@ -267,7 +277,6 @@ if ($data_result->num_rows > 0) {
     $pdf->SetFillColor(255, 255, 255);
     $pdf->Cell($noCellWidth + $groupCellWidth * 8 + $readingTimeWidth, $detailCellHeight, "No data available", 1, 1, 'C', 1);
 }
-
 
 // -----------------------------
 // OUTPUT PDF

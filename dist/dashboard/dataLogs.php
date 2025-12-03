@@ -1160,8 +1160,9 @@ ORDER BY reading_time ASC
                         <h4 class="fw-bold mb-0">Data Logs</h4>
 
                         <div class="d-flex gap-2 align-items-end">
+
                             <!-- Filter Form (POST) -->
-                            <form method="POST" class="d-flex gap-2 align-items-end">
+                            <form method="POST" class="d-flex gap-2 align-items-end" id="filterForm">
                                 <!-- From Date + Time -->
                                 <div class="d-flex flex-column">
                                     <label for="start_date" class="form-label mb-1">From</label>
@@ -1202,19 +1203,32 @@ ORDER BY reading_time ASC
                                     </div>
                                 </div>
 
-                                <button type="submit" name="filter" class="btn btn-primary btn-fixed-height">
-                                    Filter
-                                </button>
+                                <button type="submit" name="filter" class="btn btn-primary btn-fixed-height">Filter</button>
                             </form>
 
-                            <!-- Generate Report Form (GET) -->
-                            <form method="GET" action="generate_report.php" target="_blank" class="d-flex align-items-end">
-                                <input type="hidden" name="start_date" value="<?= isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d') ?>">
-                                <input type="hidden" name="end_date" value="<?= isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d') ?>">
-                                <input type="hidden" name="start_time" value="<?= isset($_POST['start_time']) ? $_POST['start_time'] : '00:00:00' ?>">
-                                <input type="hidden" name="end_time" value="<?= isset($_POST['end_time']) ? $_POST['end_time'] : '23:30:00' ?>">
-                                <button type="submit" class="btn btn-success btn-fixed-height">Generate Logs</button>
-                            </form>
+                            <!-- Action Buttons -->
+                            <div class="d-flex gap-2 align-items-end">
+
+                                <!-- Generate Report -->
+                                <form method="GET" action="generate_report.php" target="_blank">
+                                    <input type="hidden" name="start_date" value="<?= isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d') ?>">
+                                    <input type="hidden" name="end_date" value="<?= isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d') ?>">
+                                    <input type="hidden" name="start_time" value="<?= isset($_POST['start_time']) ? $_POST['start_time'] : '00:00:00' ?>">
+                                    <input type="hidden" name="end_time" value="<?= isset($_POST['end_time']) ? $_POST['end_time'] : '23:30:00' ?>">
+                                    <button type="submit" class="btn btn-success btn-fixed-height">Generate Logs</button>
+                                </form>
+
+                                <!-- Single Delete Button Form -->
+                                <form method="POST" action="delete_readings.php" onsubmit="return handleDelete(event);">
+                                    <input type="hidden" name="selected_readings" id="selected_readings_input">
+                                    <input type="hidden" name="start_date" value="<?= isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d') ?>">
+                                    <input type="hidden" name="end_date" value="<?= isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d') ?>">
+                                    <input type="hidden" name="start_time" value="<?= isset($_POST['start_time']) ? $_POST['start_time'] : '00:00:00' ?>">
+                                    <input type="hidden" name="end_time" value="<?= isset($_POST['end_time']) ? $_POST['end_time'] : '23:30:00' ?>">
+                                    <button type="submit" id="deleteBtn" class="btn btn-danger btn-fixed-height">Delete</button>
+                                </form>
+
+                            </div>
                         </div>
                     </div>
 
@@ -1247,7 +1261,10 @@ ORDER BY reading_time ASC
                         <table class="table table-bordered table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>#</th> <!-- Row number column -->
+                                    <th>
+                                        <input type="checkbox" id="selectAll">
+                                    </th>
+                                    <th>#</th>
                                     <th>Solar Voltage (V)</th>
                                     <th>Solar Current (A)</th>
                                     <th>Solar Power (W)</th>
@@ -1261,10 +1278,13 @@ ORDER BY reading_time ASC
                             </thead>
                             <tbody>
                                 <?php if ($data_result->num_rows > 0): ?>
-                                    <?php $counter = 1; ?> <!-- Initialize row number -->
+                                    <?php $counter = 1; ?>
                                     <?php while ($row = $data_result->fetch_assoc()): ?>
                                         <tr>
-                                            <td><?= $counter++ ?></td> <!-- Row number -->
+                                            <td>
+                                                <input type="checkbox" name="selected_readings[]" value="<?= $row['id'] ?>">
+                                            </td>
+                                            <td><?= $counter++ ?></td>
                                             <td><?= number_format($row['solar_voltage'], 2) ?></td>
                                             <td><?= number_format($row['solar_current'], 2) ?></td>
                                             <td><?= number_format($row['solar_power'], 2) ?></td>
@@ -1278,12 +1298,13 @@ ORDER BY reading_time ASC
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="10">No data available.</td>
+                                        <td colspan="11">No data available.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
+
 
 
                 </div> <!-- /.card-body -->
@@ -1577,6 +1598,227 @@ ORDER BY reading_time ASC
             // ----------------------------
             fetchNotifications();
             setInterval(fetchNotifications, 5000);
+        });
+
+
+        // Select All functionality
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('input[name="selected_readings[]"]');
+        const deleteBtn = document.getElementById('deleteBtn');
+
+        selectAll.addEventListener('change', () => {
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateDeleteButton();
+        });
+
+        // Update delete button label when checkboxes change
+        checkboxes.forEach(cb => cb.addEventListener('change', updateDeleteButton));
+
+        function updateDeleteButton() {
+            const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            deleteBtn.textContent = selectedCount > 0 ? `Delete ${selectedCount}` : 'Delete';
+        }
+
+        // Handle form submit with SweetAlert confirmation + success
+        deleteBtn.closest('form').addEventListener('submit', function(e) {
+            e.preventDefault(); // prevent default submission
+
+            const form = this;
+
+            // If no data available
+            if (checkboxes.length === 0) {
+                Swal.fire({
+                    title: 'No data available to delete',
+                    icon: 'info',
+                    showConfirmButton: true
+                });
+                return; // stop execution
+            }
+
+            const selected = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            // Convert dates to word format
+            const startDateRaw = document.querySelector('#start_date').value;
+            const endDateRaw = document.querySelector('#end_date').value;
+            const startDate = new Date(startDateRaw).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            const endDate = new Date(endDateRaw).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+
+            const confirmTitle = selected.length > 0 ?
+                `Delete ${selected.length} selected reading(s)?` :
+                `No readings selected. This will delete all readings from ${startDate} to ${endDate}. Proceed?`;
+
+            Swal.fire({
+                title: confirmTitle,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Prepare FormData for AJAX
+                    const formData = new FormData(form);
+                    if (selected.length > 0) {
+                        formData.set('selected_readings', selected.join(','));
+                    }
+
+                    fetch(form.action, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.text())
+                        .then(() => {
+                            Swal.fire({
+                                title: 'Deleted successfully',
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                window.location.reload(); // reload page after success
+                            });
+                        })
+                        .catch(err => {
+                            Swal.fire({
+                                title: 'Error deleting records',
+                                icon: 'error'
+                            });
+                            console.error(err);
+                        });
+                }
+            });
+        });
+
+        const generateBtn = document.querySelector('form[action="generate_report.php"] button');
+        generateBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('form');
+
+            const selected = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            if (selected.length > 0) {
+                Swal.fire({
+                    title: `Generate ${selected.length} selected reading${selected.length === 1 ? '' : 's'}?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, generate',
+                    cancelButtonText: 'Cancel',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let input = form.querySelector('input[name="selected_readings"]');
+                        if (!input) {
+                            input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'selected_readings';
+                            form.appendChild(input);
+                        }
+                        input.value = selected.join(',');
+                        form.submit();
+                    }
+                });
+            } else if (<?= $data_result->num_rows ?? 0 ?> > 0) {
+                Swal.fire({
+                    title: `Generate logs for all readings in this range?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, generate',
+                    cancelButtonText: 'Cancel',
+                }).then((result) => {
+                    if (result.isConfirmed) form.submit();
+                });
+            } else {
+                Swal.fire({
+                    title: 'No data available for the selected range',
+                    icon: 'info',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkboxes = document.querySelectorAll('input[name="selected_readings[]"]');
+            const selectAll = document.getElementById('selectAll');
+
+            // Info card elements
+            const infoCards = {
+                totalReadings: document.querySelector('.info-row .bg-readings span'),
+                totalSolar: document.querySelector('.info-row .bg-solar span'),
+                totalBattery: document.querySelector('.info-row .bg-battery span'),
+                avgSOC: document.querySelector('.info-row .bg-soc span'),
+                maxTemp: document.querySelector('.info-row .bg-max-temp span'),
+                minTemp: document.querySelector('.info-row .bg-min-temp span')
+            };
+
+            // Get all rows with their data and timestamps
+            const rowData = Array.from(document.querySelectorAll('table tbody tr')).map(tr => ({
+                solar_power: parseFloat(tr.children[4].textContent) || 0,
+                battery_power: parseFloat(tr.children[7].textContent) || 0,
+                battery_soc: parseFloat(tr.children[8].textContent) || 0,
+                temperature: parseFloat(tr.children[9].textContent) || 0,
+                reading_time: new Date(tr.children[10].textContent).getTime() / 1000 // Unix timestamp in seconds
+            }));
+
+            function updateSummary() {
+                const selectedIndices = Array.from(checkboxes)
+                    .map((cb, i) => cb.checked ? i : -1)
+                    .filter(i => i !== -1);
+
+                // If none selected, use all rows
+                const indices = selectedIndices.length ? selectedIndices : rowData.map((_, i) => i);
+
+                let totalSolarEnergy = 0;
+                let totalBatteryEnergy = 0;
+                let totalSOC = 0;
+                let maxTemp = -Infinity;
+                let minTemp = Infinity;
+
+                for (let i = 0; i < indices.length; i++) {
+                    const idx = indices[i];
+                    const current = rowData[idx];
+                    const prev = i > 0 ? rowData[indices[i - 1]] : null;
+
+                    // Time difference capped at 3600 seconds
+                    const dt = prev ? Math.min(current.reading_time - prev.reading_time, 3600) : 0;
+
+                    totalSolarEnergy += current.solar_power * dt / 3600;
+                    totalBatteryEnergy += current.battery_power * dt / 3600;
+                    totalSOC += current.battery_soc;
+                    if (current.temperature > maxTemp) maxTemp = current.temperature;
+                    if (current.temperature < minTemp) minTemp = current.temperature;
+                }
+
+                const totalReadings = indices.length;
+                const avgSOC = totalReadings ? totalSOC / totalReadings : 0;
+
+                // Update cards
+                infoCards.totalReadings.textContent = totalReadings;
+                infoCards.totalSolar.textContent = totalSolarEnergy.toFixed(4);
+                infoCards.totalBattery.textContent = totalBatteryEnergy.toFixed(4);
+                infoCards.avgSOC.textContent = avgSOC.toFixed(2);
+                infoCards.maxTemp.textContent = isFinite(maxTemp) ? maxTemp.toFixed(2) : 0;
+                infoCards.minTemp.textContent = isFinite(minTemp) ? minTemp.toFixed(2) : 0;
+            }
+
+            // Event listeners
+            checkboxes.forEach(cb => cb.addEventListener('change', updateSummary));
+            selectAll.addEventListener('change', () => {
+                checkboxes.forEach(cb => cb.checked = selectAll.checked);
+                updateSummary();
+            });
+
+            // Initial summary
+            updateSummary();
         });
     </script>
 
