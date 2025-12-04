@@ -1660,22 +1660,58 @@ ORDER BY reading_time ASC
             const filterApplied = document.querySelector('#delete_filter_applied')?.value === '1';
 
             // Default placeholders if no filter applied
-            let startDisplay = 'the start of the dataset';
-            let endDisplay = 'the end of the dataset';
+            let startDisplay, endDisplay;
 
-            // Only read input values if filter was applied
+            // If filter applied, use the filtered range
             if (filterApplied) {
-    const startDateInput = document.getElementById('delete_start_date').value;
-    const endDateInput = document.getElementById('delete_end_date').value;
-    const startTimeInput = document.getElementById('delete_start_time').value;
-    const endTimeInput = document.getElementById('delete_end_time').value;
+                const startDateInput = document.getElementById('delete_start_date').value;
+                const endDateInput = document.getElementById('delete_end_date').value;
+                const startTimeInput = document.getElementById('delete_start_time').value;
+                const endTimeInput = document.getElementById('delete_end_time').value;
 
-    const startDateTime = new Date(`${startDateInput}T${startTimeInput}`);
-    const endDateTime = new Date(`${endDateInput}T${endTimeInput}`);
+                const startDateTime = new Date(`${startDateInput}T${startTimeInput}`);
+                const endDateTime = new Date(`${endDateInput}T${endTimeInput}`);
 
-    startDisplay = startDateTime.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
-    endDisplay = endDateTime.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
-}
+                startDisplay = startDateTime.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                });
+                endDisplay = endDateTime.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                });
+            } else {
+                // Default to today from 00:00 to 23:59
+                const today = new Date();
+                const startDateTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+                const endDateTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+                startDisplay = startDateTime.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                });
+                endDisplay = endDateTime.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                });
+            }
+
 
 
             // SweetAlert confirmation title
