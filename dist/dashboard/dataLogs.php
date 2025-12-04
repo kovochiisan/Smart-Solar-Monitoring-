@@ -1616,7 +1616,6 @@ ORDER BY reading_time ASC
 
 
         // ===== Data Logs Delete JS =====
-
         // Elements
         const selectAll = document.getElementById('selectAll');
         const checkboxes = document.querySelectorAll('input[name="selected_readings[]"]');
@@ -1728,13 +1727,12 @@ ORDER BY reading_time ASC
                 cancelButtonText: 'Cancel',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Prepare form data
+                    // Proceed with deletion
                     const formData = new FormData(form);
                     if (selected.length > 0) {
                         formData.set('selected_readings', selected.join(','));
                     }
 
-                    // AJAX request to delete
                     fetch(form.action, {
                             method: 'POST',
                             body: formData
@@ -1746,9 +1744,7 @@ ORDER BY reading_time ASC
                                 icon: 'success',
                                 showConfirmButton: false,
                                 timer: 1500
-                            }).then(() => {
-                                window.location.reload(); // reload page after success
-                            });
+                            }).then(() => window.location.reload());
                         })
                         .catch(err => {
                             Swal.fire({
@@ -1757,6 +1753,19 @@ ORDER BY reading_time ASC
                             });
                             console.error(err);
                         });
+
+                } else {
+                    // ===== Reset date/time pickers on Cancel =====
+                    const startDateInput = document.getElementById('start_date');
+                    const endDateInput = document.getElementById('end_date');
+                    const startTimeInput = document.querySelector('select[name="start_time"]');
+                    const endTimeInput = document.querySelector('select[name="end_time"]');
+
+                    const today = new Date();
+                    startDateInput.value = today.toISOString().split('T')[0]; // yyyy-mm-dd
+                    endDateInput.value = today.toISOString().split('T')[0];
+                    startTimeInput.value = '00:00:00';
+                    endTimeInput.value = '23:30:00'; // or '23:59:59' if you prefer
                 }
             });
         });
