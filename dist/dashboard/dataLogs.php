@@ -1206,6 +1206,7 @@ ORDER BY reading_time ASC
                                 <button type="submit" name="filter" class="btn btn-primary btn-fixed-height">Filter</button>
                             </form>
 
+
                             <!-- Action Buttons -->
                             <div class="d-flex gap-2 align-items-end">
 
@@ -1219,14 +1220,27 @@ ORDER BY reading_time ASC
                                 </form>
 
                                 <!-- Single Delete Button Form -->
-                                <form method="POST" action="delete_readings.php" onsubmit="return handleDelete(event);">
+                                <form method="POST" action="delete_readings.php" id="deleteForm">
+                                    <!-- Selected readings filled by JS -->
                                     <input type="hidden" name="selected_readings" id="selected_readings_input">
-                                    <input type="hidden" name="start_date" value="<?= isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d') ?>">
-                                    <input type="hidden" name="end_date" value="<?= isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d') ?>">
-                                    <input type="hidden" name="start_time" value="<?= isset($_POST['start_time']) ? $_POST['start_time'] : '00:00:00' ?>">
-                                    <input type="hidden" name="end_time" value="<?= isset($_POST['end_time']) ? $_POST['end_time'] : '23:30:00' ?>">
+
+                                    <!-- Track if filter was applied -->
+                                    <input type="hidden" name="filter_applied" id="delete_filter_applied" value="<?= isset($_POST['filter']) ? '1' : '0' ?>">
+
+                                    <!-- Hidden inputs to preserve filtered date/time only if filter was applied -->
+                                    <?php if (isset($_POST['filter'])): ?>
+                                        <!-- Delete form hidden inputs -->
+                                        <input type="hidden" name="start_date" id="delete_start_date" value="<?= isset($_POST['filter']) ? $_POST['start_date'] : '' ?>">
+                                        <input type="hidden" name="end_date" id="delete_end_date" value="<?= isset($_POST['filter']) ? $_POST['end_date'] : '' ?>">
+                                        <input type="hidden" name="start_time" id="delete_start_time" value="<?= isset($_POST['filter']) ? $_POST['start_time'] : '' ?>">
+                                        <input type="hidden" name="end_time" id="delete_end_time" value="<?= isset($_POST['filter']) ? $_POST['end_time'] : '' ?>">
+                                    <?php endif; ?>
+
                                     <button type="submit" id="deleteBtn" class="btn btn-danger btn-fixed-height">Delete</button>
                                 </form>
+
+
+
 
                             </div>
                         </div>
@@ -1603,110 +1617,115 @@ ORDER BY reading_time ASC
 
         // ===== Data Logs Delete JS =====
 
-// Elements
-const selectAll = document.getElementById('selectAll');
-const checkboxes = document.querySelectorAll('input[name="selected_readings[]"]');
-const deleteBtn = document.getElementById('deleteBtn');
-const form = deleteBtn.closest('form');
+        // Elements
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('input[name="selected_readings[]"]');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const form = deleteBtn.closest('form');
 
-// ===== Select All Functionality =====
-selectAll.addEventListener('change', () => {
-    checkboxes.forEach(cb => cb.checked = selectAll.checked);
-    updateDeleteButton();
-});
-
-// Update delete button label when individual checkboxes change
-checkboxes.forEach(cb => cb.addEventListener('change', updateDeleteButton));
-
-function updateDeleteButton() {
-    const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
-    deleteBtn.textContent = selectedCount > 0 ? `Delete ${selectedCount}` : 'Delete';
-}
-
-// ===== Handle Delete Form Submission =====
-form.addEventListener('submit', function(e) {
-    e.preventDefault(); // prevent default form submission
-
-    // If no data available
-    if (checkboxes.length === 0) {
-        Swal.fire({
-            title: 'No data available to delete',
-            icon: 'info',
-            showConfirmButton: true
+        // ===== Select All Functionality =====
+        selectAll.addEventListener('change', () => {
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateDeleteButton();
         });
-        return;
-    }
 
-    // Get selected readings
-    const selected = Array.from(checkboxes)
-        .filter(cb => cb.checked)
-        .map(cb => cb.value);
+        // Update delete button label when individual checkboxes change
+        checkboxes.forEach(cb => cb.addEventListener('change', updateDeleteButton));
 
-    // Get start/end date & time from filter inputs
-    const startDateRaw = document.querySelector('#start_date').value;
-    const endDateRaw   = document.querySelector('#end_date').value;
-    const startTimeRaw = document.querySelector('select[name="start_time"]').value;
-    const endTimeRaw   = document.querySelector('select[name="end_time"]').value;
+        function updateDeleteButton() {
+            const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            deleteBtn.textContent = selectedCount > 0 ? `Delete ${selectedCount}` : 'Delete';
+        }
 
-    // Convert to display-friendly format
-    const startDateTime = new Date(`${startDateRaw}T${startTimeRaw}`);
-    const endDateTime   = new Date(`${endDateRaw}T${endTimeRaw}`);
+        // ===== Handle Delete Form Submission =====
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // prevent default form submission
 
-    const startDisplay = startDateTime.toLocaleString('en-US', { 
-        month: 'short', day: 'numeric', year: 'numeric', 
-        hour: 'numeric', minute: 'numeric', hour12: true 
-    });
-    const endDisplay = endDateTime.toLocaleString('en-US', { 
-        month: 'short', day: 'numeric', year: 'numeric', 
-        hour: 'numeric', minute: 'numeric', hour12: true 
-    });
-
-    // SweetAlert confirmation title
-    const confirmTitle = selected.length > 0 ?
-        `Delete ${selected.length} selected reading(s)?` :
-        `No readings selected. This will delete all readings from ${startDisplay} to ${endDisplay}. Proceed?`;
-
-    // Show confirmation dialog
-    Swal.fire({
-        title: confirmTitle,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete',
-        cancelButtonText: 'Cancel',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Prepare form data
-            const formData = new FormData(form);
-            if (selected.length > 0) {
-                formData.set('selected_readings', selected.join(','));
+            // If no data available
+            if (checkboxes.length === 0) {
+                Swal.fire({
+                    title: 'No data available to delete',
+                    icon: 'info',
+                    showConfirmButton: true
+                });
+                return;
             }
 
-            // AJAX request to delete
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())
-            .then(() => {
-                Swal.fire({
-                    title: 'Deleted successfully',
-                    icon: 'success',
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(() => {
-                    window.location.reload(); // reload page after success
-                });
-            })
-            .catch(err => {
-                Swal.fire({
-                    title: 'Error deleting records',
-                    icon: 'error'
-                });
-                console.error(err);
+            // Get selected readings
+            const selected = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            // ===== Determine date & time range for confirmation =====
+            const filterApplied = document.querySelector('#delete_filter_applied')?.value === '1';
+
+            // Default placeholders if no filter applied
+            let startDisplay = 'the start of the dataset';
+            let endDisplay = 'the end of the dataset';
+
+            // Only read input values if filter was applied
+            if (filterApplied) {
+    const startDateInput = document.getElementById('delete_start_date').value;
+    const endDateInput = document.getElementById('delete_end_date').value;
+    const startTimeInput = document.getElementById('delete_start_time').value;
+    const endTimeInput = document.getElementById('delete_end_time').value;
+
+    const startDateTime = new Date(`${startDateInput}T${startTimeInput}`);
+    const endDateTime = new Date(`${endDateInput}T${endTimeInput}`);
+
+    startDisplay = startDateTime.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
+    endDisplay = endDateTime.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
+}
+
+
+            // SweetAlert confirmation title
+            const confirmTitle = selected.length > 0 ?
+                `Delete ${selected.length} selected reading(s)?` :
+                `No readings selected. This will delete all readings from ${startDisplay} to ${endDisplay}. Proceed?`;
+
+            // Show confirmation dialog
+            Swal.fire({
+                title: confirmTitle,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Prepare form data
+                    const formData = new FormData(form);
+                    if (selected.length > 0) {
+                        formData.set('selected_readings', selected.join(','));
+                    }
+
+                    // AJAX request to delete
+                    fetch(form.action, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.text())
+                        .then(() => {
+                            Swal.fire({
+                                title: 'Deleted successfully',
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                window.location.reload(); // reload page after success
+                            });
+                        })
+                        .catch(err => {
+                            Swal.fire({
+                                title: 'Error deleting records',
+                                icon: 'error'
+                            });
+                            console.error(err);
+                        });
+                }
             });
-        }
-    });
-});
+        });
+
+
 
 
         const generateBtn = document.querySelector('form[action="generate_report.php"] button');
