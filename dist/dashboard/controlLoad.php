@@ -689,26 +689,29 @@ function showAccessDenied($message, $redirect)
 
 
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Access Restricted</title>
-    <link rel="stylesheet" href="access_denied.css">
-</head>
-<body>
-    <div class="glass-card">
-        <img src="../../images/LogoNoBG.png" class="logo" alt="Logo">
-        <div class="lock-emoji">🔒</div>
-        <h1>Access Denied</h1>
-        <p><?= $message ?></p>
-        <p class="redirect-msg">Redirecting in <span id="countdown" data-redirect="<?= $redirect ?>">10</span> seconds...</p>
-        <a href="<?= $redirect ?>" class="btn-modern">Go Now</a>
-    </div>
+    <!DOCTYPE html>
+    <html lang="en">
 
-    <script src="countdown.js"></script>
-</body>
-</html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Access Restricted</title>
+        <link rel="stylesheet" href="access_denied.css">
+    </head>
+
+    <body>
+        <div class="glass-card">
+            <img src="../../images/LogoNoBG.png" class="logo" alt="Logo">
+            <div class="lock-emoji">🔒</div>
+            <h1>Access Denied</h1>
+            <p><?= $message ?></p>
+            <p class="redirect-msg">Redirecting in <span id="countdown" data-redirect="<?= $redirect ?>">10</span> seconds...</p>
+            <a href="<?= $redirect ?>" class="btn-modern">Go Now</a>
+        </div>
+
+        <script src="countdown.js"></script>
+    </body>
+
+    </html>
 <?php
 }
 ?>
@@ -1740,12 +1743,16 @@ function showAccessDenied($message, $redirect)
             const response = await fetch('load_profile_data.php');
             const data = await response.json();
 
+            // Labels for x-axis
             const labels = Array.from({
                 length: 24
             }, (_, i) => formatHour(i));
 
-            // Highlight peak hours 10AM-2PM (10 → 10 AM, 14 → 2 PM)
-            const barColors = data.map((_, i) => (i >= 10 && i <= 14 ? 'rgba(255,99,132,0.8)' : 'rgba(54,162,235,0.6)'));
+            // Find the peak load
+            const maxLoad = Math.max(...data);
+
+            // Assign colors: red for peak load, blue for others
+            const barColors = data.map(value => value === maxLoad ? 'rgba(255,99,132,0.8)' : 'rgba(54,162,235,0.6)');
 
             if (todayLoadChart) {
                 todayLoadChart.data.labels = labels;
