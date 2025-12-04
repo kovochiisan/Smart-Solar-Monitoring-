@@ -1601,101 +1601,113 @@ ORDER BY reading_time ASC
         });
 
 
-        // Select All functionality
-        const selectAll = document.getElementById('selectAll');
-        const checkboxes = document.querySelectorAll('input[name="selected_readings[]"]');
-        const deleteBtn = document.getElementById('deleteBtn');
+        // ===== Data Logs Delete JS =====
 
-        selectAll.addEventListener('change', () => {
-            checkboxes.forEach(cb => cb.checked = selectAll.checked);
-            updateDeleteButton();
+// Elements
+const selectAll = document.getElementById('selectAll');
+const checkboxes = document.querySelectorAll('input[name="selected_readings[]"]');
+const deleteBtn = document.getElementById('deleteBtn');
+const form = deleteBtn.closest('form');
+
+// ===== Select All Functionality =====
+selectAll.addEventListener('change', () => {
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    updateDeleteButton();
+});
+
+// Update delete button label when individual checkboxes change
+checkboxes.forEach(cb => cb.addEventListener('change', updateDeleteButton));
+
+function updateDeleteButton() {
+    const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+    deleteBtn.textContent = selectedCount > 0 ? `Delete ${selectedCount}` : 'Delete';
+}
+
+// ===== Handle Delete Form Submission =====
+form.addEventListener('submit', function(e) {
+    e.preventDefault(); // prevent default form submission
+
+    // If no data available
+    if (checkboxes.length === 0) {
+        Swal.fire({
+            title: 'No data available to delete',
+            icon: 'info',
+            showConfirmButton: true
         });
+        return;
+    }
 
-        // Update delete button label when checkboxes change
-        checkboxes.forEach(cb => cb.addEventListener('change', updateDeleteButton));
+    // Get selected readings
+    const selected = Array.from(checkboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
 
-        function updateDeleteButton() {
-            const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
-            deleteBtn.textContent = selectedCount > 0 ? `Delete ${selectedCount}` : 'Delete';
-        }
+    // Get start/end date & time from filter inputs
+    const startDateRaw = document.querySelector('#start_date').value;
+    const endDateRaw   = document.querySelector('#end_date').value;
+    const startTimeRaw = document.querySelector('select[name="start_time"]').value;
+    const endTimeRaw   = document.querySelector('select[name="end_time"]').value;
 
-        // Handle form submit with SweetAlert confirmation + success
-        deleteBtn.closest('form').addEventListener('submit', function(e) {
-            e.preventDefault(); // prevent default submission
+    // Convert to display-friendly format
+    const startDateTime = new Date(`${startDateRaw}T${startTimeRaw}`);
+    const endDateTime   = new Date(`${endDateRaw}T${endTimeRaw}`);
 
-            const form = this;
+    const startDisplay = startDateTime.toLocaleString('en-US', { 
+        month: 'short', day: 'numeric', year: 'numeric', 
+        hour: 'numeric', minute: 'numeric', hour12: true 
+    });
+    const endDisplay = endDateTime.toLocaleString('en-US', { 
+        month: 'short', day: 'numeric', year: 'numeric', 
+        hour: 'numeric', minute: 'numeric', hour12: true 
+    });
 
-            // If no data available
-            if (checkboxes.length === 0) {
-                Swal.fire({
-                    title: 'No data available to delete',
-                    icon: 'info',
-                    showConfirmButton: true
-                });
-                return; // stop execution
+    // SweetAlert confirmation title
+    const confirmTitle = selected.length > 0 ?
+        `Delete ${selected.length} selected reading(s)?` :
+        `No readings selected. This will delete all readings from ${startDisplay} to ${endDisplay}. Proceed?`;
+
+    // Show confirmation dialog
+    Swal.fire({
+        title: confirmTitle,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete',
+        cancelButtonText: 'Cancel',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Prepare form data
+            const formData = new FormData(form);
+            if (selected.length > 0) {
+                formData.set('selected_readings', selected.join(','));
             }
 
-            const selected = Array.from(checkboxes)
-                .filter(cb => cb.checked)
-                .map(cb => cb.value);
-
-            // Convert dates to word format
-            const startDateRaw = document.querySelector('#start_date').value;
-            const endDateRaw = document.querySelector('#end_date').value;
-            const startDate = new Date(startDateRaw).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
+            // AJAX request to delete
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(() => {
+                Swal.fire({
+                    title: 'Deleted successfully',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.reload(); // reload page after success
+                });
+            })
+            .catch(err => {
+                Swal.fire({
+                    title: 'Error deleting records',
+                    icon: 'error'
+                });
+                console.error(err);
             });
-            const endDate = new Date(endDateRaw).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-            });
+        }
+    });
+});
 
-            const confirmTitle = selected.length > 0 ?
-                `Delete ${selected.length} selected reading(s)?` :
-                `No readings selected. This will delete all readings from ${startDate} to ${endDate}. Proceed?`;
-
-            Swal.fire({
-                title: confirmTitle,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete',
-                cancelButtonText: 'Cancel',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Prepare FormData for AJAX
-                    const formData = new FormData(form);
-                    if (selected.length > 0) {
-                        formData.set('selected_readings', selected.join(','));
-                    }
-
-                    fetch(form.action, {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(response => response.text())
-                        .then(() => {
-                            Swal.fire({
-                                title: 'Deleted successfully',
-                                icon: 'success',
-                                showConfirmButton: false,
-                                timer: 1500
-                            }).then(() => {
-                                window.location.reload(); // reload page after success
-                            });
-                        })
-                        .catch(err => {
-                            Swal.fire({
-                                title: 'Error deleting records',
-                                icon: 'error'
-                            });
-                            console.error(err);
-                        });
-                }
-            });
-        });
 
         const generateBtn = document.querySelector('form[action="generate_report.php"] button');
         generateBtn.addEventListener('click', function(e) {
