@@ -56,26 +56,30 @@ function checkAlertsAndNotify($data, $conn, $mqtt) {
         $notifications[] = "Hey! Your battery's running low — it's down to {$data['battery/soc']}%.";
     if ($data['battery/soc'] > 95 && canNotify('battery_soc_high'))
         $notifications[] = "Good news! Your battery’s almost full at {$data['battery/soc']}%.";
+
     if ($data['battery/voltage'] < 11 && canNotify('battery_voltage_low'))
         $notifications[] = "Heads up! Battery voltage is low ({$data['battery/voltage']}V).";
     if ($data['battery/voltage'] > 15 && canNotify('battery_voltage_high'))
         $notifications[] = "Whoa! Battery voltage is high ({$data['battery/voltage']}V).";
+
     if ($data['battery/current'] > 10 && canNotify('battery_current_high'))
         $notifications[] = "Battery current is high ({$data['battery/current']}A).";
     if ($data['battery/current'] < -5 && canNotify('battery_fast_discharge'))
         $notifications[] = "Battery is discharging fast ({$data['battery/current']}A).";
 
     // Solar Alerts
-    if ($data['solar/voltage'] < 12 && canNotify('solar_voltage_low'))
-        $notifications[] = "Solar voltage seems low ({$data['solar/voltage']}V). Maybe it’s cloudy?";
-    if ($data['solar/voltage'] > 30 && canNotify('solar_voltage_high'))
-        $notifications[] = "Solar voltage is high ({$data['solar/voltage']}V). Strong sunlight!";
-    if ($data['solar/current'] > 10 && canNotify('solar_current_high'))
-        $notifications[] = "Solar current’s high ({$data['solar/current']}A).";
-    if ($data['solar/power'] < 50 && canNotify('solar_power_low'))
-        $notifications[] = "Solar power’s really low ({$data['solar/power']}W).";
-    if ($data['solar/power'] > 3000 && canNotify('solar_power_high'))
-        $notifications[] = "Solar power’s very strong ({$data['solar/power']}W).";
+    if ($data['solar/voltageee'] < 12 && canNotify('solar_voltage_low'))
+        $notifications[] = "Solar voltage seems low ({$data['solar/voltageee']}V). Maybe it’s cloudy?";
+    if ($data['solar/voltageee'] > 30 && canNotify('solar_voltage_high'))
+        $notifications[] = "Solar voltage is high ({$data['solar/voltageee']}V). Strong sunlight!";
+
+    if ($data['solar/currenttt'] > 10 && canNotify('solar_current_high'))
+        $notifications[] = "Solar current’s high ({$data['solar/currenttt']}A).";
+
+    if ($data['solar/powerrr'] < 50 && canNotify('solar_power_low'))
+        $notifications[] = "Solar power’s really low ({$data['solar/powerrr']}W).";
+    if ($data['solar/powerrr'] > 3000 && canNotify('solar_power_high'))
+        $notifications[] = "Solar power’s very strong ({$data['solar/powerrr']}W).";
 
     // Temperature Alerts
     if ($data['system/temperature'] > 60 && canNotify('temp_high'))
@@ -86,7 +90,7 @@ function checkAlertsAndNotify($data, $conn, $mqtt) {
         $notifications[] = "System temperature is below freezing ({$data['system/temperature']}°C).";
 
     // Combined Alerts
-    if ($data['solar/power'] < 0.1 && $data['battery/soc'] < 20 && canNotify('critical_power'))
+    if ($data['solar/powerrr'] < 0.1 && $data['battery/soc'] < 20 && canNotify('critical_power'))
         $notifications[] = "Power’s in trouble — solar isn’t producing and your battery’s almost empty!";
 
     // Push notifications
@@ -132,7 +136,7 @@ function handleMessage($topic, $msg) {
     $data[$topic] = floatval($msg);
 
     $required = [
-        "solar/voltage","solar/current","solar/power",
+        "solar/voltageee","solar/currenttt","solar/powerrr",
         "battery/voltage","battery/current","battery/power",
         "battery/soc","system/temperature"
     ];
@@ -150,9 +154,9 @@ function handleMessage($topic, $msg) {
 
     $stmt->bind_param(
         "dddddddd",
-        $data['solar/voltage'],
-        $data['solar/current'],
-        $data['solar/power'],
+        $data['solar/voltageee'],
+        $data['solar/currenttt'],
+        $data['solar/powerrr'],
         $data['battery/voltage'],
         $data['battery/current'],
         $data['battery/power'],
@@ -175,14 +179,14 @@ function handleMessage($topic, $msg) {
 // Subscribe and Listen
 // -----------------------------
 $topics = [
-    "solar/voltage"      => ["qos"=>0,"function"=>"handleMessage"],
-    "solar/current"      => ["qos"=>0,"function"=>"handleMessage"],
-    "solar/power"        => ["qos"=>0,"function"=>"handleMessage"],
-    "battery/voltage"    => ["qos"=>0,"function"=>"handleMessage"],
-    "battery/current"    => ["qos"=>0,"function"=>"handleMessage"],
-    "battery/power"      => ["qos"=>0,"function"=>"handleMessage"],
-    "battery/soc"        => ["qos"=>0,"function"=>"handleMessage"],
-    "system/temperature" => ["qos"=>0,"function"=>"handleMessage"]
+    "solar/voltageee"     => ["qos"=>0,"function"=>"handleMessage"],
+    "solar/currenttt"     => ["qos"=>0,"function"=>"handleMessage"],
+    "solar/powerrr"       => ["qos"=>0,"function"=>"handleMessage"],
+    "battery/voltage"     => ["qos"=>0,"function"=>"handleMessage"],
+    "battery/current"     => ["qos"=>0,"function"=>"handleMessage"],
+    "battery/power"       => ["qos"=>0,"function"=>"handleMessage"],
+    "battery/soc"         => ["qos"=>0,"function"=>"handleMessage"],
+    "system/temperature"  => ["qos"=>0,"function"=>"handleMessage"]
 ];
 
 if ($mqtt->connect(true, NULL, NULL, NULL)) {

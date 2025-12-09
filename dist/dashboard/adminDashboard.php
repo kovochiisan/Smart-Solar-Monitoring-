@@ -1605,9 +1605,9 @@ function showAccessDenied($message, $redirect)
       console.log('Connected to MQTT broker via WebSocket');
 
       const topics = [
-        'solar/voltage',
-        'solar/current',
-        'solar/power',
+        'solar/voltageee',
+        'solar/currenttt',
+        'solar/powerrr',
         'battery/voltage',
         'battery/current',
         'battery/power',
@@ -1636,21 +1636,21 @@ function showAccessDenied($message, $redirect)
       switch (topic) {
 
         // -------- Solar --------
-        case 'solar/voltage':
+        case 'solar/voltageee':
           latestSolarV = value;
           document.getElementById('voltage').innerText = value.toFixed(2);
           document.getElementById('voltage-status').innerText = value > 12.5 ? 'Stable' : 'Low';
           document.getElementById('voltage-text').innerText = value > 12.5 ? 'within normal range' : 'low';
           break;
 
-        case 'solar/current':
+        case 'solar/currenttt':
           latestSolarI = value;
           document.getElementById('current').innerText = Math.abs(value).toFixed(2);
           document.getElementById('current-status').innerText = Math.abs(value) < 10 ? 'Normal' : 'High';
           document.getElementById('current-text').innerText = Math.abs(value) < 10 ? 'within safe limits' : 'overcurrent!';
           break;
 
-        case 'solar/power':
+        case 'solar/powerrr':
           document.getElementById('power').innerText = value.toFixed(2);
 
           if (value < 50) {
