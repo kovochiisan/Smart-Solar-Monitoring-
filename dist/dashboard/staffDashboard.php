@@ -507,6 +507,77 @@ session_start(); // must be first thing in your PHP
       pointer-events: none;
     }
 
+
+    @media (max-width: 768px) {
+      .card[style*="min-width:450px"] {
+        min-width: 100% !important;
+        width: 100%;
+      }
+    }
+
+    /* Base dropdown positioning (desktop default) */
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      width: 320px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      z-index: 999;
+    }
+
+    /* 📱 Mobile behavior */
+    @media (max-width: 768px) {
+      .notification-dropdown {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: 92vw;
+        /* almost full width */
+        max-width: 400px;
+      }
+
+      /* Center the bell icon container if needed */
+      .pc-h-item.notification {
+        display: flex;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .notification-dropdown {
+        position: fixed;
+        top: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 95vw;
+        max-height: 70vh;
+      }
+    }
+
+    .img-container {
+      max-width: 300px;
+      /* maximum width of image */
+      flex: 0 1 auto;
+      /* allow shrinking if needed */
+    }
+
+    /* Make image responsive */
+    .img-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Optional: prevent overlap by allowing wrapping */
+    .d-flex.flex-wrap {
+      gap: 1rem;
+      /* optional: space between text and image when wrapping */
+    }
+
     /* Dark mode support */
     body.dark-mode .notification-dropdown {
       background-color: rgba(36, 36, 62, 0.96);
@@ -570,15 +641,15 @@ body.dark-mode .pc-header .pc-head-link::after {
 require_once "config.php";
 
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+  session_start();
 }
 
 // ---------------------------------------------
 // DETERMINE USER STATE
 // ---------------------------------------------
 if (!isset($_SESSION['user_id'])) {
-    showAccessDenied("You must log in to access this page.", "authentication.php");
-    exit();
+  showAccessDenied("You must log in to access this page.", "authentication.php");
+  exit();
 }
 
 $userId = $_SESSION['user_id'];
@@ -591,8 +662,8 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
-    showAccessDenied("User not found.", "authentication.php");
-    exit();
+  showAccessDenied("User not found.", "authentication.php");
+  exit();
 }
 
 $user = $result->fetch_assoc();
@@ -612,8 +683,8 @@ $_SESSION['email'] = $email;
 // STAFF ROLE VALIDATION
 // ---------------------------------------------
 if ($role !== 'staff') {
-    showAccessDenied("You are logged in, but you do not have permission to access this staff page.", "adminDashboard.php");
-    exit();
+  showAccessDenied("You are logged in, but you do not have permission to access this staff page.", "adminDashboard.php");
+  exit();
 }
 
 // ------------------ ACCESS DENIED FUNCTION ------------------
@@ -621,30 +692,33 @@ function showAccessDenied($message, $redirect)
 {
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
     <meta charset="UTF-8">
     <title>Access Restricted</title>
     <!-- Separate CSS for styling -->
     <link rel="stylesheet" href="access_denied.css">
-</head>
-<body>
+  </head>
+
+  <body>
     <div class="glass-card">
-        <img src="../../images/LogoNoBG.png" class="logo" alt="Logo">
-        <div class="lock-emoji">🔒</div>
-        <h1>Access Denied</h1>
-        <p><?= $message ?></p>
-        <p class="redirect-msg">
-            Redirecting in <span id="countdown" data-redirect="<?= $redirect ?>">10</span> seconds...
-        </p>
-        <a href="<?= $redirect ?>" class="btn-modern">Go Now</a>
+      <img src="../../images/LogoNoBG.png" class="logo" alt="Logo">
+      <div class="lock-emoji">🔒</div>
+      <h1>Access Denied</h1>
+      <p><?= $message ?></p>
+      <p class="redirect-msg">
+        Redirecting in <span id="countdown" data-redirect="<?= $redirect ?>">10</span> seconds...
+      </p>
+      <a href="<?= $redirect ?>" class="btn-modern">Go Now</a>
     </div>
 
     <!-- Separate JS for countdown -->
     <script src="countdown.js"></script>
-</body>
-</html>
+  </body>
+
+  </html>
 <?php
 }
 ?>
@@ -716,7 +790,7 @@ function showAccessDenied($message, $redirect)
         </ul>
       </div>
 
-      
+
 
 
 
@@ -852,9 +926,9 @@ function showAccessDenied($message, $redirect)
       <!-- ✅ TOP METRICS ROW -->
       <div class="row g-3 mt-2 mb-4">
         <!-- Solar Voltage -->
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-sm-6 col-md-4">
           <div class="card h-100 card-hover">
-            <div class="card-body d-flex justify-content-between align-items-center p-3">
+            <div class="card-body d-flex justify-content-between align-items-center p-3 flex-wrap">
               <div class="flex-grow-1 pe-2">
                 <h6 class="mb-2 small">Solar Voltage</h6>
                 <h4 class="mb-3 fw-bold">
@@ -878,9 +952,9 @@ function showAccessDenied($message, $redirect)
         </div>
 
         <!-- Solar Current -->
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-sm-6 col-md-4">
           <div class="card h-100 card-hover">
-            <div class="card-body d-flex justify-content-between align-items-center p-3">
+            <div class="card-body d-flex justify-content-between align-items-center p-3 flex-wrap">
               <div class="flex-grow-1 pe-2">
                 <h6 class="mb-2 small">Solar Current</h6>
                 <h4 class="mb-3 fw-bold">
@@ -908,9 +982,9 @@ function showAccessDenied($message, $redirect)
         </div>
 
         <!-- Solar Power -->
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-sm-6 col-md-4">
           <div class="card h-100 card-hover">
-            <div class="card-body d-flex justify-content-between align-items-center p-3">
+            <div class="card-body d-flex justify-content-between align-items-center p-3 flex-wrap">
               <div class="flex-grow-1 pe-2">
                 <h6 class="mb-2 small">Solar Power</h6>
                 <h4 class="mb-3 fw-bold">
@@ -938,9 +1012,9 @@ function showAccessDenied($message, $redirect)
         </div>
 
         <!-- Battery Voltage -->
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-sm-6 col-md-4">
           <div class="card h-100 card-hover">
-            <div class="card-body d-flex justify-content-between align-items-center p-3">
+            <div class="card-body d-flex justify-content-between align-items-center p-3 flex-wrap">
               <div class="flex-grow-1 pe-2">
                 <h6 class="mb-2 small">Battery Voltage</h6>
                 <h4 class="mb-3 fw-bold">
@@ -966,9 +1040,9 @@ function showAccessDenied($message, $redirect)
         </div>
 
         <!-- Battery Current -->
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-sm-6 col-md-4">
           <div class="card h-100 card-hover">
-            <div class="card-body d-flex justify-content-between align-items-center p-3">
+            <div class="card-body d-flex justify-content-between align-items-center p-3 flex-wrap">
               <div class="flex-grow-1 pe-2">
                 <h6 class="mb-2 small">Battery Current</h6>
                 <h4 class="mb-3 fw-bold">
@@ -996,9 +1070,9 @@ function showAccessDenied($message, $redirect)
         </div>
 
         <!-- Battery Power -->
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-sm-6 col-md-4">
           <div class="card h-100 card-hover">
-            <div class="card-body d-flex justify-content-between align-items-center p-3">
+            <div class="card-body d-flex justify-content-between align-items-center p-3 flex-wrap">
               <div class="flex-grow-1 pe-2">
                 <h6 class="mb-2 small">Battery Power</h6>
                 <h4 class="mb-3 fw-bold">
@@ -1030,148 +1104,79 @@ function showAccessDenied($message, $redirect)
       <!-- ✅ PERFORMANCE & STATUS ROW -->
       <div class="row g-3 align-items-stretch">
         <!-- LEFT COLUMN -->
-        <div class="col-12 mt-2 col-md-6 d-flex">
-          <div class="card card-hover w-100">
+        <div class="col-12 col-md-6 d-flex">
+          <div class="card card-hover flex-fill"> <!-- flex-fill added -->
             <div class="card-body d-flex flex-column h-100">
-              <!-- TOP SECTION -->
-              <div class="d-flex justify-content-between align-items-start mb-4">
-                <div class="flex-grow-1 pe-3">
+
+              <!-- TOP SECTION (unchanged) -->
+              <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start mb-4">
+                <!-- Text -->
+                <div class="flex-grow-1 pe-lg-3">
                   <h6 class="mb-3">Performance Monitoring</h6>
                   <h4 class="mb-4">Detailed analytics and real-time monitoring</h4>
                   <p class="mb-0 text-muted small">
-                    Get insights into daily, weekly, and monthly trends of your solar system performance.
+                    Get insights into power usage and solar yield for any selected period.
                   </p>
                 </div>
-                <div class="flex-shrink-0">
-                  <img src="../../images/Solar Panel.png" alt="Solar Panel"
-                    style="max-width:300px; height:auto; border-radius:0.5rem;">
+
+                <!-- Image -->
+                <div class="img-container mt-3 mt-lg-0">
+                  <img src="../../images/Solar Panel.png" class="img-fluid rounded" alt="Solar Panel">
                 </div>
               </div>
 
 
 
 
-              <?php
-              // Connect to database
-              $conn = new mysqli("localhost", "root", "", "smart_solar");
-              if ($conn->connect_error) die("Connection failed: " . $conn->connect_error);
 
-              // Function to calculate energy (Wh) for a given period with capped time difference
-              function calculate_energy($conn, $start, $end, $type = 'solar')
-              {
-                $column = ($type === 'battery') ? 'battery_power' : 'solar_power';
-                $sql = "SELECT $column, reading_time FROM sensor_reading 
-            WHERE reading_time BETWEEN '$start' AND '$end' 
-            ORDER BY reading_time ASC";
-                $res = $conn->query($sql);
-                $total = 0;
-                $prev = null;
+              <!-- DATE RANGE PICKER -->
+              <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                <input type="date" id="startDate" class="form-control form-control-sm w-auto" />
+                <input type="date" id="endDate" class="form-control form-control-sm w-auto" />
+                <button class="btn btn-primary btn-sm" id="loadAnalytics">
+                  Load Analytics
+                </button>
+                <small class="text-muted">
+                  Select a date range to view analytics
+                </small>
+              </div>
 
-                if ($res) {
-                  while ($row = $res->fetch_assoc()) {
-                    $cur = strtotime($row['reading_time']);
-                    if ($prev !== null) {
-                      // Calculate time difference in seconds, capped at 3600s (1 hour)
-                      $diff_sec = min($cur - $prev, 3600);
-                      $total += $row[$column] * ($diff_sec / 3600);
-                    }
-                    $prev = $cur;
-                  }
-                }
-                return $total;
-              }
+              <!-- GRAPH -->
+              <canvas id="powerAnalyticsChart" height="120"></canvas>
 
-              // Periods
-              $today = date('Y-m-d');
-              $start_week = date('Y-m-d', strtotime('monday this week'));
-              $start_month = date('Y-m-01');
+              <!-- BOTTOM METRICS -->
+              <div class="d-flex justify-content-between align-items-start mt-4 flex-wrap gap-3">
 
-              // Solar yield
-              $daily_wh = calculate_energy($conn, "$today 00:00:00", "$today 23:59:59", 'solar');
-              $weekly_wh = calculate_energy($conn, "$start_week 00:00:00", "$today 23:59:59", 'solar');
-              $monthly_wh = calculate_energy($conn, "$start_month 00:00:00", "$today 23:59:59", 'solar');
-
-              // Battery usage
-              $daily_batt = calculate_energy($conn, "$today 00:00:00", "$today 23:59:59", 'battery');
-              $weekly_batt = calculate_energy($conn, "$start_week 00:00:00", "$today 23:59:59", 'battery');
-              $monthly_batt = calculate_energy($conn, "$start_month 00:00:00", "$today 23:59:59", 'battery');
-
-              $conn->close();
-              ?>
-
-
-
-              <!-- BOTTOM SECTION -->
-              <div class="d-flex justify-content-between align-items-start mt-auto">
-
-                <!-- Power Usage (Battery) -->
+                <!-- Power Usage -->
                 <div class="flex-grow-1 pe-3">
                   <h6 class="mb-1 d-flex align-items-center">
-                    <i class="ti ti-bolt me-2 text-warning fs-4"></i>
-                    Power Usage
+                    <i class="ti ti-bolt me-2 text-warning fs-4"></i> Power Usage
                   </h6>
-                  <h3 class="mb-1 fw-bold" id="batteryValue"><?php echo number_format($daily_batt, 3); ?> Wh</h3>
-                  <small class="text-muted">
-                    1 Hour usage <span class="fw-bold" id="batteryHour"><?php echo number_format($daily_batt / 24, 3); ?> Wh</span>
-                  </small>
+                  <h3 class="fw-bold" id="batteryValue">0 Wh</h3>
                 </div>
 
-                <!-- Solar Yield Card -->
-                <div class="card position-relative"
-                  style="min-width:450px; border-radius:1rem; box-shadow:0 .25rem .5rem rgba(0,0,0,.1); background-color:#f8f9fa;">
-                  <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center">
-
-                      <!-- Capacity -->
-                      <div class="d-flex align-items-center me-2">
-                        <i class="ti ti-battery-charging me-3 text-primary fs-3"></i>
-                        <div>
-                          <small class="text-muted d-block">Capacity</small>
-                          <span class="fw-bold fs-5">84 Wh</span>
-                        </div>
-                      </div>
-
-                      <!-- Vertical separator -->
-                      <div style="width:3px; background-color:#000000; height:40px;"></div>
-
-                      <!-- Dropdown in the center -->
-                      <div class="px-3">
-                        <select id="yieldPeriod" class="form-select form-select-sm">
-                          <option value="daily" selected>Daily</option>
-                          <option value="weekly">Weekly</option>
-                          <option value="monthly">Monthly</option>
-                        </select>
-                      </div>
-
-                      <!-- Yield -->
-                      <div class="d-flex align-items-center ms-2">
-                        <i class="ti ti-sun me-3 text-warning fs-3"></i>
-                        <div>
-                          <small class="text-muted d-block">Yield</small>
-                          <span id="yieldValue" class="fw-bold fs-5"><?php echo number_format($daily_wh, 3); ?> Wh</span>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
+                <!-- Solar Yield -->
+                <div class="flex-grow-1">
+                  <h6 class="mb-1 d-flex align-items-center">
+                    <i class="ti ti-sun me-2 text-warning fs-4"></i> Solar Yield
+                  </h6>
+                  <h3 class="fw-bold" id="yieldValue">0 Wh</h3>
                 </div>
 
-
-
-              </div><!-- bottom section -->
-
+              </div>
 
             </div>
           </div>
         </div>
 
-        <!-- RIGHT COLUMN -->
-        <div class="col-12 col-md-6 mt-2 d-flex flex-column h-100">
-          <div class="d-flex flex-column h-100 w-100">
 
+
+        <!-- RIGHT COLUMN -->
+        <div class="col-12 col-md-6 d-flex">
+          <div class="d-flex flex-column flex-fill"> <!-- flex-fill added -->
             <!-- Battery Level -->
-            <div class="card card-hover mb-3 flex-fill">
-              <div class="card-body d-flex justify-content-between align-items-center h-100">
+            <div class="card card-hover flex-fill">
+              <div class="card-body d-flex justify-content-between align-items-center h-100 flex-wrap">
                 <div class="flex-grow-1 pe-3">
                   <h6 class="mb-3">Battery Level</h6>
                   <h4 class="mb-4">
@@ -1228,7 +1233,7 @@ function showAccessDenied($message, $redirect)
         <!-- 🌤️ WEATHER CARD -->
         <div class="col-12 mt-2 col-md-6">
           <div class="card card-hover h-100">
-            <div class="card-body d-flex justify-content-between align-items-center p-3">
+            <div class="card-body d-flex justify-content-between align-items-center p-3 flex-wrap">
               <!-- LEFT CONTENT -->
               <div class="flex-grow-1 pe-3">
                 <h6 class="mb-2">Weather</h6>
@@ -1291,6 +1296,7 @@ function showAccessDenied($message, $redirect)
 
 
   <!-- [ Main Content ] end -->
+
 
 
   <!-- [Page Specific JS] start -->
@@ -1947,40 +1953,59 @@ function showAccessDenied($message, $redirect)
     });
 
 
-    const dailyWh = <?php echo $daily_wh; ?>;
-    const weeklyWh = <?php echo $weekly_wh; ?>;
-    const monthlyWh = <?php echo $monthly_wh; ?>;
+    
+    // Initialize chart variable
+    let chart;
 
-    const dailyBatt = <?php echo $daily_batt; ?>;
-    const weeklyBatt = <?php echo $weekly_batt; ?>;
-    const monthlyBatt = <?php echo $monthly_batt; ?>;
+    // Set default date range to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('startDate').value = today;
+    document.getElementById('endDate').value = today;
 
-    document.getElementById('yieldPeriod').addEventListener('change', function() {
-      const val = this.value;
+    // Function to load analytics for selected range
+    function loadAnalytics() {
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
 
-      let wh = 0;
-      let batt = 0;
+      if (!start || !end) return alert('Please select both start and end dates');
 
-      if (val === 'daily') {
-        wh = dailyWh;
-        batt = dailyBatt;
-      }
-      if (val === 'weekly') {
-        wh = weeklyWh;
-        batt = weeklyBatt;
-      }
-      if (val === 'monthly') {
-        wh = monthlyWh;
-        batt = monthlyBatt;
-      }
+      fetch(`fetch_range_analytics.php?start=${start}&end=${end}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) return alert(data.error);
 
-      // Update Yield
-      document.getElementById('yieldValue').textContent = wh.toFixed(3) + ' Wh';
+          // Update bottom metrics
+          document.getElementById('batteryValue').textContent = data.battery.toFixed(3) + ' Wh';
+          document.getElementById('yieldValue').textContent = data.solar.toFixed(3) + ' Wh';
 
-      // Update Power Usage (Battery)
-      document.getElementById('batteryValue').textContent = batt.toFixed(3) + ' Wh';
-      document.getElementById('batteryHour').textContent = (batt / 24).toFixed(3) + ' Wh';
-    });
+          // Render chart
+          if (chart) chart.destroy();
+          chart = new Chart(document.getElementById('powerAnalyticsChart'), {
+            type: 'bar',
+            data: {
+              labels: ['Battery Usage (Wh)', 'Solar Yield (Wh)'],
+              datasets: [{
+                data: [data.battery, data.solar],
+                backgroundColor: ['#ffc107', '#0d6efd']
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  display: false
+                }
+              }
+            }
+          });
+        });
+    }
+
+    // Load default chart on page load
+    loadAnalytics();
+
+    // Event listener
+    document.getElementById('loadAnalytics').addEventListener('click', loadAnalytics);
   </script>
 
 

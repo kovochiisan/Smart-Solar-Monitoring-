@@ -19,7 +19,8 @@ $mqtt = new Bluerhinos\phpMQTT($server, $port, $client_id);
 // -----------------------------
 // Helper: format PH numbers
 // -----------------------------
-function formatPHNumber($number) {
+function formatPHNumber($number)
+{
     $digits = preg_replace('/\D/', '', $number);
     if ($digits === '') return '';
     if (substr($digits, 0, 1) === '0') return '+63' . substr($digits, 1);
@@ -34,6 +35,12 @@ function formatPHNumber($number) {
 $state = isset($_POST['state']) ? intval($_POST['state']) : 0;
 $user_name = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Unknown User';
 
+// Determine severity
+$severity = 'INFO'; // Default
+if ($state == 0) {
+    $severity = 'WARNING'; // Turning load OFF can be a cautionary action
+}
+
 $query = "UPDATE control_load SET state = $state WHERE load_name = 'MainLoad'";
 if (mysqli_query($conn, $query)) {
 
@@ -42,9 +49,9 @@ if (mysqli_query($conn, $query)) {
         ? "Main load has been turned ON by $user_name"
         : "Main load has been turned OFF by $user_name";
 
-    // Insert into notifications
-    $stmt = $conn->prepare("INSERT INTO notifications (message) VALUES (?)");
-    $stmt->bind_param("s", $message);
+    // Insert into notifications with severity
+    $stmt = $conn->prepare("INSERT INTO notifications (message, severity) VALUES (?, ?)");
+    $stmt->bind_param("ss", $message, $severity);
     $stmt->execute();
     $notification_id = $stmt->insert_id;
     $stmt->close();
@@ -79,15 +86,15 @@ if (mysqli_query($conn, $query)) {
         $mqtt_status = true;
     }
 
-    // ✅ Return JSON cleanly for SweetAlert
+    // Return JSON for frontend
     echo json_encode([
         'success' => true,
         'state' => $state,
         'message' => $message,
+        'severity' => $severity,
         'sms_sent' => $mqtt_status,
         'sms_count' => count($sms_messages)
     ]);
-
 } else {
     echo json_encode([
         'success' => false,
@@ -96,4 +103,3 @@ if (mysqli_query($conn, $query)) {
 }
 
 $conn->close();
-?>

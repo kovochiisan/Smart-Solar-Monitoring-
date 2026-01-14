@@ -586,6 +586,78 @@ session_start(); // must be first thing in your PHP
             pointer-events: none;
         }
 
+        /* Base dropdown positioning (desktop default) */
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+        }
+
+        /* 📱 Mobile behavior */
+        @media (max-width: 768px) {
+            .notification-dropdown {
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+                width: 92vw;
+                /* almost full width */
+                max-width: 400px;
+            }
+
+            /* Center the bell icon container if needed */
+            .pc-h-item.notification {
+                display: flex;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .notification-dropdown {
+                position: fixed;
+                top: 60px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 95vw;
+                max-height: 70vh;
+            }
+        }
+
+        /* 📱 Battery Status – mobile only */
+        @media (max-width: 768px) {
+
+            /* Stack the SVG + text */
+            .battery-status-stack {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+
+            /* Center SVG */
+            .battery {
+                width: 120px;
+                height: 120px;
+                margin: 0 auto;
+            }
+
+            /* Center text */
+            .battery-status-text {
+                text-align: center !important;
+            }
+
+            /* Make button full width */
+            #applyThresholdBtn {
+                width: 100%;
+            }
+        }
+
+
         /* Dark mode support */
         body.dark-mode .notification-dropdown {
             background-color: rgba(36, 36, 62, 0.96);
@@ -971,8 +1043,8 @@ function showAccessDenied($message, $redirect)
                                         Set the battery % threshold to automatically turn off the load if it drops below
                                         this level.
                                     </p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div style="flex-shrink: 0;">
+                                    <div class="d-flex justify-content-between align-items-center battery-status-stack">
+                                        <div class="text-end battery-status-text" style="flex-shrink: 0;">
                                             <svg class="battery" viewBox="0 0 100 100" width="140px" height="140px">
                                                 <g fill="none" transform="rotate(-75,50,50)">
                                                     <circle r="40" cx="50" cy="50" stroke="hsla(223,10%,50%,0.2)"
@@ -1196,9 +1268,6 @@ function showAccessDenied($message, $redirect)
                 });
         });
 
-        // -------------------------------
-        // Apply Battery Threshold Event
-        // -------------------------------
         applyThresholdBtn.addEventListener('click', () => {
             const thresholdValue = batteryThresholdSlider.value;
 
@@ -1212,7 +1281,6 @@ function showAccessDenied($message, $redirect)
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-
                     // MQTT publish if needed
                     client.publish('system/battery/threshold', thresholdValue.toString(), {
                         qos: 1,
@@ -1220,7 +1288,7 @@ function showAccessDenied($message, $redirect)
                     });
                     console.log('Battery threshold sent:', thresholdValue);
 
-                    // Update DB and live UI
+                    // Update DB and get warnings from PHP
                     fetch('update_threshold.php', {
                             method: 'POST',
                             headers: {
@@ -1232,17 +1300,20 @@ function showAccessDenied($message, $redirect)
                         .then(data => {
                             if (data.success) {
                                 const newValue = data.value;
-
-                                // ✅ Update current threshold display ONLY after successful DB update
                                 batteryThresholdDisplay.innerText = newValue + '%';
                                 autoShutdownDisplay.innerText = newValue + '%';
 
+                                // Combine main message and warnings
+                                let swalText = `Battery threshold set to ${newValue}%`;
+                                if (data.warnings && data.warnings.length > 0) {
+                                    swalText += '\n\n' + data.warnings.join('\n');
+                                }
+
                                 Swal.fire({
                                     title: 'Applied!',
-                                    text: `Battery threshold set to ${newValue}%`,
-                                    icon: 'success',
-                                    timer: 1500,
-                                    showConfirmButton: false
+                                    text: swalText,
+                                    icon: data.warnings.length > 0 ? 'warning' : 'success',
+                                    showConfirmButton: true
                                 });
                             } else {
                                 console.error('DB error:', data.error);
@@ -1256,6 +1327,7 @@ function showAccessDenied($message, $redirect)
                 }
             });
         });
+
 
         // -------------------------------
         // Initial Load from DB

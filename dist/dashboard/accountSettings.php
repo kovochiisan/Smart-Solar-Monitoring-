@@ -611,6 +611,49 @@ require_once "config.php";
             pointer-events: none;
         }
 
+         /* Base dropdown positioning (desktop default) */
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      width: 320px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      z-index: 999;
+    }
+
+    /* 📱 Mobile behavior */
+    @media (max-width: 768px) {
+      .notification-dropdown {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: 92vw;
+        /* almost full width */
+        max-width: 400px;
+      }
+
+      /* Center the bell icon container if needed */
+      .pc-h-item.notification {
+        display: flex;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .notification-dropdown {
+        position: fixed;
+        top: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 95vw;
+        max-height: 70vh;
+      }
+    }
+
         /* Dark mode support */
         body.dark-mode .notification-dropdown {
             background-color: rgba(36, 36, 62, 0.96);

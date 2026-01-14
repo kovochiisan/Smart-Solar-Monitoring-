@@ -507,6 +507,81 @@ session_start(); // must be first thing in your PHP
       pointer-events: none;
     }
 
+    /* Base dropdown positioning (desktop default) */
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      width: 320px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      z-index: 999;
+    }
+
+    /* 📱 Mobile behavior */
+    @media (max-width: 768px) {
+      .notification-dropdown {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: 92vw;
+        /* almost full width */
+        max-width: 400px;
+      }
+
+      /* Center the bell icon container if needed */
+      .pc-h-item.notification {
+        display: flex;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .notification-dropdown {
+        position: fixed;
+        top: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 95vw;
+        max-height: 70vh;
+      }
+    }
+
+    /* 📱 Mobile-only table handling */
+    @media (max-width: 768px) {
+      .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .table {
+        min-width: 720px;
+        /* ensures columns don’t squash */
+      }
+
+      .table th,
+      .table td {
+        white-space: nowrap;
+        font-size: 0.75rem;
+        padding: 6px 8px;
+      }
+
+      /* Buttons + select scaling */
+      .table .btn {
+        font-size: 0.7rem;
+        padding: 4px 6px;
+      }
+
+      .table select.form-select {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+      }
+    }
+
+
 
     /* Dark mode support */
     body.dark-mode .notification-dropdown {
@@ -1014,74 +1089,74 @@ function showAccessDenied($message, $redirect)
   $totalStaff = $totalStaffResult->fetch_assoc()['total_staff'];
   ?>
 
-
   <!-- [ Main Content ] start -->
   <div class="pc-container">
-    <div class="pc-content" style="padding: 22px 35px 32px;">
+    <div class="pc-content py-4 px-3 px-lg-5">
 
       <!-- Manage Accounts Card -->
       <div class="card shadow-lg card-hover mb-4">
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-lg-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-bold mb-0">Manage Accounts</h4>
           </div>
-          <table class="table table-bordered table-hover align-middle mb-0">
-            <thead>
-              <tr>
-                <th class="text-center">ID</th>
-                <th class="text-center">Full Name</th>
-                <th class="text-center">Email</th>
-                <th class="text-center">Role</th>
-                <th class="text-center">Contact Number</th>
-                <th class="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              $sql = "SELECT * FROM users";
-              $result = $conn->query($sql);
-              if ($result->num_rows > 0):
-                while ($row = $result->fetch_assoc()):
-                  $role = $row['role'];
-              ?>
-                  <tr>
-                    <td class="text-center"><?= htmlspecialchars($row['id']) ?></td>
-                    <td class="text-center"><?= htmlspecialchars($row['full_name']) ?></td>
-                    <td class="text-center"><?= htmlspecialchars($row['email']) ?></td>
-                    <td class="text-center">
-                      <select class="form-select role-select" data-id="<?= $row['id'] ?>">
-                        <option value="staff" <?= $role === 'staff' ? 'selected' : '' ?>>Staff</option>
-                        <option value="admin" <?= $role === 'admin' ? 'selected' : '' ?>>Admin</option>
-                      </select>
-                    </td>
-                    <td class="text-center"><?= htmlspecialchars($row['contact_number']) ?></td>
-                    <td class="text-center">
-                      <button class="btn btn-danger btn-sm delete-account" data-id="<?= $row['id'] ?>">
-                        <i class="ti ti-trash"></i> Delete
-                      </button>
-                    </td>
-                  </tr>
-                <?php
-                endwhile;
-              else:
-                ?>
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle mb-0">
+              <thead class="table-light">
                 <tr>
-                  <td colspan="6" class="text-center">No accounts found.</td>
+                  <th class="text-center">ID</th>
+                  <th class="text-center">Full Name</th>
+                  <th class="text-center">Email</th>
+                  <th class="text-center">Role</th>
+                  <th class="text-center">Contact Number</th>
+                  <th class="text-center">Actions</th>
                 </tr>
-              <?php endif; ?>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                <?php
+                $sql = "SELECT * FROM users";
+                $result = $conn->query($sql);
+                if ($result->num_rows > 0):
+                  while ($row = $result->fetch_assoc()):
+                    $role = $row['role'];
+                ?>
+                    <tr>
+                      <td class="text-center"><?= htmlspecialchars($row['id']) ?></td>
+                      <td class="text-center"><?= htmlspecialchars($row['full_name']) ?></td>
+                      <td class="text-center"><?= htmlspecialchars($row['email']) ?></td>
+                      <td class="text-center">
+                        <select class="form-select form-select-sm role-select" data-id="<?= $row['id'] ?>">
+                          <option value="staff" <?= $role === 'staff' ? 'selected' : '' ?>>Staff</option>
+                          <option value="admin" <?= $role === 'admin' ? 'selected' : '' ?>>Admin</option>
+                        </select>
+                      </td>
+                      <td class="text-center"><?= htmlspecialchars($row['contact_number']) ?></td>
+                      <td class="text-center">
+                        <button class="btn btn-danger btn-sm delete-account" data-id="<?= $row['id'] ?>">
+                          <i class="ti ti-trash"></i> Delete
+                        </button>
+                      </td>
+                    </tr>
+                  <?php
+                  endwhile;
+                else:
+                  ?>
+                  <tr>
+                    <td colspan="6" class="text-center">No accounts found.</td>
+                  </tr>
+                <?php endif; ?>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       <!-- Three Horizontal Cards -->
-      <div class="row g-4 mt-4">
+      <div class="row g-3 mt-4">
         <!-- Card 1: Total Users -->
-        <div class="col-lg-4">
+        <div class="col-12 col-md-4">
           <div class="card shadow-lg card-hover h-100 text-white" style="background-color: #0d6efd;">
-            <div class="card-body p-4 text-center">
-              <!-- Big Emoji -->
-              <div style="font-size: 3rem;">👥</div>
+            <div class="card-body p-3 p-md-4 text-center">
+              <div class="display-4">👥</div>
               <h5 class="fw-bold mt-2 mb-1">Total Users</h5>
               <p id="total-users" class="fs-2 mb-0"><?= $totalUsers ?></p>
             </div>
@@ -1089,11 +1164,10 @@ function showAccessDenied($message, $redirect)
         </div>
 
         <!-- Card 2: Admins -->
-        <div class="col-lg-4">
+        <div class="col-12 col-md-4">
           <div class="card shadow-lg card-hover h-100 text-white" style="background-color: #198754;">
-            <div class="card-body p-4 text-center">
-              <!-- Big Emoji -->
-              <div style="font-size: 3rem;">🛡️</div>
+            <div class="card-body p-3 p-md-4 text-center">
+              <div class="display-4">🛡️</div>
               <h5 class="fw-bold mt-2 mb-1">Admins</h5>
               <p id="total-admins" class="fs-2 mb-0"><?= $totalAdmins ?></p>
             </div>
@@ -1101,11 +1175,10 @@ function showAccessDenied($message, $redirect)
         </div>
 
         <!-- Card 3: Staff -->
-        <div class="col-lg-4">
+        <div class="col-12 col-md-4">
           <div class="card shadow-lg card-hover h-100 text-dark" style="background-color: #ffc107;">
-            <div class="card-body p-4 text-center">
-              <!-- Big Emoji -->
-              <div style="font-size: 3rem;">👨‍💼</div>
+            <div class="card-body p-3 p-md-4 text-center">
+              <div class="display-4">👨‍💼</div>
               <h5 class="fw-bold mt-2 mb-1">Staff</h5>
               <p id="total-staff" class="fs-2 mb-0"><?= $totalStaff ?></p>
             </div>
@@ -1113,10 +1186,9 @@ function showAccessDenied($message, $redirect)
         </div>
       </div>
 
-
-
     </div>
   </div>
+
 
 
 

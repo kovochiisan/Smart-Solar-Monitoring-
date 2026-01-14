@@ -586,6 +586,49 @@ session_start(); // must be first thing in your PHP
             pointer-events: none;
         }
 
+        /* Base dropdown positioning (desktop default) */
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+        }
+
+        /* 📱 Mobile behavior */
+        @media (max-width: 768px) {
+            .notification-dropdown {
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+                width: 92vw;
+                /* almost full width */
+                max-width: 400px;
+            }
+
+            /* Center the bell icon container if needed */
+            .pc-h-item.notification {
+                display: flex;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .notification-dropdown {
+                position: fixed;
+                top: 60px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 95vw;
+                max-height: 70vh;
+            }
+        }
+
         .btn-fixed-height {
             height: 45px;
             /* adjust the height as needed */
@@ -769,6 +812,104 @@ session_start(); // must be first thing in your PHP
         body.dark-mode .table th {
             color: white !important;
             border-color: #2f2f4a !important;
+        }
+
+        /* Header Filter + Action Buttons Alignment */
+        #filterForm {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            /* allow wrapping on small screens */
+        }
+
+        #filterForm .flex-column {
+            min-width: 180px;
+            /* prevent inputs from shrinking too much */
+        }
+
+        /* Date and Time Fields */
+        #filterForm input,
+        #filterForm select {
+            height: 36px;
+            /* consistent height */
+            padding: 0 6px;
+            /* reduce default padding */
+            line-height: 1.2;
+            /* adjust text vertical alignment */
+            box-sizing: border-box;
+            /* include padding in height */
+            font-size: 0.875rem;
+            /* match bootstrap-sm inputs */
+            border-radius: 0.25rem;
+        }
+
+        /* Specific widths */
+        #filterForm input[type="date"] {
+            width: 120px;
+        }
+
+        #filterForm select {
+            width: 120px;
+            /* enough for AM/PM + arrow */
+        }
+
+        /* Filter Button */
+        #filterForm button {
+            height: 36px;
+            margin-bottom: 0;
+        }
+
+        /* Action Buttons container */
+        .d-flex>form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .d-flex>form button {
+            height: 36px;
+        }
+
+        /* Optional: make the "Generate Logs" & "Delete" buttons slightly wider but consistent */
+        #deleteBtn,
+        form[action="generate_report.php"] button {
+            min-width: 110px;
+        }
+
+        /* 📱 Mobile only */
+        @media (max-width: 768px) {
+            .info-row {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                /* center cards */
+                gap: 12px;
+            }
+
+            .info-card {
+                width: 100%;
+                max-width: 360px;
+                /* centered card width */
+            }
+        }
+
+        /* 📱 Very small phones */
+        @media (max-width: 480px) {
+            .info-card {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+
+            .table th,
+            .table td {
+                padding: 6px 8px;
+                font-size: 0.75rem;
+                white-space: nowrap;
+            }
         }
     </style>
 
@@ -1156,19 +1297,19 @@ ORDER BY reading_time ASC
                 <div class="card-body p-4">
 
                     <!-- Header + Date Filter -->
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
                         <h4 class="fw-bold mb-0">Data Logs</h4>
 
-                        <div class="d-flex gap-2 align-items-end">
+                        <div class="d-flex gap-2 align-items-end flex-wrap">
 
                             <!-- Filter Form (POST) -->
-                            <form method="POST" class="d-flex gap-2 align-items-end" id="filterForm">
+                            <form method="POST" class="d-flex gap-2 align-items-end flex-wrap" id="filterForm">
                                 <!-- From Date + Time -->
-                                <div class="d-flex flex-column">
+                                <div class="d-flex flex-column" style="min-width: 180px;">
                                     <label for="start_date" class="form-label mb-1">From</label>
                                     <div class="d-flex gap-1">
-                                        <input type="date" id="start_date" name="start_date" value="<?= $start_date ?>" class="form-control">
-                                        <select name="start_time" class="form-select">
+                                        <input type="date" id="start_date" name="start_date" value="<?= $start_date ?>" class="form-control" style="height:36px;">
+                                        <select name="start_time" class="form-select" style="height:36px;">
                                             <?php
                                             for ($h = 0; $h < 24; $h++) {
                                                 for ($m = 0; $m < 60; $m += 30) {
@@ -1184,11 +1325,11 @@ ORDER BY reading_time ASC
                                 </div>
 
                                 <!-- To Date + Time -->
-                                <div class="d-flex flex-column">
+                                <div class="d-flex flex-column" style="min-width: 180px;">
                                     <label for="end_date" class="form-label mb-1">To</label>
                                     <div class="d-flex gap-1">
-                                        <input type="date" id="end_date" name="end_date" value="<?= $end_date ?>" class="form-control">
-                                        <select name="end_time" class="form-select">
+                                        <input type="date" id="end_date" name="end_date" value="<?= $end_date ?>" class="form-control" style="height:36px;">
+                                        <select name="end_time" class="form-select" style="height:36px;">
                                             <?php
                                             for ($h = 0; $h < 24; $h++) {
                                                 for ($m = 0; $m < 60; $m += 30) {
@@ -1206,45 +1347,33 @@ ORDER BY reading_time ASC
                                 <button type="submit" name="filter" class="btn btn-primary btn-fixed-height">Filter</button>
                             </form>
 
-
                             <!-- Action Buttons -->
-                            <div class="d-flex gap-2 align-items-end">
-
+                            <div class="d-flex gap-2 align-items-end flex-wrap">
                                 <!-- Generate Report -->
                                 <form method="GET" action="generate_report.php" target="_blank">
                                     <input type="hidden" name="start_date" value="<?= isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d') ?>">
                                     <input type="hidden" name="end_date" value="<?= isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d') ?>">
                                     <input type="hidden" name="start_time" value="<?= isset($_POST['start_time']) ? $_POST['start_time'] : '00:00:00' ?>">
                                     <input type="hidden" name="end_time" value="<?= isset($_POST['end_time']) ? $_POST['end_time'] : '23:30:00' ?>">
-                                    <button type="submit" class="btn btn-success btn-fixed-height">Generate Logs</button>
+                                    <button type="submit" class="btn btn-success btn-fixed-height" style="min-width:110px;">Generate Logs</button>
                                 </form>
 
-                                <!-- Single Delete Button Form -->
+                                <!-- Delete Button -->
                                 <form method="POST" action="delete_readings.php" id="deleteForm">
-                                    <!-- Selected readings filled by JS -->
                                     <input type="hidden" name="selected_readings" id="selected_readings_input">
-
-                                    <!-- Track if filter was applied -->
                                     <input type="hidden" name="filter_applied" id="delete_filter_applied" value="<?= isset($_POST['filter']) ? '1' : '0' ?>">
-
-                                    <!-- Hidden inputs to preserve filtered date/time only if filter was applied -->
                                     <?php if (isset($_POST['filter'])): ?>
-                                        <!-- Delete form hidden inputs -->
                                         <input type="hidden" name="start_date" id="delete_start_date" value="<?= isset($_POST['filter']) ? $_POST['start_date'] : '' ?>">
                                         <input type="hidden" name="end_date" id="delete_end_date" value="<?= isset($_POST['filter']) ? $_POST['end_date'] : '' ?>">
                                         <input type="hidden" name="start_time" id="delete_start_time" value="<?= isset($_POST['filter']) ? $_POST['start_time'] : '' ?>">
                                         <input type="hidden" name="end_time" id="delete_end_time" value="<?= isset($_POST['filter']) ? $_POST['end_time'] : '' ?>">
                                     <?php endif; ?>
-
-                                    <button type="submit" id="deleteBtn" class="btn btn-danger btn-fixed-height">Delete</button>
+                                    <button type="submit" id="deleteBtn" class="btn btn-danger btn-fixed-height" style="min-width:110px;">Delete</button>
                                 </form>
-
-
-
-
                             </div>
                         </div>
                     </div>
+
 
 
                     <!-- Summary Info Boxes Row -->

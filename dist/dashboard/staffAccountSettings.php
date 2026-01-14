@@ -611,6 +611,49 @@ require_once "config.php";
             pointer-events: none;
         }
 
+        /* Base dropdown positioning (desktop default) */
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+        }
+
+        /* 📱 Mobile behavior */
+        @media (max-width: 768px) {
+            .notification-dropdown {
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+                width: 92vw;
+                /* almost full width */
+                max-width: 400px;
+            }
+
+            /* Center the bell icon container if needed */
+            .pc-h-item.notification {
+                display: flex;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .notification-dropdown {
+                position: fixed;
+                top: 60px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 95vw;
+                max-height: 70vh;
+            }
+        }
+
         /* Dark mode support */
         body.dark-mode .notification-dropdown {
             background-color: rgba(36, 36, 62, 0.96);
@@ -711,30 +754,33 @@ function showAccessDenied($message, $redirect)
 {
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Access Restricted</title>
-    <!-- Separate CSS for styling -->
-    <link rel="stylesheet" href="access_denied.css">
-</head>
-<body>
-    <div class="glass-card">
-        <img src="../../images/LogoNoBG.png" class="logo" alt="Logo">
-        <div class="lock-emoji">🔒</div>
-        <h1>Access Denied</h1>
-        <p><?= $message ?></p>
-        <p class="redirect-msg">
-            Redirecting in <span id="countdown" data-redirect="<?= $redirect ?>">10</span> seconds...
-        </p>
-        <a href="<?= $redirect ?>" class="btn-modern">Go Now</a>
-    </div>
+    <!DOCTYPE html>
+    <html lang="en">
 
-    <!-- Separate JS for countdown -->
-    <script src="countdown.js"></script>
-</body>
-</html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Access Restricted</title>
+        <!-- Separate CSS for styling -->
+        <link rel="stylesheet" href="access_denied.css">
+    </head>
+
+    <body>
+        <div class="glass-card">
+            <img src="../../images/LogoNoBG.png" class="logo" alt="Logo">
+            <div class="lock-emoji">🔒</div>
+            <h1>Access Denied</h1>
+            <p><?= $message ?></p>
+            <p class="redirect-msg">
+                Redirecting in <span id="countdown" data-redirect="<?= $redirect ?>">10</span> seconds...
+            </p>
+            <a href="<?= $redirect ?>" class="btn-modern">Go Now</a>
+        </div>
+
+        <!-- Separate JS for countdown -->
+        <script src="countdown.js"></script>
+    </body>
+
+    </html>
 <?php
 }
 ?>
@@ -1030,7 +1076,7 @@ function showAccessDenied($message, $redirect)
                                             placeholder="N/A">
                                     </div>
 
-                                       <div class="col-md-6">
+                                    <div class="col-md-6">
                                         <label for="phone" class="form-label fw-semibold">Contact Number</label>
                                         <input type="tel" class="form-control" id="phone" name="phone"
                                             pattern="^(09\d{9}|\+639\d{9})$"
