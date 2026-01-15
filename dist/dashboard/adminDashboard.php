@@ -1973,58 +1973,85 @@ function showAccessDenied($message, $redirect)
 
 
 
-    // Initialize chart variable
     let chart;
 
-    // Set default date range to today
+    // Set default date range = today
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('startDate').value = today;
-    document.getElementById('endDate').value = today;
+    const startInput = document.getElementById('startDate');
+    const endInput = document.getElementById('endDate');
 
-    // Function to load analytics for selected range
+    startInput.value = today;
+    endInput.value = today;
+
+    // Auto load ONLY on page load (today’s analytics)
+    document.addEventListener('DOMContentLoaded', loadAnalytics);
+
+    // ✅ BUTTON CLICK FIX
+    document.getElementById('loadAnalytics')
+      .addEventListener('click', loadAnalytics);
+
     function loadAnalytics() {
-      const start = document.getElementById('startDate').value;
-      const end = document.getElementById('endDate').value;
+      const start = startInput.value;
+      const end = endInput.value;
 
-      if (!start || !end) return alert('Please select both start and end dates');
+      if (!start || !end) return;
 
       fetch(`fetch_range_analytics.php?start=${start}&end=${end}`)
         .then(res => res.json())
         .then(data => {
           if (data.error) return alert(data.error);
 
-          // Update bottom metrics
-          document.getElementById('batteryValue').textContent = data.battery.toFixed(3) + ' Wh';
-          document.getElementById('yieldValue').textContent = data.solar.toFixed(3) + ' Wh';
+          document.getElementById('batteryValue').textContent =
+            data.totalBattery.toFixed(3) + ' Wh';
 
-          // Render chart
+          document.getElementById('yieldValue').textContent =
+            data.totalSolar.toFixed(3) + ' Wh';
+
           if (chart) chart.destroy();
+
           chart = new Chart(document.getElementById('powerAnalyticsChart'), {
-            type: 'bar',
+            type: 'line',
             data: {
-              labels: ['Battery Usage (Wh)', 'Solar Yield (Wh)'],
+              labels: data.labels,
               datasets: [{
-                data: [data.battery, data.solar],
-                backgroundColor: ['#ffc107', '#0d6efd']
-              }]
+                  label: 'Battery Usage (W)',
+                  data: data.batterySeries,
+                  borderWidth: 2,
+                  tension: 0.3
+                },
+                {
+                  label: 'Solar Yield (W)',
+                  data: data.solarSeries,
+                  borderWidth: 2,
+                  tension: 0.3
+                }
+              ]
             },
             options: {
               responsive: true,
               plugins: {
                 legend: {
-                  display: false
+                  display: true
+                }
+              },
+              scales: {
+                x: {
+                  title: {
+                    display: true,
+                    text: 'Time'
+                  }
+                },
+                y: {
+                  title: {
+                    display: true,
+                    text: 'Power (W)'
+                  }
                 }
               }
             }
           });
         });
     }
-
-    // Load default chart on page load
-    loadAnalytics();
-
-    // Event listener
-    document.getElementById('loadAnalytics').addEventListener('click', loadAnalytics);
   </script>
 
 
