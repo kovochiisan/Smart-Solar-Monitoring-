@@ -27,32 +27,34 @@ $labels = [];
 $solarSeries = [];
 $batterySeries = [];
 
-$totalSolar = 0;
-$totalBattery = 0;
-
-$prevTime = null;
+$sumSolar = 0;
+$sumBattery = 0;
+$count = 0;
 
 while ($row = $res->fetch_assoc()) {
     $labels[] = date("M d H:i", strtotime($row['reading_time']));
-    $solarSeries[] = (float)$row['solar_power'];
-    $batterySeries[] = (float)$row['battery_power'];
+    
+    $solar = (float)$row['solar_power'];
+    $battery = (float)$row['battery_power'];
 
-    // Energy calculation (Wh)
-    $curTime = strtotime($row['reading_time']);
-    if ($prevTime !== null) {
-        $diffSec = min($curTime - $prevTime, 3600);
-        $totalSolar   += $row['solar_power'] * ($diffSec / 3600);
-        $totalBattery += $row['battery_power'] * ($diffSec / 3600);
-    }
-    $prevTime = $curTime;
+    $solarSeries[] = $solar;
+    $batterySeries[] = $battery;
+
+    $sumSolar += $solar;
+    $sumBattery += $battery;
+    $count++;
 }
+
+$avgSolar = $count > 0 ? $sumSolar / $count : 0;
+$avgBattery = $count > 0 ? $sumBattery / $count : 0;
 
 echo json_encode([
     'labels'        => $labels,
     'solarSeries'   => $solarSeries,
     'batterySeries' => $batterySeries,
-    'totalSolar'    => round($totalSolar, 3),
-    'totalBattery'  => round($totalBattery, 3)
+    'avgSolar'      => round($avgSolar, 2),
+    'avgBattery'    => round($avgBattery, 2)
 ]);
+
 
 $conn->close();

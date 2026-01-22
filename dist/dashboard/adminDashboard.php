@@ -2002,10 +2002,11 @@ function showAccessDenied($message, $redirect)
           if (data.error) return alert(data.error);
 
           document.getElementById('batteryValue').textContent =
-            data.totalBattery.toFixed(3) + ' Wh';
+            data.avgBattery.toFixed(2) + ' W';
 
           document.getElementById('yieldValue').textContent =
-            data.totalSolar.toFixed(3) + ' Wh';
+            data.avgSolar.toFixed(2) + ' W';
+
 
           if (chart) chart.destroy();
 
